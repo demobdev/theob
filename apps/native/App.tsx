@@ -1,44 +1,63 @@
-import { View, StatusBar, Platform } from "react-native";
-import { useFonts } from "expo-font";
-import { LogBox } from "react-native";
-import Navigation from "./src/navigation/Navigation";
+import React from "react";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useAuth } from "@clerk/clerk-expo";
+
+// Import Screens
+import LandingScreen from "./src/screens/LandingScreen";
+import LoginScreen from "./src/screens/LoginScreen";
+import HomeScreen from "./src/screens/HomeScreen";
+import MenuScreen from "./src/screens/MenuScreen";
+import ProductDetailScreen from "./src/screens/ProductDetailScreen";
+import CartScreen from "./src/screens/CartScreen";
+import LiveGamesScreen from "./src/screens/LiveGamesScreen";
+import RewardsScreen from "./src/screens/RewardsScreen";
+import MoreScreen from "./src/screens/MoreScreen";
+
+// Providers
 import ConvexClientProvider from "./ConvexClientProvider";
+import { CartProvider } from "./src/context/CartContext";
+import { OrderProvider } from "./src/context/OrderContext";
 
-export default function App() {
-  LogBox.ignoreLogs(["Warning: ..."]);
-  LogBox.ignoreAllLogs();
+const Stack = createNativeStackNavigator();
 
-  const [loaded] = useFonts({
-    Bold: require("./src/assets/fonts/Inter-Bold.ttf"),
-    SemiBold: require("./src/assets/fonts/Inter-SemiBold.ttf"),
-    Medium: require("./src/assets/fonts/Inter-Medium.ttf"),
-    Regular: require("./src/assets/fonts/Inter-Regular.ttf"),
+function AppNavigation() {
+  const { isLoaded } = useAuth();
 
-    MBold: require("./src/assets/fonts/Montserrat-Bold.ttf"),
-    MSemiBold: require("./src/assets/fonts/Montserrat-SemiBold.ttf"),
-    MMedium: require("./src/assets/fonts/Montserrat-Medium.ttf"),
-    MRegular: require("./src/assets/fonts/Montserrat-Regular.ttf"),
-    MLight: require("./src/assets/fonts/Montserrat-Light.ttf"),
-  });
-  if (!loaded) {
-    return false;
+  if (!isLoaded) {
+    return null;
   }
 
-  const STATUS_BAR_HEIGHT =
-    Platform.OS === "ios" ? 50 : StatusBar.currentHeight;
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="LandingScreen">
+      <Stack.Screen name="LandingScreen" component={LandingScreen} />
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="LiveGamesScreen" component={LiveGamesScreen} />
+      <Stack.Screen name="MenuScreen" component={MenuScreen} />
+      <Stack.Screen name="ProductDetailScreen" component={ProductDetailScreen} />
+      <Stack.Screen name="CartScreen" component={CartScreen} />
+      <Stack.Screen name="RewardsScreen" component={RewardsScreen} />
+      <Stack.Screen name="MoreScreen" component={MoreScreen} />
+      <Stack.Screen name="LoginScreen" component={LoginScreen} />
+    </Stack.Navigator>
+  );
+}
 
+export default function App() {
   return (
     <ConvexClientProvider>
-      <View style={{ flex: 1 }}>
-        <View style={{ height: STATUS_BAR_HEIGHT, backgroundColor: "#0D87E1" }}>
-          <StatusBar
-            translucent
-            backgroundColor={"#0D87E1"}
-            barStyle="light-content"
-          />
-        </View>
-        <Navigation />
-      </View>
+      <CartProvider>
+        <OrderProvider>
+          <SafeAreaProvider>
+            <NavigationContainer>
+              <AppNavigation />
+              <StatusBar style="auto" />
+            </NavigationContainer>
+          </SafeAreaProvider>
+        </OrderProvider>
+      </CartProvider>
     </ConvexClientProvider>
   );
 }

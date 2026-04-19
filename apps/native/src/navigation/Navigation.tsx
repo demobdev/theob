@@ -1,30 +1,40 @@
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useAuth } from "@clerk/clerk-expo";
+import LandingScreen from "../screens/LandingScreen";
 import LoginScreen from "../screens/LoginScreen";
-import NotesDashboardScreen from "../screens/NotesDashboardScreen";
-import InsideNoteScreen from "../screens/InsideNoteScreen";
-import CreateNoteScreen from "../screens/CreateNoteScreen";
+import HomeScreen from "../screens/HomeScreen";
+import MenuScreen from "../screens/MenuScreen";
+import ProductDetailScreen from "../screens/ProductDetailScreen";
+import CartScreen from "../screens/CartScreen";
+import LiveGamesScreen from "../screens/LiveGamesScreen";
+import RewardsScreen from "../screens/RewardsScreen";
+import MoreScreen from "../screens/MoreScreen";
 
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
+  const { isLoaded } = useAuth();
+
+  // Wait for Clerk to load the session state
+  if (!isLoaded) {
+    return null;
+  }
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        id={undefined}
-        initialRouteName="LoginScreen"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="LoginScreen" component={LoginScreen} />
-        <Stack.Screen
-          name="NotesDashboardScreen"
-          component={NotesDashboardScreen}
-        />
-        <Stack.Screen name="InsideNoteScreen" component={InsideNoteScreen} />
-        <Stack.Screen name="CreateNoteScreen" component={CreateNoteScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="LandingScreen">
+      <Stack.Screen name="LandingScreen" component={LandingScreen} />
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="LiveGamesScreen" component={LiveGamesScreen} />
+      <Stack.Screen name="MenuScreen" component={MenuScreen} />
+      <Stack.Screen name="ProductDetailScreen" component={ProductDetailScreen} />
+      <Stack.Screen name="CartScreen" component={CartScreen} />
+      <Stack.Screen name="RewardsScreen" component={RewardsScreen} />
+      <Stack.Screen name="MoreScreen" component={MoreScreen} />
+      
+      {/* Auth Module */}
+      <Stack.Screen name="LoginScreen" component={LoginScreen} />
+    </Stack.Navigator>
   );
 };
 

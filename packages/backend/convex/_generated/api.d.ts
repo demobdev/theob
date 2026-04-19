@@ -8,8 +8,24 @@
  * @module
  */
 
+import type * as crons from "../crons.js";
+import type * as loyalty from "../loyalty.js";
 import type * as notes from "../notes.js";
 import type * as openai from "../openai.js";
+import type * as orders from "../orders.js";
+import type * as products from "../products.js";
+import type * as seed from "../seed.js";
+import type * as seedMenu from "../seedMenu.js";
+import type * as seedRewards from "../seedRewards.js";
+import type * as sports_leagues from "../sports/leagues.js";
+import type * as sports_sportradar_client from "../sports/sportradar/client.js";
+import type * as sports_sportradar_images from "../sports/sportradar/images.js";
+import type * as sports_sportradar_normalize from "../sports/sportradar/normalize.js";
+import type * as sports_sportradar_sync from "../sports/sportradar/sync.js";
+import type * as sports_types from "../sports/types.js";
+import type * as sports_actions from "../sports_actions.js";
+import type * as sports_mutations from "../sports_mutations.js";
+import type * as sports_queries from "../sports_queries.js";
 import type * as utils from "../utils.js";
 
 import type {
@@ -19,8 +35,24 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  crons: typeof crons;
+  loyalty: typeof loyalty;
   notes: typeof notes;
   openai: typeof openai;
+  orders: typeof orders;
+  products: typeof products;
+  seed: typeof seed;
+  seedMenu: typeof seedMenu;
+  seedRewards: typeof seedRewards;
+  "sports/leagues": typeof sports_leagues;
+  "sports/sportradar/client": typeof sports_sportradar_client;
+  "sports/sportradar/images": typeof sports_sportradar_images;
+  "sports/sportradar/normalize": typeof sports_sportradar_normalize;
+  "sports/sportradar/sync": typeof sports_sportradar_sync;
+  "sports/types": typeof sports_types;
+  sports_actions: typeof sports_actions;
+  sports_mutations: typeof sports_mutations;
+  sports_queries: typeof sports_queries;
   utils: typeof utils;
 }>;
 

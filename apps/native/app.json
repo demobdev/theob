@@ -1,20 +1,23 @@
 {
   "expo": {
-    "newArchEnabled": true,
-    "name": "NotesContract",
-    "slug": "NotesContract",
+    "newArchEnabled": false,
+    "name": "The Owner's Box",
+    "slug": "the-owners-box",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0D87E1"
+      "backgroundColor": "#1A1A1A"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.the-owners-box"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +28,8 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font"]
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

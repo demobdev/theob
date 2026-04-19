@@ -15,7 +15,8 @@ type NavigationItem = {
 };
 
 const navigation: NavigationItem[] = [
-  { name: "Benefits", href: "#Benefits", current: true },
+  { name: "Menu", href: "#menu", current: true },
+  { name: "Sports & Live Games", href: "#sports", current: false },
   { name: "Reviews", href: "#reviews", current: false },
 ];
 
@@ -27,24 +28,24 @@ export default function Header() {
     <Disclosure as="nav" className=" ">
       {({ open }) => (
         <>
-          <div className="flex items-center bg-white h-16 sm:h-20">
+          <div className="flex items-center bg-white h-16 sm:h-20 shadow-sm border-b">
             <div className="container px-2 sm:px-0">
               <div className="relative flex h-16 items-center justify-between">
                 <div className="flex sm:hidden shrink-0 items-center">
                   <Logo isMobile={true} />
                 </div>
-                <div className="sm:flex hidden shrink-0 items-center">
+                <div className="sm:flex hidden shrink-0 items-center w-[300px]">
                   <Logo />
                 </div>
                 {pathname === "/" && (
-                  <div className="flex flex-1 items-center justify-center ">
+                  <div className="flex flex-[2] items-center justify-center ">
                     <div className="hidden sm:ml-6 sm:block">
-                      <ul className="flex space-x-28">
+                      <ul className="flex space-x-12">
                         {navigation.map((item) => (
                           <li key={item.name}>
                             <Link
                               href={item.href}
-                              className="text-[#2D2D2D] text-center text-xl not-italic font-normal leading-[normal]"
+                              className="text-[#2D2D2D] text-center text-[18px] not-italic font-medium leading-[normal] hover:text-[#d4af37] transition-colors"
                               aria-current={item.current ? "page" : undefined}
                             >
                               {item.name}
@@ -56,13 +57,13 @@ export default function Header() {
                   </div>
                 )}
                 {user ? (
-                  <div className="hidden sm:flex absolute inset-y-0 right-0 gap-6 items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                    <Link href="/notes">
+                  <div className="hidden sm:flex absolute inset-y-0 right-0 gap-6 items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 w-[300px] justify-end">
+                    <Link href="#menu">
                       <button
                         type="button"
-                        className=" text-white text-center text-xl not-italic font-normal leading-[normal] font-montserrat px-[22px] py-[11px] button"
+                        className=" text-white bg-black hover:bg-neutral-800 transition-colors text-center text-lg not-italic font-semibold leading-[normal] font-montserrat px-[22px] py-[11px] rounded-[10px]"
                       >
-                        See your Notes
+                        Order Now
                       </button>
                     </Link>
                     <UserNav
@@ -72,18 +73,18 @@ export default function Header() {
                     />
                   </div>
                 ) : (
-                  <div className="hidden sm:flex absolute inset-y-0 right-0 gap-6 items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                  <div className="hidden sm:flex absolute inset-y-0 right-0 gap-6 items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 w-[300px] justify-end">
                     <Link
-                      href="/notes"
-                      className="border rounded-lg border-solid border-[#2D2D2D] text-[#2D2D2D] text-center text-xl not-italic font-normal leading-[normal] font-montserrat px-[22px] py-2.5"
+                      href="/sign-in"
+                      className="border rounded-lg border-solid border-[#2D2D2D] text-[#2D2D2D] hover:bg-neutral-100 transition-colors text-center text-lg not-italic font-medium leading-[normal] font-montserrat px-[22px] py-2.5"
                     >
-                      Sign in
+                      Sign In
                     </Link>
                     <Link
-                      href="/notes"
-                      className=" text-white text-center text-xl not-italic font-normal leading-[normal] font-montserrat px-[22px] py-[11px] button"
+                      href="#menu"
+                      className=" text-white bg-black hover:bg-[#d4af37] transition-colors text-center text-lg not-italic font-semibold leading-[normal] font-montserrat px-[22px] py-[11px] rounded-[10px]"
                     >
-                      Get Started
+                      Order Now
                     </Link>
                   </div>
                 )}
