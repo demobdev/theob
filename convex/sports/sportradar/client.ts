@@ -44,8 +44,6 @@ export async function sportradarFetch<T>(endpoint: string, sport?: string): Prom
       "accept": "application/json",
       "x-api-key": apiKey,
     },
-    // Server-side caching strategy (300s = 5 minutes)
-    next: { revalidate: 300 },
   });
 
   if (!response.ok) {

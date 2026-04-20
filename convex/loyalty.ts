@@ -13,23 +13,35 @@ export const getUserProfile = query({
     const userId = await getUserId(ctx);
     if (!userId) return null;
 
-    let profile = await ctx.db
+    return await ctx.db
+      .query("user_profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+  },
+});
+
+// Ensure user profile exists
+export const ensureUser = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getUserId(ctx);
+    if (!userId) return null;
+
+    const existing = await ctx.db
       .query("user_profiles")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
 
-    if (!profile) {
-      // Create profile on first access
-      const profileId = await ctx.db.insert("user_profiles", {
-        userId,
-        points: 0,
-        lifetimePoints: 0,
-        lastPointsUpdate: new Date().toISOString(),
-      });
-      profile = await ctx.db.get(profileId);
-    }
+    if (existing) return existing;
 
-    return profile;
+    const profileId = await ctx.db.insert("user_profiles", {
+      userId,
+      points: 0,
+      lifetimePoints: 0,
+      lastPointsUpdate: new Date().toISOString(),
+    });
+
+    return await ctx.db.get(profileId);
   },
 });
 

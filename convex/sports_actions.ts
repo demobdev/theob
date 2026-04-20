@@ -14,15 +14,15 @@ export const scheduledSync = action({
 
 export const clearStaleGames = action({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<{ purgedCount: number }> => {
     // Clear everything older than yesterday to purge the "Sept 27" mock data
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     
     console.log(`Purging games older than ${yesterday.toISOString()}...`);
-    const count = await ctx.runMutation(api.sports_mutations.deleteStaleGames, { 
+    const count = (await ctx.runMutation(api.sports_mutations.deleteStaleGames, { 
       olderThan: yesterday.toISOString() 
-    });
+    })) as number;
     
     return { purgedCount: count };
   },
