@@ -1,6 +1,6 @@
 {
   "expo": {
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "name": "The Owner's Box",
     "slug": "the-owners-box",
     "version": "1.0.0",
