@@ -17,7 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.the-owners-box"
+      "bundleIdentifier": "com.theownersbox.app"
     },
     "android": {
       "adaptiveIcon": {
