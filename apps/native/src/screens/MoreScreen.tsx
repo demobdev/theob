@@ -6,128 +6,107 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  Image
+  Image,
+  StatusBar
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
-import { useQuery } from "convex/react";
-import { api } from "@packages/backend/convex/_generated/api";
+import { useUser, useAuth } from "@clerk/clerk-expo";
 import BottomNavBar from "../components/BottomNavBar";
+import { ensureAuth } from "../utils/authGuard";
 
 const MoreScreen = ({ navigation }) => {
-  const profile = useQuery(api.loyalty.getUserProfile);
-  const points = profile?.points ?? 0;
+  const { user } = useUser();
+  const { isSignedIn } = useAuth();
 
-  const UtilityItem = ({ icon, title, subtitle, onPress, showArrow = true, color = "#fff" }) => (
-    <TouchableOpacity style={styles.utilityItem} onPress={onPress}>
-      <View style={styles.utilityIconContainer}>
-         <Ionicons name={icon as any} size={22} color="#F5A623" />
-      </View>
-      <View style={styles.utilityTextContainer}>
-        <Text style={[styles.utilityTitle, { color }]}>{title}</Text>
-        {subtitle && <Text style={styles.utilitySubtitle}>{subtitle}</Text>}
-      </View>
-      {showArrow && <Ionicons name="chevron-forward" size={20} color="#333" />}
+  const MenuItem = ({ title, onPress, showArrow = false }) => (
+    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+      <Text style={styles.menuItemText}>{title.toUpperCase()}</Text>
+      {showArrow && <Ionicons name="chevron-forward" size={18} color="#CCC" />}
     </TouchableOpacity>
   );
 
+  const handleNav = (screen: string) => {
+    ensureAuth(!!isSignedIn, navigation, () => navigation.navigate(screen));
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      
+      {/* Header with Close & Title */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>UTILITIES</Text>
+        <View style={styles.headerLeft}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeBtn}>
+            <Ionicons name="close" size={28} color="#FFF" />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.headerTitle}>MORE</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("LandingScreen")}>
+          <Text style={styles.logoText}>#THEOB</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Profile Summary */}
-        <View style={styles.profileSection}>
-            <View style={styles.avatarPlaceholder}>
-                <Ionicons name="person" size={40} color="#333" />
-            </View>
-            <View style={styles.profileInfo}>
-                <Text style={styles.profileName}>BOX SCORE MEMBER</Text>
-                <View style={styles.pointsBadge}>
-                    <Ionicons name="flame" size={14} color="#000" />
-                    <Text style={styles.pointsText}>{points} BOX SCORE POINTS</Text>
-                </View>
-            </View>
-        </View>
-
-        <View style={styles.section}>
-            <Text style={styles.sectionLabel}>MY ACCOUNT</Text>
-            <UtilityItem 
-                icon="person-outline" 
-                title="Profile Settings" 
-                subtitle="Manage your personal info and security"
-                onPress={() => {}} 
-            />
-            <UtilityItem 
-                icon="receipt-outline" 
-                title="Order History" 
-                subtitle="View your past orders and receipts"
-                onPress={() => {}} 
-            />
-            <UtilityItem 
-                icon="card-outline" 
-                title="Payment Methods" 
-                subtitle="Manage your saved cards and loyalty link"
-                onPress={() => {}} 
-            />
-        </View>
-
-        <View style={styles.section}>
-            <Text style={styles.sectionLabel}>PREFERENCES</Text>
-            <UtilityItem 
-                icon="notifications-outline" 
-                title="Notifications" 
-                subtitle="Game alerts, order updates, and promos"
-                onPress={() => {}} 
-            />
-            <UtilityItem 
-                icon="location-outline" 
-                title="Preferred Location" 
-                subtitle="Greenville #THEOB"
-                onPress={() => {}} 
-            />
-        </View>
-
-        <View style={styles.section}>
-            <Text style={styles.sectionLabel}>SUPPORT</Text>
-            <UtilityItem 
-                icon="help-circle-outline" 
-                title="Help Center" 
-                subtitle="FAQ and application guides"
-                onPress={() => {}} 
-            />
-            <UtilityItem 
-                icon="mail-outline" 
-                title="Contact #THEOB" 
-                subtitle="Reach out to our hospitality team"
-                onPress={() => {}} 
-            />
-        </View>
-
-        <View style={[styles.section, { borderBottomWidth: 0 }]}>
-            <Text style={styles.sectionLabel}>ABOUT</Text>
-            <UtilityItem 
-                icon="information-circle-outline" 
-                title="Terms of Service" 
-                onPress={() => {}} 
-            />
-            <UtilityItem 
-                icon="shield-checkmark-outline" 
-                title="Privacy Policy" 
-                onPress={() => {}} 
-            />
-            
-            <TouchableOpacity style={styles.logoutBtn}>
-                <Text style={styles.logoutText}>SIGN OUT</Text>
+        
+        {/* IDENTITY SECTION */}
+        <View style={styles.identitySection}>
+          {user ? (
+            <TouchableOpacity style={styles.profileBlock} onPress={() => handleNav("AccountScreen")}>
+              <Image source={{ uri: user.imageUrl }} style={styles.avatar} />
+              <View>
+                <Text style={styles.greetingText}>Welcome back,</Text>
+                <Text style={styles.userNameText}>{user.firstName || "Superfan"}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#666" style={{ marginLeft: "auto" }} />
             </TouchableOpacity>
-            
-            <Text style={styles.versionText}>#THEOB APP v1.0.4 (MVP)</Text>
+          ) : (
+            <TouchableOpacity style={styles.authCTA} onPress={() => navigation.navigate("LoginScreen")}>
+              <View style={styles.authTextCol}>
+                <Text style={styles.authCTATitle}>Join the Roster</Text>
+                <Text style={styles.authCTASub}>Sign in to earn points and set your favorite teams.</Text>
+              </View>
+              <View style={styles.authBtn}>
+                <Text style={styles.authBtnText}>Sign In</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+        {/* REWARDS SECTION */}
+        <View style={styles.section}>
+          <MenuItem title="Rewards" onPress={() => navigation.navigate("RewardsScreen")} />
+          <MenuItem title="Collect Points" onPress={() => handleNav("CollectPointsScreen")} />
+          <MenuItem title="Multipliers" onPress={() => {}} />
+          <MenuItem title="Upload Receipts" onPress={() => handleNav("UploadReceiptScreen")} />
+          <MenuItem title="Saved Cards" onPress={() => handleNav("SavedCardsScreen")} />
         </View>
 
-        <View style={{ height: 120 }} />
+        {/* ORDER & NOTIFS SECTION */}
+        <View style={styles.section}>
+          <MenuItem title="Order History" onPress={() => handleNav("OrderHistoryScreen")} />
+          <MenuItem title="My Teams" onPress={() => handleNav("MyTeamsScreen")} />
+          <MenuItem title="Notifications" onPress={() => navigation.navigate("NotificationSettingsScreen")} />
+        </View>
+
+        {/* SUPPORT & ABOUT SECTION */}
+        <View style={styles.section}>
+          <MenuItem title="Support" onPress={() => navigation.navigate("HelpCenterScreen")} />
+          <MenuItem title="Account" onPress={() => handleNav("AccountScreen")} />
+          <MenuItem title="About" onPress={() => navigation.navigate("AboutScreen")} />
+        </View>
+
+        <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* FOOTER ACTION */}
+      <View style={styles.footer}>
+        <TouchableOpacity 
+          style={styles.startOrderBtn}
+          onPress={() => navigation.navigate("HomeScreen")}
+        >
+          <Text style={styles.startOrderBtnText}>START ORDER</Text>
+        </TouchableOpacity>
+      </View>
 
       <BottomNavBar activeTab="MORE" navigation={navigation} />
     </SafeAreaView>
@@ -140,129 +119,146 @@ const styles = StyleSheet.create({
     backgroundColor: "#0F0F11",
   },
   header: {
-    paddingHorizontal: 25,
-    paddingVertical: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#1A1A1A",
   },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  closeBtn: {
+    marginRight: 10,
+  },
+  headerIcon: {
+    width: 36,
+    height: 36,
+  },
   headerTitle: {
-    color: "#fff",
-    fontFamily: "MBold",
     fontSize: RFValue(14),
+    fontFamily: "MBold",
+    color: "#FFF",
+    letterSpacing: 2,
+  },
+  logoText: {
+    color: "#FFA500",
+    fontFamily: "MBold",
+    fontSize: RFValue(12),
     letterSpacing: 2,
   },
   scrollContent: {
-    paddingTop: 20,
-  },
-  profileSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 25,
-    paddingVertical: 25,
-    backgroundColor: "#161616",
-    marginBottom: 20,
-  },
-  avatarPlaceholder: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: "#222",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 20,
-    borderWidth: 1,
-    borderColor: "#333",
-  },
-  profileInfo: {
-    flex: 1,
-  },
-  profileName: {
-    color: "#fff",
-    fontFamily: "MBold",
-    fontSize: RFValue(12),
-    letterSpacing: 1,
-    marginBottom: 6,
-  },
-  pointsBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F5A623",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 4,
-    alignSelf: "flex-start",
-  },
-  pointsText: {
-    color: "#000",
-    fontFamily: "MBold",
-    fontSize: 9,
-    marginLeft: 6,
+    paddingVertical: 10,
+    paddingTop: 15,
   },
   section: {
     paddingHorizontal: 25,
-    marginBottom: 30,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#1A1A1A",
-    paddingBottom: 20,
   },
-  sectionLabel: {
-    color: "#666",
-    fontFamily: "MBold",
-    fontSize: 9,
-    letterSpacing: 1.5,
-    marginBottom: 15,
-  },
-  utilityItem: {
+  menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 15,
+    justifyContent: "space-between",
+    paddingVertical: 20,
   },
-  utilityIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: "#1A1A1A",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 15,
-  },
-  utilityTextContainer: {
-    flex: 1,
-  },
-  utilityTitle: {
-    color: "#fff",
-    fontFamily: "MSemiBold",
-    fontSize: RFValue(12),
-    marginBottom: 2,
-  },
-  utilitySubtitle: {
-    color: "#666",
-    fontFamily: "MRegular",
-    fontSize: RFValue(9),
-  },
-  logoutBtn: {
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: "#E31837",
-    height: 50,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  logoutText: {
-    color: "#E31837",
+  menuItemText: {
+    fontSize: RFValue(13),
     fontFamily: "MBold",
-    fontSize: 12,
+    color: "#FFF",
+    letterSpacing: 1.5,
+  },
+  footer: {
+    paddingHorizontal: 20,
+    paddingBottom: 90, // Above nav bar
+    paddingTop: 10,
+    backgroundColor: "#0F0F11",
+  },
+  startOrderBtn: {
+    backgroundColor: "#E31837", // Keep red for the primary action
+    height: 55,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  startOrderBtnText: {
+    color: "#FFF",
+    fontFamily: "MBold",
+    fontSize: RFValue(13),
     letterSpacing: 2,
   },
-  versionText: {
-    color: "#333",
+
+  identitySection: {
+    paddingHorizontal: 20,
+    marginBottom: 25,
+  },
+  profileBlock: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1A1A1A",
+    padding: 16,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#2A2A2A",
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    marginRight: 15,
+    backgroundColor: "#333",
+  },
+  greetingText: {
+    color: "#888",
     fontFamily: "MRegular",
-    fontSize: 9,
-    textAlign: "center",
-    marginTop: 25,
-    letterSpacing: 1,
-  }
+    fontSize: RFValue(11),
+  },
+  userNameText: {
+    color: "#FFF",
+    fontFamily: "MBold",
+    fontSize: RFValue(16),
+  },
+  authCTA: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1A1A1A",
+    padding: 20,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#E31837",
+    borderLeftWidth: 4,
+  },
+  authTextCol: {
+    flex: 1,
+    paddingRight: 15,
+  },
+  authCTATitle: {
+    color: "#FFF",
+    fontFamily: "MBold",
+    fontSize: RFValue(14),
+    marginBottom: 4,
+  },
+  authCTASub: {
+    color: "#888",
+    fontFamily: "MRegular",
+    fontSize: RFValue(10),
+    lineHeight: 14,
+  },
+  authBtn: {
+    backgroundColor: "#E31837",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  authBtnText: {
+    color: "#FFF",
+    fontFamily: "MBold",
+    fontSize: RFValue(10),
+  },
 });
 
 export default MoreScreen;

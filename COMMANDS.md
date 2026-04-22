@@ -19,8 +19,13 @@ Run these from the **root** directory (`/Users/demobailey/theob`):
 ## 📱 Mobile Development (Native)
 Run from root or `cd apps/native`:
 
-- **iOS Simulator**: `npm run ios`
-- **Android Emulator**: `npm run android`
+- **iOS Simulator**: `npm run ios --workspace=native -- --clear`
+- **Android Emulator**: `npm run android --workspace=native -- --clear`
+
+> [!TIP]
+> **Reliable iOS Launch (Direct)**: If the workspace script hangs, run this from the root:
+> `cd apps/native && npx expo start --ios --clear`
+> Then press **`i`** and select the **iPhone 16 Pro** from the list.
 
 > [!TIP]
 > If the Android emulator hangs on the Google logo, try:

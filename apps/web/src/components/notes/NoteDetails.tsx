@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@packages/backend/convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import { Id } from "@packages/backend/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import ComplexToggle from "../home/ComplexToggle";

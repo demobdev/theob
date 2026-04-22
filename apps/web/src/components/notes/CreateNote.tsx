@@ -4,7 +4,7 @@ import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import Image from "next/image";
 import Checkbox from "./Checkbox";
-import { api } from "@packages/backend/convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 
 export default function CreateNote() {

@@ -25,7 +25,10 @@ config.resolver.extraNodeModules = {
 // 4. Properly resolve standard monorepo modules
 config.resolver.sourceExts = [...config.resolver.sourceExts, "mjs", "cjs"];
 
-// 5. Wrap with NativeWind configuration
+// 5. Watch workspace root to allow resolving from the consolidated convex dir
+config.watchFolders = [workspaceRoot];
+
+// 6. Wrap with NativeWind configuration
 module.exports = withNativeWind(config, {
   input: "./global.css",
   projectRoot,

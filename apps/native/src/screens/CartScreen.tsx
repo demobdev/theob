@@ -6,13 +6,20 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
-  SafeAreaView
+  SafeAreaView,
+  Modal,
+  TextInput
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
-import { useCart } from "../context/CartContext";
+import { useCart, getUniqueKey } from "../context/CartContext";
+import { useOrder } from "../context/OrderContext";
 import { useMutation } from "convex/react";
-import { api } from "@packages/backend/convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
+import { useState } from "react";
+import { useAuth } from "@clerk/clerk-expo";
+import PreferencesModal from "../components/PreferencesModal";
+import { ensureAuth } from "../utils/authGuard";
 
 const getImageSource = (imgStr) => {
   switch (imgStr) {
@@ -42,15 +49,38 @@ const getImageSource = (imgStr) => {
     case "short_rib_nachos": return require("../../assets/images/menu/short_rib_nachos.png");
     case "steak_and_eggs": return require("../../assets/images/menu/steak_and_eggs.png");
     case "chicken_waffles": return require("../../assets/images/menu/chicken_waffles.png");
+
+    // DRINKS
+    case "beer": return require("../../assets/images/menu/cheese_pizza.png"); // Placeholder
+    case "soda": return require("../../assets/images/menu/crab_dip.png"); // Placeholder
+    case "cocktail": return require("../../assets/images/menu/philly.png"); // Placeholder
+    
+    case "supreme_pizza": return require("../../assets/images/menu/supreme_pizza.png");
+    case "ham_pineapple": return require("../../assets/images/menu/ham_pineapple.png");
+    case "chicken_alfredo_pizza": return require("../../assets/images/menu/chicken_alfredo_pizza.png");
+    case "egg_breakfast": return require("../../assets/images/menu/egg_breakfast.png");
+    case "pancakes": return require("../../assets/images/menu/pancakes.png");
+    case "breakfast_skillet": return require("../../assets/images/menu/breakfast_skillet.png");
+    
     default: return null;
   }
 };
 
 const CartScreen = ({ navigation }) => {
+  const { isSignedIn } = useAuth();
   const { items, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
+  const { 
+    fulfillmentMethod, 
+    phoneNumber, 
+    scheduledTime, 
+    vehicleInfo, 
+    deliveryAddress 
+  } = useOrder();
+  
+  const [showPreferences, setShowPreferences] = useState(false);
 
-  const renderItem = ({ item }) => {
-    const itemUniqueId = item.id + (item.instructions || "");
+  const renderItem = ({ item }: { item: any }) => {
+    const itemUniqueId = getUniqueKey(item);
 
     return (
       <View style={styles.cartItem}>
@@ -98,6 +128,9 @@ const CartScreen = ({ navigation }) => {
   const placeOrder = useMutation(api.orders.placeOrder);
 
   const handleCheckout = async () => {
+    // Hide preferences modal when proceeding
+    setShowPreferences(false);
+
     try {
       const subtotal = totalPrice;
       const tax = subtotal * 0.0825; // Example tax
@@ -108,9 +141,20 @@ const CartScreen = ({ navigation }) => {
         subtotal: subtotal,
         tax: tax,
         total: total,
+        destination: fulfillmentMethod === "pickup_instore" ? "In-Store Pickup" : 
+                     fulfillmentMethod === "pickup_curbside" ? "Curbside Pickup" : "Delivery",
+        location: "1757 Woodruff Rd. STE A, Greenville, SC 29607",
+        customerPhone: phoneNumber,
+        pickupTime: scheduledTime || "ASAP",
+        ...(fulfillmentMethod === "pickup_curbside" && {
+          carDetails: vehicleInfo
+        }),
+        ...(fulfillmentMethod === "delivery_partner" && {
+          deliveryAddress: deliveryAddress
+        })
       });
 
-      alert(`Order Placed Successfully! You earned ${Math.floor(subtotal)} Box Score points!`);
+      alert(`Order Placed Successfully!`);
       clearCart();
       navigation.navigate("HomeScreen");
     } catch (err) {
@@ -154,7 +198,7 @@ const CartScreen = ({ navigation }) => {
           <FlatList
             data={items}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id + (item.instructions || "")}
+            keyExtractor={(item) => getUniqueKey(item)}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
           />
@@ -166,7 +210,7 @@ const CartScreen = ({ navigation }) => {
             </View>
             <TouchableOpacity 
                 style={styles.checkoutBtn}
-                onPress={handleCheckout}
+                onPress={() => ensureAuth(!!isSignedIn, navigation, () => setShowPreferences(true))}
             >
               <Text style={styles.checkoutText}>PROCEED TO CHECKOUT</Text>
               <Ionicons name="arrow-forward" size={20} color="#000" style={{ marginLeft: 10 }} />
@@ -174,6 +218,11 @@ const CartScreen = ({ navigation }) => {
           </View>
         </>
       )}
+
+      <PreferencesModal 
+        visible={showPreferences} 
+        onClose={() => setShowPreferences(false)} 
+      />
     </SafeAreaView>
   );
 };
@@ -355,6 +404,206 @@ const styles = StyleSheet.create({
     fontFamily: "MBold",
     letterSpacing: 1,
   },
+  
+  /* PREFERENCES MODAL STYLES */
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "#1A1A1A",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingBottom: 40,
+    borderWidth: 1,
+    borderColor: "#333",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 25,
+  },
+  modalTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontFamily: "MBold",
+  },
+  prefSection: {
+    marginBottom: 20,
+  },
+  prefLabel: {
+    color: "#888",
+    fontSize: 10,
+    fontFamily: "MBold",
+    letterSpacing: 1.5,
+    marginBottom: 10,
+    textTransform: "uppercase"
+  },
+  locationCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  locationTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "MBold",
+    marginBottom: 4,
+  },
+  locationAddress: {
+    color: "#888",
+    fontSize: 12,
+    fontFamily: "MRegular",
+  },
+  methodRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    marginBottom: 20,
+  },
+  methodBtn: {
+    flex: 1,
+    backgroundColor: "#222",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#333",
+    paddingVertical: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  methodBtnActive: {
+    backgroundColor: "#FFA500",
+    borderColor: "#FFA500",
+  },
+  methodText: {
+    color: "#888",
+    fontSize: 10,
+    fontFamily: "MBold",
+    textAlign: "center",
+  },
+  methodTextActive: {
+    color: "#000",
+  },
+  timeModeRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    marginBottom: 20,
+  },
+  timeModeBtn: {
+    flex: 1,
+    backgroundColor: "#222",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#333",
+    paddingVertical: 15,
+    alignItems: "center",
+  },
+  timeModeBtnActive: {
+    backgroundColor: "#FFA500",
+    borderColor: "#FFA500",
+  },
+  timeModeText: {
+    color: "#888",
+    fontSize: 12,
+    fontFamily: "MBold",
+  },
+  timeModeTextActive: {
+    color: "#000",
+  },
+  inputBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#222",
+    borderWidth: 1,
+    borderColor: "#333",
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+  },
+  inputText: {
+    flex: 1,
+    color: "#fff",
+    fontFamily: "MRegular",
+    fontSize: 14,
+  },
+  updateOrderBtn: {
+    backgroundColor: "#FFA500",
+    height: 55,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  updateOrderBtnText: {
+    color: "#000",
+    fontSize: 16,
+    fontFamily: "MBold",
+  },
+  
+  /* SUB-MODAL FOR CURBSIDE & DELIVERY */
+  subModalContent: {
+    backgroundColor: "#1A1A1A",
+    flex: 1,
+    marginTop: 50,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 20,
+    borderWidth: 1,
+    borderColor: "#333",
+  },
+  subModalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+    marginBottom: 20,
+  },
+  subModalTitle: {
+    fontSize: 16,
+    fontFamily: "MRegular",
+    color: "#fff",
+  },
+  backBtn: {
+    paddingRight: 10,
+  },
+  doneText: {
+    fontSize: 16,
+    fontFamily: "MRegular",
+    color: "#FFA500",
+  },
+  helperText: {
+    fontSize: 16,
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: 30,
+    paddingHorizontal: 20,
+    fontFamily: "MRegular"
+  },
+  inputLabel: {
+    fontSize: 10,
+    fontFamily: "MBold",
+    color: "#888",
+    letterSpacing: 1.5,
+    marginBottom: 5,
+    marginTop: 10,
+  },
+  subInput: {
+    borderWidth: 1,
+    borderColor: "#333",
+    borderRadius: 6,
+    padding: 12,
+    fontSize: 16,
+    color: "#fff",
+    fontFamily: "MRegular",
+    marginBottom: 10,
+    backgroundColor: "#222"
+  }
 });
 
 export default CartScreen;

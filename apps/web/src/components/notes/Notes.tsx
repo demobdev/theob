@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@packages/backend/convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import Image from "next/image";
 import { useState } from "react";
