@@ -10,9 +10,50 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useQuery } from "convex/react";
-import { api } from "@packages/backend/convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 
 const { width } = Dimensions.get("window");
+
+const getImageSource = (imgStr) => {
+  switch (imgStr) {
+    case "boneless_wings": return require("../../assets/images/menu/boneless_wings.png");
+    case "cheese_pizza": return require("../../assets/images/menu/cheese_pizza.png");
+    case "queso_chorizo": return require("../../assets/images/menu/queso_chorizo.png");
+    case "spicy_bang_bang": return require("../../assets/images/menu/spicy_bang_bang.png");
+    case "crispy_calamari": return require("../../assets/images/menu/crispy_calamari.png");
+    case "chopped_salad": return require("../../assets/images/menu/chopped_salad.png");
+    case "goat_cheese_salad": return require("../../assets/images/menu/goat_cheese_salad.png");
+    case "chicago_dog": return require("../../assets/images/menu/chicago_dog.png");
+    case "crabcake_sandwich": return require("../../assets/images/menu/crabcake_sandwich.png");
+    case "cauliflower_wings": return require("../../assets/images/menu/cauliflower_wings.png");
+    case "crab_dip": return require("../../assets/images/menu/crab_dip.png");
+    case "fried_shrimp": return require("../../assets/images/menu/fried_shrimp.png");
+    case "bar_chicken": return require("../../assets/images/menu/bar_chicken.png");
+    case "philly": return require("../../assets/images/menu/philly.png");
+    case "rib_eye": return require("../../assets/images/menu/rib_eye.png");
+    case "coho_salmon": return require("../../assets/images/menu/coho_salmon.png");
+    case "picanha_steak": return require("../../assets/images/menu/picanha_steak.png");
+    case "ny_strip": return require("../../assets/images/menu/ny_strip.png");
+    case "short_rib_hash": return require("../../assets/images/menu/short_rib_hash.png");
+    case "neapolitan_pizza": return require("../../assets/images/menu/neapolitan_pizza.png");
+    case "caesar_salad": return require("../../assets/images/menu/caesar_salad.png");
+    case "jumbo_wings": return require("../../assets/images/menu/jumbo_wings.png");
+    case "meat_lover_pizza": return require("../../assets/images/menu/meat_lover_pizza.png");
+    case "short_rib_nachos": return require("../../assets/images/menu/short_rib_nachos.png");
+    case "steak_and_eggs": return require("../../assets/images/menu/steak_and_eggs.png");
+    case "chicken_waffles": return require("../../assets/images/menu/chicken_waffles.png");
+
+    // NEW MAPPINGS
+    case "supreme_pizza": return require("../../assets/images/menu/supreme_pizza.png");
+    case "ham_pineapple": return require("../../assets/images/menu/ham_pineapple.png");
+    case "chicken_alfredo_pizza": return require("../../assets/images/menu/chicken_alfredo_pizza.png");
+    case "egg_breakfast": return require("../../assets/images/menu/egg_breakfast.png");
+    case "pancakes": return require("../../assets/images/menu/pancakes.png");
+    case "breakfast_skillet": return require("../../assets/images/menu/breakfast_skillet.png");
+    
+    default: return require("../../assets/images/menu/cheese_pizza.png");
+  }
+};
 
 const MenuScreen = ({ route, navigation }) => {
   const { categoryId, categoryName } = route.params;
@@ -35,7 +76,15 @@ const MenuScreen = ({ route, navigation }) => {
       onPress={() => navigation.navigate("ProductDetailScreen", { product: item })}
     >
       <View style={styles.imagePlaceholder}>
-        <Ionicons name="pizza-outline" size={50} color="#555" />
+        {item.image ? (
+            <Image 
+                source={getImageSource(item.image)} 
+                style={{ width: "100%", height: "100%" }} 
+                resizeMode="cover" 
+            />
+        ) : (
+            <Ionicons name="pizza-outline" size={50} color="#555" />
+        )}
       </View>
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>

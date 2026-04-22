@@ -10,16 +10,19 @@ import {
   FlatList,
   Platform,
   StatusBar,
-  ImageBackground
+  ImageBackground,
+  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery } from "convex/react";
-import { api } from "@packages/backend/convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 import BottomNavBar from "../components/BottomNavBar";
 import PreferencesModal from "../components/PreferencesModal";
 import { useCart } from "../context/CartContext";
+import { useOrder } from "../context/OrderContext";
+import { useEffect, useRef } from "react";
 
 const { width } = Dimensions.get("window");
 
@@ -51,6 +54,20 @@ const getImageSource = (imgStr) => {
     case "short_rib_nachos": return require("../../assets/images/menu/short_rib_nachos.png");
     case "steak_and_eggs": return require("../../assets/images/menu/steak_and_eggs.png");
     case "chicken_waffles": return require("../../assets/images/menu/chicken_waffles.png");
+
+    // DRINKS
+    case "beer": return require("../../assets/images/menu/cheese_pizza.png"); // Placeholder
+    case "soda": return require("../../assets/images/menu/crab_dip.png"); // Placeholder
+    case "cocktail": return require("../../assets/images/menu/philly.png"); // Placeholder
+    
+    // NEW MAPPINGS
+    case "supreme_pizza": return require("../../assets/images/menu/supreme_pizza.png");
+    case "ham_pineapple": return require("../../assets/images/menu/ham_pineapple.png");
+    case "chicken_alfredo_pizza": return require("../../assets/images/menu/chicken_alfredo_pizza.png");
+    case "egg_breakfast": return require("../../assets/images/menu/egg_breakfast.png");
+    case "pancakes": return require("../../assets/images/menu/pancakes.png");
+    case "breakfast_skillet": return require("../../assets/images/menu/breakfast_skillet.png");
+
     case "pizza": return require("../../assets/images/menu/meat_lover_pizza.png");
     case "wings": return require("../../assets/images/menu/jumbo_wings.png");
     case "salads": return require("../../assets/images/menu/chopped_salad.png");
@@ -92,9 +109,35 @@ const ProductCard = ({ item, navigation, addToCart }) => {
 };
 
 const HomeScreen = ({ navigation }) => {
-  const { addToCart, cartCount } = useCart();
+  const { addToCart, totalItems } = useCart();
+  const { fulfillmentMethod, locationName } = useOrder();
   const [activeCategory, setActiveCategory] = useState(null);
   const [preferencesVisible, setPreferencesVisible] = useState(false);
+
+  // Animation for the header arrows
+  const rotation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(rotation, {
+      toValue: preferencesVisible ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [preferencesVisible]);
+
+  const spin = rotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "180deg"]
+  });
+
+  const getFulfillmentDisplayLabel = () => {
+    switch (fulfillmentMethod) {
+      case "pickup_instore": return "In-Store Pickup";
+      case "pickup_curbside": return "Curbside Pickup";
+      case "delivery_partner": return "Delivery Service";
+      default: return "In-Store Pickup";
+    }
+  };
 
   const categories = useQuery(api.products.getCategories) || [];
   const allProducts = useQuery(api.products.getAllProducts);
@@ -105,13 +148,40 @@ const HomeScreen = ({ navigation }) => {
   );
   const products = activeCategory ? filteredProducts : allProducts;
 
+  const { shopNotice } = useOrder();
+  const [bannerHidden, setBannerHidden] = useState(false);
+
   const renderProductCard = ({ item }) => (
       <ProductCard item={item} navigation={navigation} addToCart={addToCart} />
   );
 
+  const getDynamicBanner = () => {
+    // 1. Check for shop notice first
+    if (shopNotice && shopNotice !== "") {
+      const parts = shopNotice.split(/(@\w+)/g);
+      return (
+        <Text style={styles.goldBannerText}>
+          {parts.map((part, index) => {
+            if (part && part.startsWith("@")) {
+              return <Text key={index} style={styles.underlineVariable}>{part.substring(1)}</Text>;
+            }
+            return part || "";
+          })}
+        </Text>
+      );
+    }
+
+    // 2. Fallback to fulfillment
+    return (
+      <Text style={styles.goldBannerText}>
+        Ready for <Text style={styles.underlineVariable}>{getFulfillmentDisplayLabel()}</Text>? Order now!
+      </Text>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" transparent={true} />
+      <StatusBar barStyle="light-content" translucent={true} />
       
       {/* FLOATING TRANSPARENT HEADER */}
       <View style={styles.floatingHeader}>
@@ -121,19 +191,23 @@ const HomeScreen = ({ navigation }) => {
 
           <TouchableOpacity style={styles.locationContainer} onPress={() => setPreferencesVisible(true)}>
               <View style={styles.selectorRow}>
-                  <Text style={styles.selectorMainText}>In-Store Pickup</Text>
-                  <Ionicons name="chevron-down" size={18} color="#fff" />
+                  <Text style={styles.selectorMainText}>{getFulfillmentDisplayLabel()}</Text>
+                  <Animated.View style={{ transform: [{ rotate: spin }] }}>
+                    <Ionicons name="chevron-down" size={18} color="#fff" />
+                  </Animated.View>
               </View>
               <View style={styles.selectorSubRow}>
-                  <Text style={styles.selectorSubText}>Greenville (1 mi)</Text>
-                  <Ionicons name="chevron-down" size={14} color="#FFA500" />
+                  <Text style={styles.selectorSubText}>{locationName || "Greenville (1 mi)"}</Text>
+                  <Animated.View style={{ transform: [{ rotate: spin }] }}>
+                    <Ionicons name="chevron-down" size={14} color="#FFA500" />
+                  </Animated.View>
               </View>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.cartBtn} onPress={() => navigation.navigate("CartScreen")}>
               <Ionicons name="cart" size={32} color="#FFA500" />
-              {cartCount > 0 && (
-                  <View style={styles.cartBadge}><Text style={styles.cartBadgeText}>{cartCount}</Text></View>
+              {totalItems > 0 && (
+                  <View style={styles.cartBadge}><Text style={styles.cartBadgeText}>{totalItems}</Text></View>
               )}
           </TouchableOpacity>
       </View>
@@ -149,6 +223,7 @@ const HomeScreen = ({ navigation }) => {
             <ImageBackground 
                 source={require("../../assets/images/menu/meat_lover_pizza.png")} 
                 style={styles.heroImage}
+                resizeMode="cover"
             >
                 <LinearGradient 
                     colors={['rgba(15,15,17,0.3)', 'rgba(15,15,17,0.6)', '#0F0F11']} 
@@ -162,12 +237,12 @@ const HomeScreen = ({ navigation }) => {
             </ImageBackground>
         </View>
         {/* GOLD STATUS BANNER - FLOATING AT TOP OF FEED */}
-        <View style={styles.goldBanner}>
-            <Text style={styles.goldBannerText}>
-                You are ordering <Text style={styles.boldText}>In-Store Pickup</Text> at <Text style={styles.boldText}>Greenville</Text>.
-            </Text>
-            <TouchableOpacity onPress={() => console.log("close banner")}><Ionicons name="close" size={20} color="#000" /></TouchableOpacity>
-        </View>
+        {!bannerHidden && (
+          <View style={styles.goldBanner}>
+              {getDynamicBanner()}
+              <TouchableOpacity onPress={() => setBannerHidden(true)}><Ionicons name="close" size={20} color="#000" /></TouchableOpacity>
+          </View>
+        )}
 
         {/* CATEGORIES SCROLLER */}
         <View style={styles.categoryWrap}>
@@ -282,7 +357,7 @@ const styles = StyleSheet.create({
     height: 400,
   },
   heroImage: {
-    width: '100%',
+    width: width,
     height: '100%',
     justifyContent: 'flex-end',
     paddingBottom: 40,
@@ -330,6 +405,10 @@ const styles = StyleSheet.create({
   boldText: {
     fontFamily: "MBold",
   },
+  underlineVariable: {
+    fontFamily: "MBold",
+    textDecorationLine: "underline",
+  },
   categoryWrap: {
     marginTop: 25,
     marginBottom: 15,
@@ -359,10 +438,11 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   productWrap: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
+    marginTop: 10,
   },
   gridContainer: {
-    gap: 15,
+    paddingBottom: 20,
   },
   productCard: {
     backgroundColor: "#1C1C1E",
@@ -372,6 +452,7 @@ const styles = StyleSheet.create({
     borderColor: "#333",
     flexDirection: "row",
     height: 120,
+    marginBottom: 15,
   },
   productImage: {
     width: 120,

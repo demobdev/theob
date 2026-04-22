@@ -16,9 +16,11 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useQuery } from "convex/react";
-import { api } from "@packages/backend/convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 import { Video } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
+import { useUser } from "@clerk/clerk-expo";
+
 import BottomNavBar from "../components/BottomNavBar";
 
 const { width } = Dimensions.get("window");
@@ -50,52 +52,62 @@ const getNext7Days = () => {
 const LiveGamesScreen = ({ navigation }) => {
   const daysString = useMemo(() => getNext7Days(), []);
   
+  const { user } = useUser();
   const [selectedDate, setSelectedDate] = useState(daysString[0].fullDate);
   const [selectedSport, setSelectedSport] = useState("All");
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   
+  // Read favorite teams from Clerk metadata
+  const favoriteTeams = (user?.unsafeMetadata?.favoriteTeams as Record<string, string[]>) ?? {};
+
+  // Helper: does this game feature a favorite team?
+  const isFavoriteGame = (game: any): boolean => {
+    const sport = game.sport;
+    const favs = favoriteTeams[sport] ?? [];
+    if (favs.length === 0) return false;
+    return (
+      favs.includes(game.awayTeam?.abbr) ||
+      favs.includes(game.homeTeam?.abbr)
+    );
+  };
+
   const [selectedGame, setSelectedGame] = useState(null);
   const [showTVGuide, setShowTVGuide] = useState(false);
   const [listPage, setListPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
-  // Filtered query for the list view (respects sport filter)
-  const upcomingGames = useQuery(api.sports_queries.getUpcomingGames, {
-    limit: 100,
+  // Main query: ALL games for selected date (live, closed, scheduled)
+  const allGamesForDate = useQuery(api.sports_queries.getGamesForDate, {
     targetDate: selectedDate,
     sportFilter: selectedSport,
   });
+  const allTeamsBySport = useQuery(api.sports_queries.getUniqueTeams);
 
-  // UNFILTERED query for the carousel — always shows all sports
-  const allGamesForCarousel = useQuery(api.sports_queries.getUpcomingGames, {
-    limit: 100,
-    targetDate: selectedDate,
-    sportFilter: "All",
-  });
-
+  // Carousel: uses same data, filtered by sport already
   const carouselGames = useMemo(() => {
-    if (!allGamesForCarousel) return [];
+    if (!allGamesForDate) return [];
     
     // Use a Map to ensure uniqueness by ID
     const uniqueGames = new Map();
     
     // Priority 1: Live games
-    const live = allGamesForCarousel.filter(g => g.status === 'inprogress');
+    const live = allGamesForDate.filter(g => g.status === 'inprogress');
     live.forEach(g => uniqueGames.set(g._id, g));
     
     // Priority 2: Prime Time games
-    const prime = allGamesForCarousel.filter(g => g.isPrimeTime && g.status !== 'inprogress');
+    const prime = allGamesForDate.filter(g => g.isPrimeTime && g.status !== 'inprogress');
     prime.forEach(g => {
         if (uniqueGames.size < 10) uniqueGames.set(g._id, g);
     });
     
-    // Fallback: Featured or just regular games if list is too small
+    // Fallback: Fill with upcoming/closed games if carousel is too small
     if (uniqueGames.size < 5) {
-        const others = allGamesForCarousel.filter(g => !uniqueGames.has(g._id));
+        const others = allGamesForDate.filter(g => !uniqueGames.has(g._id));
         others.slice(0, 5 - uniqueGames.size).forEach(g => uniqueGames.set(g._id, g));
     }
     
     return Array.from(uniqueGames.values());
-  }, [allGamesForCarousel]);
+  }, [allGamesForDate]);
 
   const [carouselIndex, setCarouselIndex] = useState(0);
   const carouselRef = useRef<FlatList>(null);
@@ -103,13 +115,15 @@ const LiveGamesScreen = ({ navigation }) => {
   const majorLeagues = ["NFL", "NBA", "MLB", "NHL"];
 
   const groupedGames = useMemo(() => {
-    if (!upcomingGames) return {};
-    const filtered = selectedSport === "All" 
-        ? upcomingGames 
-        : upcomingGames.filter(g => g.sport === selectedSport);
+    if (!allGamesForDate) return {};
     
-    // Pagination: Limit to 10 * listPage
-    const paginated = filtered.slice(0, listPage * ITEMS_PER_PAGE);
+    // Apply team filter, then paginate
+    const teamFiltered = selectedTeam
+      ? allGamesForDate.filter((g: any) =>
+          g.awayTeam?.abbr === selectedTeam || g.homeTeam?.abbr === selectedTeam
+        )
+      : allGamesForDate;
+    const paginated = teamFiltered.slice(0, listPage * ITEMS_PER_PAGE);
 
     const groups = {};
     
@@ -125,8 +139,18 @@ const LiveGamesScreen = ({ navigation }) => {
       if (!groups[sport]) groups[sport] = [];
       groups[sport].push(game);
     });
+
+    // Priority Sort within each group
+    Object.keys(groups).forEach(sport => {
+        groups[sport].sort((a, b) => {
+            const aFav = isFavoriteGame(a) ? 1 : 0;
+            const bFav = isFavoriteGame(b) ? 1 : 0;
+            return bFav - aFav;
+        });
+    });
+
     return groups;
-  }, [upcomingGames, selectedSport, listPage]);
+  }, [allGamesForDate, selectedSport, listPage, selectedTeam]);
 
   const getSportColor = (sport) => {
       switch(sport) {
@@ -233,6 +257,11 @@ const LiveGamesScreen = ({ navigation }) => {
             <View style={[styles.sportBadge, { backgroundColor: sportColor }]}>
               <Text style={styles.sportBadgeText}>{item.sport}</Text>
             </View>
+            {isFavoriteGame(item) && (
+              <View style={styles.favBadge}>
+                <Text style={styles.favBadgeText}>★ YOUR TEAM</Text>
+              </View>
+            )}
             {isLive && (
               <View style={styles.liveBadge}>
                 <View style={styles.liveDot} />
@@ -361,8 +390,13 @@ const LiveGamesScreen = ({ navigation }) => {
                       </View>
                   </View>
 
-                  {/* RIGHT: WIN PROB */}
+                  {/* RIGHT: WIN PROB & FAVORITE */}
                   <View style={styles.listRightCol}>
+                    {isFavoriteGame(item) && (
+                      <View style={[styles.favBadge, { marginBottom: 8 }]}>
+                        <Text style={styles.favBadgeText}>YOUR TEAM</Text>
+                      </View>
+                    )}
                     <View style={styles.winProbContainer}>
                         <View style={[styles.winProbBar, { width: '60%', backgroundColor: '#222' }]} />
                         <Text style={styles.winProbText}>58.2%</Text>
@@ -375,7 +409,7 @@ const LiveGamesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" transparent={true} />
+      <StatusBar barStyle="light-content" translucent={true} />
       
       <View style={styles.topNav}>
         <TouchableOpacity style={styles.navBack} onPress={() => navigation.goBack()}>
@@ -399,11 +433,11 @@ const LiveGamesScreen = ({ navigation }) => {
         {/* VIDEO JUMBOTRON HERO */}
         <View style={styles.videoHeroContainer}>
             <Video 
-                source={require("../../assets/videos/homerun-hero.mp4")}
+                source={require("../../assets/videos/homerun-hero.mp4") as any}
                 rate={1.0}
                 volume={0}
                 isMuted={true}
-                resizeMode="cover"
+                resizeMode={"cover" as any}
                 shouldPlay
                 isLooping
                 style={StyleSheet.absoluteFill}
@@ -448,6 +482,7 @@ const LiveGamesScreen = ({ navigation }) => {
                             onPress={() => {
                                 setSelectedSport(sport);
                                 setListPage(1);
+                                setSelectedTeam(null);
                             }}
                         >
                             <Text style={[styles.filterText, selectedSport === sport && styles.filterTextActive]}>{sport.toUpperCase()}</Text>
@@ -474,6 +509,11 @@ const LiveGamesScreen = ({ navigation }) => {
                             const idx = Math.round(e.nativeEvent.contentOffset.x / (width * 0.88 + 16));
                             setCarouselIndex(idx);
                         }}
+                        getItemLayout={(data, index) => ({
+                            length: width * 0.88 + 16,
+                            offset: (width * 0.88 + 16) * index,
+                            index,
+                        })}
                     />
                     {/* Carousel dots + arrows */}
                     {carouselGames.length > 1 && (
@@ -516,13 +556,46 @@ const LiveGamesScreen = ({ navigation }) => {
                 </View>
             )}
 
+            {/* Team Filter Row */}
+            {allTeamsBySport && allTeamsBySport.length > 0 && (() => {
+              const sportTeams = selectedSport === "All"
+                ? allTeamsBySport
+                : allTeamsBySport.filter(s => s.sport === selectedSport);
+              const teams = sportTeams.flatMap(s => s.teams);
+              if (teams.length === 0) return null;
+              return (
+                <View style={styles.teamFilterSection}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.teamFilterScroll}>
+                    <TouchableOpacity
+                      style={[styles.teamPill, !selectedTeam && styles.teamPillActive]}
+                      onPress={() => setSelectedTeam(null)}
+                    >
+                      <Text style={[styles.teamPillText, !selectedTeam && styles.teamPillTextActive]}>ALL</Text>
+                    </TouchableOpacity>
+                    {teams.map((team, idx) => (
+                      <TouchableOpacity
+                        key={`${team.sport || 'all'}-${team.abbr}-${idx}`}
+                        style={[styles.teamPill, selectedTeam === team.abbr && styles.teamPillActive]}
+                        onPress={() => setSelectedTeam(selectedTeam === team.abbr ? null : team.abbr)}
+                      >
+                        {team.logoUrl ? (
+                          <Image source={{ uri: team.logoUrl }} style={styles.teamPillLogo} resizeMode="contain" />
+                        ) : null}
+                        <Text style={[styles.teamPillText, selectedTeam === team.abbr && styles.teamPillTextActive]}>{team.abbr}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              );
+            })()}
+
             {/* Main Grouped Feed */}
             <View style={styles.listContainer}>
                 {Object.keys(groupedGames).map(sport => 
                     renderLeagueSection(sport, groupedGames[sport])
                 )}
                 
-                {upcomingGames && upcomingGames.length > listPage * ITEMS_PER_PAGE && (
+                {allGamesForDate && allGamesForDate.length > listPage * ITEMS_PER_PAGE && (
                     <TouchableOpacity 
                         style={styles.loadMoreBtn}
                         onPress={() => setListPage(prev => prev + 1)}
@@ -622,6 +695,25 @@ const LiveGamesScreen = ({ navigation }) => {
                                     )}
                                 </View>
                             </View>
+
+                            {/* Game Highlights — only for final games with a real highlight URL */}
+                            {isFinal && selectedGame.highlightVideoId && (
+                                <View style={styles.modalHighlightSection}>
+                                    <View style={styles.modalSectionLabel}>
+                                        <Ionicons name="play-circle" size={12} color="#E31837" />
+                                        <Text style={styles.modalSectionLabelText}>GAME HIGHLIGHTS</Text>
+                                    </View>
+                                    <View style={styles.modalVideoPlayerContainer}>
+                                        <Video
+                                            source={{ uri: selectedGame.highlightVideoId }}
+                                            style={{ width: "100%", height: RFValue(190) }}
+                                            useNativeControls
+                                            resizeMode={"cover" as any}
+                                            shouldPlay={false}
+                                        />
+                                    </View>
+                                </View>
+                            )}
 
                             {/* Bar Map / TV Zone */}
                             {selectedGame.tvZone ? (
@@ -1092,6 +1184,45 @@ const styles = StyleSheet.create({
   filterTextActive: {
     color: '#000',
   },
+  // Team Filter Row
+  teamFilterSection: {
+    marginBottom: 4,
+  },
+  teamFilterScroll: {
+    paddingHorizontal: 16,
+    gap: 6,
+    paddingVertical: 6,
+  },
+  teamPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#111',
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
+    borderRadius: 20,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    gap: 4,
+  },
+  teamPillActive: {
+    backgroundColor: '#FFA500',
+    borderColor: '#FFA500',
+  },
+  teamPillLogo: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+  },
+  teamPillText: {
+    color: '#666',
+    fontFamily: 'MBold',
+    fontSize: 9,
+    letterSpacing: 0.5,
+  },
+  teamPillTextActive: {
+    color: '#000',
+  },
   listContainer: {
     paddingHorizontal: 15,
   },
@@ -1453,6 +1584,20 @@ const styles = StyleSheet.create({
     fontSize: 9,
     letterSpacing: 2,
   },
+  modalHighlightSection: {
+    width: '100%',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  modalVideoPlayerContainer: {
+    width: '100%',
+    borderRadius: 14,
+    overflow: 'hidden',
+    marginTop: 10,
+    backgroundColor: '#000',
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
+  },
   modalBarMapSection: {
     marginBottom: 30,
     padding: 20,
@@ -1522,6 +1667,20 @@ const styles = StyleSheet.create({
     fontFamily: 'MBold',
     fontSize: 12,
     letterSpacing: 1,
+  },
+  // --- Favorite Team Styles ---
+  favBadge: {
+    backgroundColor: "#FFA500",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    alignSelf: "center",
+  },
+  favBadgeText: {
+    color: "#000",
+    fontFamily: "MBold",
+    fontSize: 7,
+    letterSpacing: 0.5,
   },
 });
 

@@ -44,6 +44,14 @@ const getImageSource = (imgStr) => {
     case "short_rib_nachos": return require("../../assets/images/menu/short_rib_nachos.png");
     case "steak_and_eggs": return require("../../assets/images/menu/steak_and_eggs.png");
     case "chicken_waffles": return require("../../assets/images/menu/chicken_waffles.png");
+
+    case "supreme_pizza": return require("../../assets/images/menu/supreme_pizza.png");
+    case "ham_pineapple": return require("../../assets/images/menu/ham_pineapple.png");
+    case "chicken_alfredo_pizza": return require("../../assets/images/menu/chicken_alfredo_pizza.png");
+    case "egg_breakfast": return require("../../assets/images/menu/egg_breakfast.png");
+    case "pancakes": return require("../../assets/images/menu/pancakes.png");
+    case "breakfast_skillet": return require("../../assets/images/menu/breakfast_skillet.png");
+    
     default: return require("../../assets/images/menu/cheese_pizza.png");
   }
 };
@@ -57,8 +65,19 @@ const ProductDetailScreen = ({ route, navigation }) => {
   const initialModifiers = useMemo(() => {
     const mods = {};
     product.modifiers?.forEach(m => {
-      if (m.required && m.options.length > 0) {
-        mods[m.name] = m.options[0].name;
+      if (m.type === "multi_select") {
+        mods[m.name] = m.options
+          .filter(o => o.defaultSelected)
+          .map(o => o.name);
+      } else {
+        // For single_select, find the one marked defaultSelected
+        const defaultOpt = m.options.find(o => o.defaultSelected);
+        if (defaultOpt) {
+          mods[m.name] = defaultOpt.name;
+        } else if (m.required && m.options.length > 0) {
+          // Fallback to first option if required and no default marked
+          mods[m.name] = m.options[0].name;
+        }
       }
     });
     return mods;
@@ -69,9 +88,16 @@ const ProductDetailScreen = ({ route, navigation }) => {
   const calculateTotalPrice = () => {
     let basePrice = product.price;
     product.modifiers?.forEach(m => {
-      const selectedOptionName = selectedModifiers[m.name];
-      const option = m.options.find(o => o.name === selectedOptionName);
-      if (option) basePrice += option.priceExtra || 0;
+      const selection = selectedModifiers[m.name];
+      if (Array.isArray(selection)) {
+        selection.forEach(optionName => {
+          const option = m.options.find(o => o.name === optionName);
+          if (option) basePrice += option.priceExtra || 0;
+        });
+      } else {
+        const option = m.options.find(o => o.name === selection);
+        if (option) basePrice += option.priceExtra || 0;
+      }
     });
     return basePrice * quantity;
   };
@@ -80,9 +106,16 @@ const ProductDetailScreen = ({ route, navigation }) => {
     for (let i = 0; i < quantity; i++) {
         let itemPrice = product.price;
         product.modifiers?.forEach(m => {
-          const selectedOptionName = selectedModifiers[m.name];
-          const option = m.options.find(o => o.name === selectedOptionName);
-          if (option) itemPrice += option.priceExtra || 0;
+          const selection = selectedModifiers[m.name];
+          if (Array.isArray(selection)) {
+            selection.forEach(optionName => {
+              const option = m.options.find(o => o.name === optionName);
+              if (option) itemPrice += option.priceExtra || 0;
+            });
+          } else {
+            const option = m.options.find(o => o.name === selection);
+            if (option) itemPrice += option.priceExtra || 0;
+          }
         });
 
         addToCart({
@@ -96,6 +129,30 @@ const ProductDetailScreen = ({ route, navigation }) => {
     }
     navigation.goBack();
   };
+
+  const toggleMultiSelect = (modName, optionName) => {
+    const current = selectedModifiers[modName] || [];
+    if (current.includes(optionName)) {
+      setSelectedModifiers({
+        ...selectedModifiers,
+        [modName]: current.filter(n => n !== optionName)
+      });
+    } else {
+      setSelectedModifiers({
+        ...selectedModifiers,
+        [modName]: [...current, optionName]
+      });
+    }
+  };
+
+  const isFormValid = useMemo(() => {
+    return product.modifiers?.every(m => {
+      if (!m.required) return true;
+      const selection = selectedModifiers[m.name];
+      if (Array.isArray(selection)) return selection.length > 0;
+      return !!selection;
+    }) ?? true;
+  }, [product.modifiers, selectedModifiers]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -128,26 +185,54 @@ const ProductDetailScreen = ({ route, navigation }) => {
            <Text style={styles.descText}>{product.description}</Text>
         </View>
 
+        {product.disclaimer && (
+          <View style={styles.disclaimerBox}>
+            <Ionicons name="alert-circle" size={18} color="#FFA500" />
+            <Text style={styles.disclaimerText}>{product.disclaimer}</Text>
+          </View>
+        )}
+
         {/* Dynamic Modifiers */}
         {product.modifiers?.map((mod, modIdx) => (
           <View key={modIdx} style={styles.modifierSection}>
             <View style={styles.modifierHeader}>
                <Text style={styles.modifierTitle}>{mod.name.toUpperCase()}</Text>
-               {mod.required && <Text style={styles.requiredTag}>REQUIRED</Text>}
+               {mod.required ? (
+                 <Text style={styles.requiredTag}>REQUIRED</Text>
+               ) : (
+                 <Text style={[styles.requiredTag, { backgroundColor: "rgba(255,255,255,0.05)", color: "#666" }]}>OPTIONAL</Text>
+               )}
             </View>
             
             <View style={styles.optionsList}>
                {mod.options.map((option, optIdx) => {
-                 const isSelected = selectedModifiers[mod.name] === option.name;
+                 const isMulti = mod.type === "multi_select";
+                 const isSelected = isMulti 
+                   ? selectedModifiers[mod.name]?.includes(option.name)
+                   : selectedModifiers[mod.name] === option.name;
+
                  return (
                    <TouchableOpacity 
                      key={optIdx} 
                      style={styles.optionRow}
-                     onPress={() => setSelectedModifiers({...selectedModifiers, [mod.name]: option.name})}
+                     onPress={() => {
+                       if (isMulti) {
+                         toggleMultiSelect(mod.name, option.name);
+                       } else {
+                         setSelectedModifiers({...selectedModifiers, [mod.name]: option.name});
+                       }
+                     }}
                      activeOpacity={0.7}
                    >
-                     <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
-                        {isSelected && <View style={styles.radioInner} />}
+                     <View style={[
+                        isMulti ? styles.checkOuter : styles.radioOuter, 
+                        isSelected && (isMulti ? styles.checkOuterSelected : styles.radioOuterSelected)
+                     ]}>
+                        {isSelected && (
+                          isMulti 
+                            ? <Ionicons name="checkmark" size={16} color="#FFA500" />
+                            : <View style={styles.radioInner} />
+                        )}
                      </View>
                      
                      <View style={styles.optionInfo}>
@@ -178,8 +263,12 @@ const ProductDetailScreen = ({ route, navigation }) => {
       </ScrollView>
 
       <View style={styles.footer}>
-         <TouchableOpacity style={styles.submitBtn} onPress={handleAddToCart}>
-            <Text style={styles.submitBtnText}>ADD TO ORDER</Text>
+         <TouchableOpacity 
+            style={[styles.submitBtn, !isFormValid && styles.disabledBtn]} 
+            onPress={handleAddToCart}
+            disabled={!isFormValid}
+         >
+            <Text style={styles.submitBtnText}>{isFormValid ? 'ADD TO ORDER' : 'SELECT OPTIONS'}</Text>
             <Text style={styles.submitBtnPrice}>${calculateTotalPrice().toFixed(2)}</Text>
          </TouchableOpacity>
       </View>
@@ -258,6 +347,25 @@ const styles = StyleSheet.create({
     textAlign: "left",
     lineHeight: 18,
   },
+  disclaimerBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 165, 0, 0.1)",
+    marginHorizontal: 25,
+    marginTop: 0,
+    marginBottom: 25,
+    padding: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255, 165, 0, 0.3)",
+  },
+  disclaimerText: {
+    color: "#FFA500",
+    fontSize: RFValue(11),
+    fontFamily: "MSemiBold",
+    marginLeft: 10,
+    flex: 1,
+  },
   modifierSection: {
     backgroundColor: "#161616",
     marginBottom: 20,
@@ -313,6 +421,20 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#FFA500",
   },
+  checkOuter: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#444",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 15,
+  },
+  checkOuterSelected: {
+    borderColor: "#FFA500",
+    backgroundColor: "rgba(255, 165, 0, 0.1)",
+  },
   optionInfo: {
     flex: 1,
     flexDirection: "row",
@@ -367,6 +489,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 25,
+  },
+  disabledBtn: {
+    backgroundColor: "#333",
+    opacity: 0.5,
   },
   submitBtnText: {
     color: "#fff",

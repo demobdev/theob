@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ImageBackground,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useOAuth, useSignIn, useSignUp } from "@clerk/clerk-expo";
@@ -18,32 +19,35 @@ import { AntDesign, Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
-const GOLD = "#d4af37";
-const DARK = "#0f0f0f";
-const DARK_CARD = "#1a1a1a";
-const BORDER = "#2e2e2e";
+// ── Brand tokens ────────────────────────────────────────────────────────────
+const RED       = "#E31837";   // Primary CTA — THE OB red
+const GOLD      = "#FFA500";   // Brand accent — logo, links
+const DARK      = "#0F0F11";   // Background
+const DARK_CARD = "#1A1A1A";   // Card / input surface
+const BORDER    = "#2A2A2A";   // Subtle borders
 const TEXT_MUTED = "#888";
 
 type AuthMode = "options" | "email-signin" | "email-signup" | "verify";
 
-const LoginScreen = () => {
-  const [mode, setMode] = useState<AuthMode>("options");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+const LoginScreen = ({ navigation }: any) => {
+  const [mode, setMode]               = useState<AuthMode>("options");
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState<string | null>(null);
+  const [email, setEmail]             = useState("");
+  const [code, setCode]               = useState("");
+  const [firstName, setFirstName]     = useState("");
+  const [lastName, setLastName]       = useState("");
+  const [verifyType, setVerifyType]   = useState<"signin" | "signup" | null>(null);
 
   const { startOAuthFlow: startGoogleAuthFlow } = useOAuth({ strategy: "oauth_google" });
-  const { startOAuthFlow: startAppleAuthFlow } = useOAuth({ strategy: "oauth_apple" });
+  const { startOAuthFlow: startAppleAuthFlow }  = useOAuth({ strategy: "oauth_apple" });
   const { signIn, setActive: setSignInActive, isLoaded: signInLoaded } = useSignIn();
   const { signUp, setActive: setSignUpActive, isLoaded: signUpLoaded } = useSignUp();
 
   const clearError = () => setError(null);
 
-  // SSO
+  // ── Auth handlers ─────────────────────────────────────────────────────────
+
   const onSSOPress = async (provider: "google" | "apple") => {
     setLoading(true);
     clearError();
@@ -52,41 +56,49 @@ const LoginScreen = () => {
       const { createdSessionId, setActive } = await flow();
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
+        navigation.navigate("LandingScreen");
       }
     } catch (err: any) {
-      setError("Sign-in failed. Please try again.");
+      console.error("SSO Error:", err);
+      setError(err?.errors?.[0]?.message || err?.message || "Sign-in failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Email sign-in
   const onEmailSignIn = async () => {
     if (!signInLoaded) return;
     setLoading(true);
     clearError();
     try {
-      const result = await signIn.create({ identifier: email, password });
-      if (result.status === "complete" && setSignInActive) {
-        await setSignInActive({ session: result.createdSessionId });
+      const { supportedFirstFactors } = await signIn.create({ identifier: email });
+      const emailCodeFactor = supportedFirstFactors?.find((factor: any) => factor.strategy === "email_code");
+      
+      if (emailCodeFactor) {
+        await signIn.prepareFirstFactor({
+          strategy: "email_code",
+          emailAddressId: emailCodeFactor.emailAddressId,
+        });
+        setVerifyType("signin");
+        setMode("verify");
       } else {
-        setError("Sign-in incomplete. Check your email.");
+        setError("Passwordless sign-in not supported for this account.");
       }
     } catch (err: any) {
-      setError(err?.errors?.[0]?.message ?? "Sign-in failed. Check credentials.");
+      setError(err?.errors?.[0]?.message ?? "Sign-in failed. Check your email.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Email sign-up
   const onEmailSignUp = async () => {
     if (!signUpLoaded) return;
     setLoading(true);
     clearError();
     try {
-      await signUp.create({ emailAddress: email, password, firstName });
+      await signUp.create({ emailAddress: email, firstName, lastName });
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      setVerifyType("signup");
       setMode("verify");
     } catch (err: any) {
       setError(err?.errors?.[0]?.message ?? "Sign-up failed. Try again.");
@@ -95,43 +107,54 @@ const LoginScreen = () => {
     }
   };
 
-  // Verify email code
   const onVerify = async () => {
-    if (!signUpLoaded) return;
     setLoading(true);
     clearError();
     try {
-      const result = await signUp.attemptEmailAddressVerification({ code });
-      console.log("Verify result status:", result.status, "sessionId:", result.createdSessionId);
-
-      if (result.status === "complete") {
-        if (result.createdSessionId && setSignUpActive) {
+      if (verifyType === "signup" && signUpLoaded) {
+        const result = await signUp.attemptEmailAddressVerification({ code });
+        if (result.status === "complete" && setSignUpActive) {
           await setSignUpActive({ session: result.createdSessionId });
+          navigation.navigate("LandingScreen");
+        } else if (result.status === "missing_requirements") {
+          const missingArr = (result as any).missingFields || (result as any).unverifiedFields || [];
+          const missing = missingArr.join(", ") || "Unknown fields";
+          setError(`Missing requirements: ${missing}`);
         } else {
-          setError("Signed up but no session returned. Check Clerk dashboard.");
+          setError(`Status: "${result.status}" — incomplete.`);
         }
-      } else {
-        setError(
-          `Status: "${result.status}" — Enable Email+Password in Clerk Dashboard:\nConfigure → Email, Phone, Username → Password`
-        );
+      } else if (verifyType === "signin" && signInLoaded) {
+        const result = await signIn.attemptFirstFactor({ strategy: "email_code", code });
+        if (result.status === "complete" && setSignInActive) {
+          await setSignInActive({ session: result.createdSessionId });
+          navigation.navigate("LandingScreen");
+        } else {
+          setError(`Status: "${result.status}" — incomplete.`);
+        }
       }
     } catch (err: any) {
-      console.log("Verify error:", JSON.stringify(err?.errors));
-      const errCode = err?.errors?.[0]?.code ?? "";
-      const errMsg = err?.errors?.[0]?.message ?? "";
-
-      if (errCode === "form_identifier_already_verified" || errMsg.toLowerCase().includes("already verified")) {
-        setError("Account already verified. Redirecting to sign in…");
-        setTimeout(() => { clearError(); setMode("email-signin"); }, 1500);
-      } else {
-        setError(errMsg || `Clerk error code: ${errCode}`);
-      }
+      setError(err?.errors?.[0]?.message ?? "Verification failed.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ---- Render helpers ----
+  // ── Shared render helpers ────────────────────────────────────────────────
+
+  const renderBrandHeader = () => (
+    <>
+      <View style={styles.logoWrapper}>
+        <Image
+          source={require("../assets/icons/logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+      <Text style={styles.brandName}>THE OWNER'S BOX</Text>
+      <Text style={styles.tagline}>GREENVILLE, SC  •  EST. 2026</Text>
+      <View style={styles.divider} />
+    </>
+  );
 
   const renderHeader = (title: string, sub: string, onBack?: () => void) => (
     <View style={styles.headerBlock}>
@@ -180,229 +203,180 @@ const LoginScreen = () => {
     </View>
   );
 
-  // ---- Main options screen ----
+  // ── Mode: Options (landing) ──────────────────────────────────────────────
   if (mode === "options") {
     return (
-      <View style={styles.container}>
-        <View style={styles.topAccent} />
+      <ImageBackground 
+        source={require("../../assets/images/leather_black.jpg")}
+        style={styles.container}
+        imageStyle={styles.leatherTexture}
+      >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <View style={styles.logoWrapper}>
-            <Image
-              source={require("../assets/icons/logo.png")}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-          <Text style={styles.brandName}>THE OB</Text>
-          <Text style={styles.tagline}>#THEOB SPORTS BAR</Text>
-          <View style={styles.divider} />
-          {renderHeader("Welcome", "Sign in to track games,\norder food, and earn rewards")}
+          {renderBrandHeader()}
+          {renderHeader(
+            "Welcome to The Box",
+            "Sign in to earn points, track\nyour teams, and order game-day food."
+          )}
 
           <View style={styles.buttonGroup}>
-            {/* Google */}
-            <TouchableOpacity
-              style={styles.authButton}
-              onPress={() => onSSOPress("google")}
-              disabled={loading}
-              activeOpacity={0.8}
-            >
+            <TouchableOpacity style={styles.authButton} onPress={() => onSSOPress("google")} disabled={loading}>
               <Image style={styles.buttonIcon} source={require("../assets/icons/google.png")} />
               <Text style={styles.authButtonText}>Continue with Google</Text>
             </TouchableOpacity>
 
-            {/* Apple */}
-            <TouchableOpacity
-              style={[styles.authButton, styles.appleButton]}
-              onPress={() => onSSOPress("apple")}
-              disabled={loading}
-              activeOpacity={0.8}
-            >
-              <AntDesign name="apple" size={20} color="#fff" style={styles.appleIcon} />
-              <Text style={[styles.authButtonText, styles.appleButtonText]}>
-                Continue with Apple
-              </Text>
+            <TouchableOpacity style={[styles.authButton, styles.appleButton]} onPress={() => onSSOPress("apple")} disabled={loading}>
+              <AntDesign name="apple" size={20} color="#fff" style={styles.ssoIcon} />
+              <Text style={[styles.authButtonText, styles.appleButtonText]}>Continue with Apple</Text>
             </TouchableOpacity>
 
-            {/* Divider */}
             <View style={styles.orRow}>
               <View style={styles.orLine} />
               <Text style={styles.orText}>OR</Text>
               <View style={styles.orLine} />
             </View>
 
-            {/* Email sign-in */}
-            <TouchableOpacity
-              style={styles.emailButton}
-              onPress={() => setMode("email-signin")}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="mail-outline" size={18} color={GOLD} style={styles.appleIcon} />
+            <TouchableOpacity style={styles.emailButton} onPress={() => setMode("email-signin")}>
+              <Ionicons name="mail-outline" size={18} color={RED} style={styles.ssoIcon} />
               <Text style={styles.emailButtonText}>Sign in with Email</Text>
             </TouchableOpacity>
 
-            {/* Sign up link */}
             <TouchableOpacity onPress={() => setMode("email-signup")} style={styles.signupLink}>
               <Text style={styles.signupLinkText}>
-                New here?{" "}
-                <Text style={styles.signupLinkGold}>Create an account →</Text>
+                New to The Box? <Text style={styles.signupLinkAccent}>Join the Roster →</Text>
               </Text>
             </TouchableOpacity>
           </View>
 
-          {loading && <ActivityIndicator size="small" color={GOLD} style={{ marginTop: 20 }} />}
+          {loading && <ActivityIndicator size="small" color={RED} style={{ marginTop: 20 }} />}
           {error && <Text style={styles.errorText}>{error}</Text>}
         </ScrollView>
-
         <View style={styles.footer}>
           <View style={styles.footerDot} />
           <Text style={styles.footerText}>GREENVILLE, SC</Text>
           <View style={styles.footerDot} />
         </View>
-      </View>
+      </ImageBackground>
     );
   }
 
-  // ---- Email sign-in ----
+  // ── Mode: Email Sign-In ──────────────────────────────────────────────────
   if (mode === "email-signin") {
     return (
-      <KeyboardAvoidingView
+      <ImageBackground 
+        source={require("../../assets/images/leather_black.jpg")}
         style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        imageStyle={styles.leatherTexture}
       >
-        <View style={styles.topAccent} />
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <View style={styles.logoWrapper}>
-            <Image source={require("../assets/icons/logo.png")} style={styles.logo} resizeMode="contain" />
-          </View>
-          {renderHeader("Sign In", "Welcome back to The OB", () => setMode("options"))}
-
-          {renderInput("Email address", email, setEmail, { keyboardType: "email-address" })}
-          {renderInput("Password", password, setPassword, {
-            secureTextEntry: !showPassword,
-            onToggleSecure: () => setShowPassword((p) => !p),
-          })}
-
-          {error && <Text style={styles.errorText}>{error}</Text>}
-
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={onEmailSignIn}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color="#1a1a1a" />
-            ) : (
-              <Text style={styles.primaryButtonText}>Sign In</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setMode("email-signup")} style={styles.signupLink}>
-            <Text style={styles.signupLinkText}>
-              No account? <Text style={styles.signupLinkGold}>Sign up →</Text>
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+            {renderBrandHeader()}
+            {renderHeader("Welcome Back", "Sign in to The Owner's Box", () => setMode("options"))}
+            {renderInput("Email address", email, setEmail, { keyboardType: "email-address" })}
+            {error && <Text style={styles.errorText}>{error}</Text>}
+            <TouchableOpacity style={styles.primaryButton} onPress={onEmailSignIn} disabled={loading}>
+              {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.primaryButtonText}>SIGN IN</Text>}
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setMode("email-signup")} style={styles.signupLink}>
+              <Text style={styles.signupLinkText}>No account? <Text style={styles.signupLinkAccent}>Join the Roster →</Text></Text>
+            </TouchableOpacity>
+            <View style={[styles.orRow, { marginTop: 24, marginBottom: 16 }]}>
+              <View style={styles.orLine} />
+              <Text style={styles.orText}>OR</Text>
+              <View style={styles.orLine} />
+            </View>
+            <View style={styles.buttonGroup}>
+              <TouchableOpacity style={styles.authButton} onPress={() => onSSOPress("google")} disabled={loading}>
+                <Image style={styles.buttonIcon} source={require("../assets/icons/google.png")} />
+                <Text style={styles.authButtonText}>Continue with Google</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.authButton, styles.appleButton]} onPress={() => onSSOPress("apple")} disabled={loading}>
+                <AntDesign name="apple" size={20} color="#fff" style={styles.ssoIcon} />
+                <Text style={[styles.authButtonText, styles.appleButtonText]}>Continue with Apple</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
     );
   }
 
-  // ---- Email sign-up ----
+  // ── Mode: Email Sign-Up ──────────────────────────────────────────────────
   if (mode === "email-signup") {
     return (
-      <KeyboardAvoidingView
+      <ImageBackground 
+        source={require("../../assets/images/leather_black.jpg")}
         style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        imageStyle={styles.leatherTexture}
       >
-        <View style={styles.topAccent} />
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <View style={styles.logoWrapper}>
-            <Image source={require("../assets/icons/logo.png")} style={styles.logo} resizeMode="contain" />
-          </View>
-          {renderHeader("Create Account", "Join The Owner's Box loyalty family", () => setMode("options"))}
-
-          {renderInput("First name", firstName, setFirstName, { autoCapitalize: "words" })}
-          {renderInput("Email address", email, setEmail, { keyboardType: "email-address" })}
-          {renderInput("Password", password, setPassword, {
-            secureTextEntry: !showPassword,
-            onToggleSecure: () => setShowPassword((p) => !p),
-          })}
-
-          {error && <Text style={styles.errorText}>{error}</Text>}
-
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={onEmailSignUp}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color="#1a1a1a" />
-            ) : (
-              <Text style={styles.primaryButtonText}>Create Account</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setMode("email-signin")} style={styles.signupLink}>
-            <Text style={styles.signupLinkText}>
-              Already have an account? <Text style={styles.signupLinkGold}>Sign in →</Text>
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+            {renderBrandHeader()}
+            {renderHeader("Join the Roster", "Create your account and start earning.", () => setMode("options"))}
+            <View style={styles.row}>
+              <View style={{ flex: 1 }}>{renderInput("First name", firstName, setFirstName, { autoCapitalize: "words" })}</View>
+              <View style={{ width: 15 }} />
+              <View style={{ flex: 1 }}>{renderInput("Last name", lastName, setLastName, { autoCapitalize: "words" })}</View>
+            </View>
+            {renderInput("Email address", email, setEmail, { keyboardType: "email-address" })}
+            {error && <Text style={styles.errorText}>{error}</Text>}
+            <TouchableOpacity style={styles.primaryButton} onPress={onEmailSignUp} disabled={loading}>
+              {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.primaryButtonText}>JOIN THE ROSTER</Text>}
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setMode("email-signin")} style={styles.signupLink}>
+              <Text style={styles.signupLinkText}>Already in the Box? <Text style={styles.signupLinkAccent}>Sign in →</Text></Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
     );
   }
 
-  // ---- Verify email ----
+  // ── Mode: Verify Email ───────────────────────────────────────────────────
   if (mode === "verify") {
     return (
-      <KeyboardAvoidingView
+      <ImageBackground 
+        source={require("../../assets/images/leather_black.jpg")}
         style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        imageStyle={styles.leatherTexture}
       >
-        <View style={styles.topAccent} />
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <View style={styles.logoWrapper}>
-            <Image source={require("../assets/icons/logo.png")} style={styles.logo} resizeMode="contain" />
-          </View>
-          {renderHeader(
-            "Check Your Email",
-            `We sent a 6-digit code to\n${email}`,
-            () => setMode("email-signup")
-          )}
-
-          {renderInput("6-digit code", code, setCode, { keyboardType: "number-pad" })}
-          {error && <Text style={styles.errorText}>{error}</Text>}
-
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={onVerify}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color="#1a1a1a" />
-            ) : (
-              <Text style={styles.primaryButtonText}>Verify & Enter</Text>
-            )}
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+            {renderBrandHeader()}
+            {renderHeader("Check Your Email", `We sent a code to\n${email}`, () => setMode("email-signup"))}
+            {renderInput("6-digit code", code, setCode, { keyboardType: "number-pad" })}
+            {error && <Text style={styles.errorText}>{error}</Text>}
+            <TouchableOpacity style={styles.primaryButton} onPress={onVerify} disabled={loading}>
+              {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.primaryButtonText}>VERIFY & ENTER</Text>}
+            </TouchableOpacity>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
     );
   }
 
   return null;
 };
 
+// ── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: DARK },
-  topAccent: { position: "absolute", top: 0, left: 0, right: 0, height: 3, backgroundColor: GOLD, zIndex: 10 },
+  container: {
+    flex: 1,
+    height: "100%",
+    backgroundColor: DARK,
+  },
+  leatherTexture: {
+    opacity: 0.15,
+  },
+  row: {
+    flexDirection: "row",
+    width: "100%",
+  },
   content: {
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 28,
-    paddingVertical: 40,
+    paddingVertical: 50,
   },
   logoWrapper: {
     width: 100,
@@ -416,57 +390,210 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     shadowColor: GOLD,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 14,
     elevation: 10,
   },
-  logo: { width: 72, height: 72 },
-  brandName: { color: GOLD, fontSize: RFValue(15), fontFamily: "MBold", letterSpacing: 4, textAlign: "center" },
-  tagline: { color: TEXT_MUTED, fontSize: RFValue(9), fontFamily: "MRegular", letterSpacing: 3, textAlign: "center", marginTop: 4 },
-  divider: { width: 44, height: 1.5, backgroundColor: GOLD, opacity: 0.5, marginVertical: 20 },
-  headerBlock: { width: "100%", alignItems: "center", marginBottom: 24, position: "relative" },
-  backBtn: { position: "absolute", left: 0, top: 0, padding: 4 },
-  headline: { color: "#fff", fontSize: RFValue(22), fontFamily: "MBold", textAlign: "center", marginBottom: 6 },
-  subtitle: { color: TEXT_MUTED, fontSize: RFValue(13), fontFamily: "MRegular", textAlign: "center", lineHeight: 20 },
-  buttonGroup: { width: "100%", gap: 10 },
+  logo: {
+    width: 72,
+    height: 72,
+  },
+  brandName: {
+    color: "#FFF",
+    fontSize: RFValue(16),
+    fontFamily: "MBold",
+    letterSpacing: 3,
+    textAlign: "center",
+  },
+  tagline: {
+    color: GOLD,
+    fontSize: RFValue(9),
+    fontFamily: "MBold",
+    letterSpacing: 2,
+    textAlign: "center",
+    marginTop: 4,
+  },
+  divider: {
+    width: 44,
+    height: 2,
+    backgroundColor: RED,
+    marginVertical: 22,
+    borderRadius: 1,
+  },
+  headerBlock: {
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 24,
+    position: "relative",
+  },
+  backBtn: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    padding: 4,
+  },
+  headline: {
+    color: "#FFF",
+    fontSize: RFValue(22),
+    fontFamily: "MBold",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  subtitle: {
+    color: TEXT_MUTED,
+    fontSize: RFValue(12),
+    fontFamily: "MRegular",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  buttonGroup: {
+    width: "100%",
+    gap: 10,
+  },
   authButton: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center",
-    backgroundColor: "#fff", borderRadius: 12, height: 50, width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 12,
+    height: 52,
+    width: "100%",
   },
-  appleButton: { backgroundColor: "#1c1c1e", borderWidth: 1, borderColor: BORDER },
+  appleButton: {
+    backgroundColor: "#1C1C1E",
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
   emailButton: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center",
-    backgroundColor: DARK_CARD, borderRadius: 12, height: 50, width: "100%",
-    borderWidth: 1, borderColor: GOLD,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: DARK_CARD,
+    borderRadius: 12,
+    height: 52,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: RED,
   },
-  buttonIcon: { width: 20, height: 20, marginRight: 12 },
-  appleIcon: { marginRight: 12 },
-  authButtonText: { color: "#1a1a1a", fontSize: RFValue(14), fontFamily: "MSemiBold" },
-  appleButtonText: { color: "#fff" },
-  emailButtonText: { color: GOLD, fontSize: RFValue(14), fontFamily: "MSemiBold" },
-  orRow: { flexDirection: "row", alignItems: "center", marginVertical: 4 },
-  orLine: { flex: 1, height: 1, backgroundColor: BORDER },
-  orText: { color: TEXT_MUTED, fontSize: RFValue(11), fontFamily: "MRegular", marginHorizontal: 12 },
-  signupLink: { alignItems: "center", marginTop: 8 },
-  signupLinkText: { color: TEXT_MUTED, fontSize: RFValue(13), fontFamily: "MRegular" },
-  signupLinkGold: { color: GOLD, fontFamily: "MSemiBold" },
+  buttonIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 12,
+  },
+  ssoIcon: {
+    marginRight: 12,
+  },
+  authButtonText: {
+    color: "#1A1A1A",
+    fontSize: RFValue(14),
+    fontFamily: "MBold",
+  },
+  appleButtonText: {
+    color: "#FFF",
+  },
+  emailButtonText: {
+    color: RED,
+    fontSize: RFValue(14),
+    fontFamily: "MBold",
+  },
+  orRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 4,
+  },
+  orLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: BORDER,
+  },
+  orText: {
+    color: TEXT_MUTED,
+    fontSize: RFValue(11),
+    fontFamily: "MRegular",
+    marginHorizontal: 12,
+  },
+  signupLink: {
+    alignItems: "center",
+    marginTop: 10,
+  },
+  signupLinkText: {
+    color: TEXT_MUTED,
+    fontSize: RFValue(13),
+    fontFamily: "MRegular",
+  },
+  signupLinkAccent: {
+    color: GOLD,
+    fontFamily: "MBold",
+  },
   inputWrapper: {
-    width: "100%", height: 50, backgroundColor: DARK_CARD, borderRadius: 12,
-    borderWidth: 1, borderColor: BORDER, marginBottom: 12,
-    flexDirection: "row", alignItems: "center", paddingHorizontal: 16,
+    width: "100%",
+    height: 52,
+    backgroundColor: DARK_CARD,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: BORDER,
+    marginBottom: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
   },
-  input: { flex: 1, color: "#fff", fontSize: RFValue(14), fontFamily: "MRegular" },
-  eyeBtn: { padding: 4 },
+  input: {
+    flex: 1,
+    color: "#FFF",
+    fontSize: RFValue(14),
+    fontFamily: "MRegular",
+  },
+  eyeBtn: {
+    padding: 4,
+  },
   primaryButton: {
-    width: "100%", height: 52, backgroundColor: GOLD, borderRadius: 12,
-    justifyContent: "center", alignItems: "center", marginTop: 8,
-    shadowColor: GOLD, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10,
+    width: "100%",
+    height: 54,
+    backgroundColor: RED,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+    shadowColor: RED,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  primaryButtonText: { color: "#1a1a1a", fontSize: RFValue(15), fontFamily: "MBold" },
-  errorText: { color: "#ff4d4d", fontSize: RFValue(12), fontFamily: "MRegular", textAlign: "center", marginBottom: 10 },
-  footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", paddingBottom: 32, gap: 8 },
-  footerDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: GOLD, opacity: 0.6 },
-  footerText: { color: TEXT_MUTED, fontSize: RFValue(10), fontFamily: "MRegular", letterSpacing: 3 },
+  primaryButtonText: {
+    color: "#FFF",
+    fontSize: RFValue(14),
+    fontFamily: "MBold",
+    letterSpacing: 1,
+  },
+  errorText: {
+    color: "#FF4D4D",
+    fontSize: RFValue(12),
+    fontFamily: "MRegular",
+    textAlign: "center",
+    marginBottom: 10,
+    lineHeight: 18,
+  },
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingBottom: 32,
+    gap: 8,
+  },
+  footerDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: RED,
+    opacity: 0.6,
+  },
+  footerText: {
+    color: TEXT_MUTED,
+    fontSize: RFValue(10),
+    fontFamily: "MRegular",
+    letterSpacing: 3,
+  },
 });
 
 export default LoginScreen;
