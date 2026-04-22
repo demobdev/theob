@@ -17,6 +17,16 @@ export interface OrderContextState {
     model: string;
     color: string;
   };
+  deliveryAddress: {
+    firstName: string;
+    lastName: string;
+    address: string;
+    apt: string;
+    city: string;
+    state: string;
+    zip: string;
+    instructions: string;
+  };
   shopNotice: string | null;
 }
 
@@ -26,6 +36,7 @@ interface OrderContextType extends OrderContextState {
   setSchedule: (mode: ScheduleMode, time?: string | null) => void;
   setPhone: (phone: string) => void;
   setVehicle: (info: { make: string; model: string; color: string }) => void;
+  setDeliveryAddress: (address: OrderContextState["deliveryAddress"]) => void;
   setShopNotice: (notice: string | null) => void;
   isOrderContextSetup: boolean;
 }
@@ -45,6 +56,16 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       make: "",
       model: "",
       color: "",
+    },
+    deliveryAddress: {
+      firstName: "",
+      lastName: "",
+      address: "",
+      apt: "",
+      city: "",
+      state: "",
+      zip: "",
+      instructions: "",
     },
     shopNotice: "Kitchen closes at 10:30 PM tonight.", // Example shop notice
   });
@@ -105,6 +126,12 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     saveState(newState);
   };
 
+  const setDeliveryAddress = (address: OrderContextState["deliveryAddress"]) => {
+    const newState = { ...state, deliveryAddress: address };
+    setState(newState);
+    saveState(newState);
+  };
+
   const setShopNotice = (notice: string | null) => {
     setState(prev => ({ ...prev, shopNotice: notice }));
   };
@@ -118,6 +145,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setSchedule,
         setPhone,
         setVehicle,
+        setDeliveryAddress,
         setShopNotice,
         isOrderContextSetup,
       }}
