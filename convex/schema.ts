@@ -89,20 +89,24 @@ export default defineSchema({
     isPrimeTime: v.optional(v.boolean()),
     tvZone: v.optional(v.string()), // e.g., "ZONE A", "MAIN JUMBOTRON"
     editorialNote: v.optional(v.string()),
+    highlightVideoId: v.optional(v.string()), // YouTube 11-char ID
     lastSyncedAt: v.optional(v.string()),
   }).index("by_startsAt", ["startsAt"]).index("by_sport", ["sport"]).index("by_externalId", ["externalId"]),
   categories: defineTable({
     name: v.string(),
     icon: v.optional(v.string()),
     order: v.optional(v.number()),
+    pointMultiplier: v.optional(v.number()),
   }),
   products: defineTable({
     name: v.string(),
     description: v.optional(v.string()),
     price: v.number(),
+    pointsWorth: v.optional(v.number()),
     categoryId: v.id("categories"),
     image: v.optional(v.string()),
     isFeatured: v.optional(v.boolean()),
+    disclaimer: v.optional(v.string()),
     modifiers: v.optional(
       v.array(
         v.object({
@@ -114,6 +118,7 @@ export default defineSchema({
             v.object({
               name: v.string(),
               priceExtra: v.number(),
+              defaultSelected: v.optional(v.boolean()),
             })
           ),
         })
@@ -126,6 +131,17 @@ export default defineSchema({
     points: v.number(),
     lifetimePoints: v.number(),
     lastPointsUpdate: v.string(),
+    phone: v.optional(v.string()),
+    birthMonth: v.optional(v.string()),
+    birthDay: v.optional(v.string()),
+    lastBirthdayRewardYear: v.optional(v.number()),
+    vehicle: v.optional(v.object({
+      make: v.string(),
+      model: v.string(),
+      color: v.string(),
+    })),
+    smsConsent: v.optional(v.boolean()),
+    marketingOptIn: v.optional(v.boolean()),
   }).index("by_userId", ["userId"]),
 
   reward_definitions: defineTable({
@@ -146,14 +162,73 @@ export default defineSchema({
     createdAt: v.string(),
   }).index("by_userId", ["userId"]),
 
+  receipt_submissions: defineTable({
+    userId: v.string(),
+    imageUrl: v.string(),
+    amount: v.number(),
+    receiptDate: v.string(),
+    status: v.string(), // "pending", "approved", "rejected"
+    pointsAwarded: v.optional(v.number()),
+    createdAt: v.string(),
+  }).index("by_userId", ["userId"]),
+
   orders: defineTable({
     userId: v.string(),
-    items: v.array(v.any()),
+    items: v.array(v.any()), // Mirroring POS order logic
     subtotal: v.number(),
     tax: v.number(),
     total: v.number(),
     pointsAwarded: v.number(),
-    status: v.string(), // "pending", "completed"
+    
+    // Xenial POS Required Fields
+    destination: v.optional(v.string()), // "In-Store Pickup", "Delivery", "Curbside"
+    location: v.optional(v.string()), // e.g. "Greenville"
+    customerPhone: v.optional(v.string()),
+    pickupTime: v.optional(v.string()), // e.g., "10:30 am - 10:45 am"
+    paymentStatus: v.optional(v.string()), // "pending", "paid"
+    
+    // Fulfillment Details
+    carDetails: v.optional(
+      v.object({
+        make: v.string(),
+        model: v.string(),
+        color: v.string(),
+      })
+    ),
+    deliveryAddress: v.optional(
+      v.object({
+        firstName: v.string(),
+        lastName: v.string(),
+        address: v.string(),
+        apt: v.optional(v.string()),
+        city: v.string(),
+        state: v.string(),
+        zip: v.string(),
+        instructions: v.optional(v.string()),
+      })
+    ),
+    
+    status: v.string(), // "pending", "in-progress", "completed", "cancelled"
+    createdAt: v.string(),
+  }).index("by_userId", ["userId"]),
+
+  /**
+   * payment_methods — stores tokenized card references ONLY.
+   * Raw card numbers are NEVER stored. All sensitive data lives in
+   * the GeniuS/Xenial secure vault. We hold only the opaque token
+   * returned after tokenization, plus display metadata.
+   */
+  payment_methods: defineTable({
+    userId: v.string(),           // Clerk subject ID
+    gatewayToken: v.string(),     // Opaque token from GeniuS/Xenial vault
+    brand: v.string(),            // "Visa" | "Mastercard" | "Amex" | "Discover"
+    last4: v.string(),            // Last 4 digits for display only
+    expMonth: v.string(),         // "04"
+    expYear: v.string(),          // "2028"
+    isDefault: v.boolean(),       // Whether this is the user's default card
+    billingZip: v.optional(v.string()),
+    nickname: v.optional(v.string()), // e.g. "My Visa"
     createdAt: v.string(),
   }).index("by_userId", ["userId"]),
 });
+

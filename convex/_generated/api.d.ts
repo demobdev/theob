@@ -13,6 +13,7 @@ import type * as loyalty from "../loyalty.js";
 import type * as notes from "../notes.js";
 import type * as openai from "../openai.js";
 import type * as orders from "../orders.js";
+import type * as payments from "../payments.js";
 import type * as products from "../products.js";
 import type * as seed from "../seed.js";
 import type * as seedMenu from "../seedMenu.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   notes: typeof notes;
   openai: typeof openai;
   orders: typeof orders;
+  payments: typeof payments;
   products: typeof products;
   seed: typeof seed;
   seedMenu: typeof seedMenu;

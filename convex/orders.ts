@@ -12,6 +12,29 @@ export const placeOrder = mutation({
     subtotal: v.number(),
     tax: v.number(),
     total: v.number(),
+    destination: v.optional(v.string()),
+    location: v.optional(v.string()),
+    customerPhone: v.optional(v.string()),
+    pickupTime: v.optional(v.string()),
+    carDetails: v.optional(
+      v.object({
+        make: v.string(),
+        model: v.string(),
+        color: v.string(),
+      })
+    ),
+    deliveryAddress: v.optional(
+      v.object({
+        firstName: v.string(),
+        lastName: v.string(),
+        address: v.string(),
+        apt: v.optional(v.string()),
+        city: v.string(),
+        state: v.string(),
+        zip: v.string(),
+        instructions: v.optional(v.string()),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     const userId = await getUserId(ctx);
@@ -28,9 +51,25 @@ export const placeOrder = mutation({
       tax: args.tax,
       total: args.total,
       pointsAwarded,
-      status: "completed",
+      destination: args.destination,
+      location: args.location,
+      customerPhone: args.customerPhone,
+      pickupTime: args.pickupTime,
+      carDetails: args.carDetails,
+      deliveryAddress: args.deliveryAddress,
+      paymentStatus: "pending",
+      status: "pending", // Waiting on POS Confirmation
       createdAt: new Date().toISOString(),
     });
+
+    // MOCK XENIAL INJECTION POINT
+    // Once Integrator Tokens are acquired from Hector, we will execute an
+    // internal HTTP call here using node-fetch or Convex's fetch() to hit
+    // the Xenial xooapi.xenial.com endpoint securely.
+    console.log(`📡 [Mock API] Submitting Order ${orderId} to Xenial POS...`);
+    console.log(`   - Destination: ${args.destination} at ${args.location}`);
+    console.log(`   - Phone: ${args.customerPhone}`);
+    // MOCK SUCCESS
 
     // Update user points
     const profile = await ctx.db

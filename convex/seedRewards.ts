@@ -4,21 +4,15 @@ export const seedRewards = mutation({
   args: {},
   handler: async (ctx) => {
     const rewards = [
+      { title: "$5 Off The Owner's Wings", pointsCost: 0, rewardType: "discount", category: "Promotions", isActive: true },
       { title: "Free Fountain Drink", pointsCost: 25, rewardType: "free_item", category: "Tier 1 — Easy Wins", isActive: true },
       { title: "Free Fries or Side", pointsCost: 50, rewardType: "free_item", category: "Tier 1 — Easy Wins", isActive: true },
-      { title: "Free Classic Caesar", pointsCost: 75, rewardType: "free_item", category: "Tier 2 — Small Food Reward", isActive: true },
-      { title: "Free Brunch Side Bundle", pointsCost: 75, rewardType: "free_item", category: "Tier 2 — Small Food Reward", isActive: true },
-      { title: "$5 Off Direct Order", pointsCost: 100, rewardType: "discount", category: "Tier 3 — Strong Mid-Tier", isActive: true },
-      { title: "Free Queso & Chorizo", pointsCost: 125, rewardType: "free_item", category: "Tier 3 — Strong Mid-Tier", isActive: true },
-      { title: "Free Crispy Calamari", pointsCost: 125, rewardType: "free_item", category: "Tier 3 — Strong Mid-Tier", isActive: true },
-      { title: "Free Bar Chicken Sandwich", pointsCost: 150, rewardType: "free_item", category: "Tier 4 — Appetizer / Sandwich Tier", isActive: true },
-      { title: "Free Chicago Sandwich", pointsCost: 150, rewardType: "free_item", category: "Tier 4 — Appetizer / Sandwich Tier", isActive: true },
-      { title: "Free Breakfast Sandwich", pointsCost: 150, rewardType: "free_item", category: "Tier 4 — Appetizer / Sandwich Tier", isActive: true },
-      { title: "$10 Off ($25+ Order)", pointsCost: 200, rewardType: "discount", category: "Tier 5 — Premium Casual Tier", isActive: true },
-      { title: "Free Jumbo Wings (6ct)", pointsCost: 200, rewardType: "free_item", category: "Tier 5 — Premium Casual Tier", isActive: true },
-      { title: "Free Cheese Pizza", pointsCost: 250, rewardType: "free_item", category: "Tier 6 — Party / Shareable Tier", isActive: true },
-      { title: "Free Jumbo Wings (12ct)", pointsCost: 250, rewardType: "free_item", category: "Tier 6 — Party / Shareable Tier", isActive: true },
-      { title: "Free Premium Pizza", pointsCost: 300, rewardType: "free_item", category: "Tier 7 — High Value / Promo Tier", isActive: true },
+      { title: "Free Bar Sandwich", pointsCost: 125, rewardType: "free_item", category: "Tier 2 — The Staples", isActive: true },
+      { title: "Free Entree Salad", pointsCost: 125, rewardType: "free_item", category: "Tier 2 — The Staples", isActive: true },
+      { title: "Free Craft Pasta", pointsCost: 125, rewardType: "free_item", category: "Tier 2 — The Staples", isActive: true },
+      { title: "Free 14\" Premium Pizza", pointsCost: 300, rewardType: "free_item", category: "Tier 3 — The Heavy Hitters", isActive: true },
+      { title: "Free Jumbo Wings (12ct)", pointsCost: 300, rewardType: "free_item", category: "Tier 3 — The Heavy Hitters", isActive: true },
+      { title: "The Owners Box Yeti", pointsCost: 1000, rewardType: "merch", category: "Tier 4 — Legend Status", isActive: true },
     ];
 
     // Clear existing rewards first to avoid duplicates during dev

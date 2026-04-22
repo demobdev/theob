@@ -3,9 +3,9 @@ import { api } from "./_generated/api";
 
 const crons = cronJobs();
 
-crons.hourly(
-  "sync-sportradar-games-hourly",
-  { minuteUTC: 0 },
+crons.interval(
+  "sync-sportradar-games-30min",
+  { minutes: 30 },
   api.sports_actions.scheduledSync,
 );
 
