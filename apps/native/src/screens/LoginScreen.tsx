@@ -211,6 +211,14 @@ const LoginScreen = ({ navigation }: any) => {
         style={styles.container}
         imageStyle={styles.leatherTexture}
       >
+        <TouchableOpacity 
+          style={styles.topSkipBtn} 
+          onPress={() => navigation.navigate("LandingScreen")}
+        >
+          <Text style={styles.topSkipText}>SKIP TO MENU</Text>
+          <Ionicons name="chevron-forward" size={14} color={GOLD} />
+        </TouchableOpacity>
+
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           {renderBrandHeader()}
           {renderHeader(
@@ -593,6 +601,23 @@ const styles = StyleSheet.create({
     fontSize: RFValue(10),
     fontFamily: "MRegular",
     letterSpacing: 3,
+  },
+  topSkipBtn: {
+    position: "absolute",
+    top: Platform.OS === "ios" ? 60 : 40,
+    right: 25,
+    zIndex: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+  },
+  topSkipText: {
+    color: GOLD,
+    fontFamily: "MBold",
+    fontSize: RFValue(10),
+    letterSpacing: 1.5,
+    marginRight: 4,
+    textTransform: "uppercase",
   },
 });
 

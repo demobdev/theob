@@ -32,4 +32,5 @@ config.watchFolders = [workspaceRoot];
 module.exports = withNativeWind(config, {
   input: "./global.css",
   projectRoot,
+  configPath: "./tailwind.config.js",
 });

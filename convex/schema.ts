@@ -106,6 +106,8 @@ export default defineSchema({
     categoryId: v.id("categories"),
     image: v.optional(v.string()),
     isFeatured: v.optional(v.boolean()),
+    isOutOfStock: v.optional(v.boolean()),
+    isVisible: v.optional(v.boolean()),
     disclaimer: v.optional(v.string()),
     modifiers: v.optional(
       v.array(
@@ -169,6 +171,8 @@ export default defineSchema({
     receiptDate: v.string(),
     status: v.string(), // "pending", "approved", "rejected"
     pointsAwarded: v.optional(v.number()),
+    processedAt: v.optional(v.string()),
+    rejectionReason: v.optional(v.string()),
     createdAt: v.string(),
   }).index("by_userId", ["userId"]),
 
@@ -186,6 +190,8 @@ export default defineSchema({
     customerPhone: v.optional(v.string()),
     pickupTime: v.optional(v.string()), // e.g., "10:30 am - 10:45 am"
     paymentStatus: v.optional(v.string()), // "pending", "paid"
+    status: v.optional(v.string()), // "pending", "preparing", "ready", "completed", "cancelled"
+    createdAt: v.optional(v.string()),
     
     // Fulfillment Details
     carDetails: v.optional(
@@ -207,9 +213,6 @@ export default defineSchema({
         instructions: v.optional(v.string()),
       })
     ),
-    
-    status: v.string(), // "pending", "in-progress", "completed", "cancelled"
-    createdAt: v.string(),
   }).index("by_userId", ["userId"]),
 
   /**

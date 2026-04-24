@@ -7,10 +7,14 @@
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1440px;
 
-  --color-primary: #0d87e1;
-
+  --color-primary: #D4AF37;
+  --color-primary-hover: #E5C04A;
+  --color-gold-glow: rgba(212, 175, 55, 0.2);
+  
+  --color-charcoal: #121212;
+  --color-black-rich: #0A0A0A;
+  
   --font-inter: Inter, sans-serif;
-  --font-lato: Lato, sans-serif;
   --font-montserrat: Montserrat, sans-serif;
 
   --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
@@ -18,59 +22,94 @@
     from 180deg at 50% 50%,
     var(--tw-gradient-stops)
   );
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-marquee-slow: marquee 60s linear infinite;
 }
 
-@utility container {
-  margin-inline: auto;
-}
-
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
+  body {
+    @apply bg-[#0A0A0A] text-white antialiased selection:bg-[#D4AF37] selection:text-black;
+  }
+  
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--color-white-10, rgba(255, 255, 255, 0.1));
   }
 }
 
-.linear_gradient {
-  background: linear-gradient(
-    267deg,
-    #fff -9.43%,
-    #040218 -9.42%,
-    #fff 4.63%,
-    #d2e4f2 127.55%
-  );
+@layer components {
+  .noise-overlay {
+    position: relative;
+  }
+  
+  .noise-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("/images/noise_grain.png");
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .leather-bg {
+    background-image: linear-gradient(to bottom, rgba(10, 10, 10, 0.8), rgba(10, 10, 10, 0.95)), url("/images/leather_black.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+
+  .gold-gradient {
+    background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+  }
+
+  .gold-text-gradient {
+    background: linear-gradient(135deg, #F5D76E 0%, #D4AF37 50%, #B8860B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .premium-card {
+    @apply bg-[#121212] border border-white/5 rounded-2xl overflow-hidden hover:border-[#D4AF37]/30 transition-all duration-300;
+  }
 }
 
-.bg_image {
-  background:
-    linear-gradient(
-      181deg,
-      rgba(255, 255, 255, 0) 57.92%,
-      #fff 97.09%,
-      rgba(255, 255, 255, 0) 127.09%
-    ),
-    url("/images/background.png"),
-    lightgray 0% 0% / 261.2499952316284px 261.2499952316284px repeat;
+.bg-texture {
+  background-image: url("/images/noise_grain.png");
+  background-repeat: repeat;
+  opacity: 0.03;
 }
-.button {
-  border-radius: 8px;
-  background: linear-gradient(
-    267deg,
-    #0983df -9.43%,
-    #040218 -9.42%,
-    #0d87e1 4.63%,
-    #0983df 127.55%
-  );
-  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+
+.gold-glow {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+}
+
+/* Leaflet Map Refinements */
+.leaflet-container {
+  font-family: inherit !important;
+}
+
+.user-location-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: white !important;
+  color: black !important;
+  font-family: var(--font-montserrat) !important;
+  font-weight: 700 !important;
+}
+
+.leaflet-popup-tip {
+  background: white !important;
 }

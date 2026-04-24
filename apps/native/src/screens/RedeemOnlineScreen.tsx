@@ -26,16 +26,16 @@ const RedeemOnlineScreen = ({ route, navigation }) => {
   const { rewardId } = route.params;
   const { applyReward } = useCart();
 
-  const reward = (useQuery(api.loyalty.getRewardDefinitions) as any[])?.find(r => r._id === rewardId);
+  const currentReward = (useQuery(api.loyalty.getRewardDefinitions) as any[])?.find(r => r._id === rewardId);
 
-  if (!reward) return null;
+  if (!currentReward) return null;
 
   const handleApply = () => {
     // In a real app, logic would verify eligibility here
-    applyReward(reward);
+    applyReward(currentReward);
     Alert.alert(
         "Successfully Applied!",
-        `${reward.title} has been added to your current order. You'll see the discount at checkout.`,
+        `${currentReward.title} has been added to your current order. You'll see the discount at checkout.`,
         [{ text: "Go to Menu", onPress: () => navigation.navigate("HomeScreen") }]
     );
   };
@@ -57,7 +57,7 @@ const RedeemOnlineScreen = ({ route, navigation }) => {
 
       <View style={styles.content}>
         <Text style={styles.headerTitle}>How to redeem online</Text>
-        <Text style={styles.rewardTitle}>{reward.title}</Text>
+        <Text style={styles.rewardTitle}>{currentReward.title}</Text>
         
         <View style={styles.instructions}>
             <View style={styles.step}>

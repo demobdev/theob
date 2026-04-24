@@ -105,6 +105,19 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const applyReward = (reward: any) => {
     setAppliedReward(reward);
+
+    // SMART LOGIC: Auto-add item if it's a specific "Free Item" reward
+    if (reward?._id === "promo_wings") {
+      const hasWings = items.some(i => i.name.toLowerCase().includes("wing"));
+      if (!hasWings) {
+        addToCart({
+          id: "jumbo_wings",
+          name: "Jumbo Owner's Wings",
+          price: 15.99,
+          image: "jumbo_wings"
+        });
+      }
+    }
   };
 
   const totalItems = useMemo(
@@ -119,16 +132,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const discount = useMemo(() => {
     if (!appliedReward) return 0;
-    if (appliedReward.rewardType === "discount") {
-        return Math.min(subtotal, 10); // Mock $10 discount logic
+    
+    // FREE OWNER'S WINGS PROMO
+    if (appliedReward._id === "promo_wings") {
+      const wingItem = items.find(i => i.name.toLowerCase().includes("wing"));
+      return wingItem ? wingItem.price : 0;
     }
+
+    if (appliedReward.rewardType === "discount") {
+        return Math.min(subtotal, 10); // Standard $10 discount
+    }
+
     if (appliedReward.rewardType === "free_item") {
-        // Find most expensive eligible item if eligibleMenuItemIds exists
-        // For now, simplify: if any item is in cart, deduct roughly $15 for pizza
-        return subtotal > 0 ? 15.00 : 0; 
+        // Find if any item in cart matches the reward
+        // For simplicity, if it's a free item reward, deduct the price of the first item
+        // or a fixed amount if no items. In a real app, this would be more specific.
+        return items.length > 0 ? items[0].price : 0;
     }
     return 0;
-  }, [appliedReward, subtotal]);
+  }, [appliedReward, items, subtotal]);
 
   const totalPrice = subtotal - discount;
 

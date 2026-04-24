@@ -227,7 +227,7 @@ export const populate = mutation({
     // 3. SANDWICHES
     // ==========================================
     await ctx.db.insert("products", {
-      name: "Chicago Dog",
+      name: "Chicago",
       description: "Yellow mustard, onions, bright pickle relish, pickle, tomatoes, sport peppers.",
       price: 14.00,
       categoryId: catMap["Sandwiches"],
@@ -240,7 +240,7 @@ export const populate = mutation({
     });
     await ctx.db.insert("products", {
       name: "The Bar Chicken",
-      description: "Grilled or crispy fried chicken with buffalo sauce, ranch & smoked bacon.",
+      description: "Choice of grilled or crispy fried chicken with buffalo sauce, ranch & smoked bacon.",
       price: 16.00,
       categoryId: catMap["Sandwiches"],
       image: "bar_chicken",
@@ -254,6 +254,18 @@ export const populate = mutation({
         },
         sideChoice,
         ingredientMod(["Buffalo Sauce", "Ranch", "Bacon"])
+      ]
+    });
+    await ctx.db.insert("products", {
+      name: "Crab Cake",
+      description: "Lump crabmeat served on toasted bun, arugula, tomatoes & tartar sauce.",
+      price: 19.00,
+      categoryId: catMap["Sandwiches"],
+      image: "crab_cake",
+      isFeatured: false,
+      modifiers: [
+        sideChoice,
+        ingredientMod(["Arugula", "Tomatoes", "Tartar Sauce"])
       ]
     });
     await ctx.db.insert("products", {

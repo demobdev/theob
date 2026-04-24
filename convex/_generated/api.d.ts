@@ -8,7 +8,13 @@
  * @module
  */
 
+import type * as admin from "../admin.js";
+import type * as admin_loyalty from "../admin_loyalty.js";
+import type * as admin_orders from "../admin_orders.js";
+import type * as admin_products from "../admin_products.js";
+import type * as admin_sports from "../admin_sports.js";
 import type * as crons from "../crons.js";
+import type * as lib_requireAdmin from "../lib/requireAdmin.js";
 import type * as loyalty from "../loyalty.js";
 import type * as notes from "../notes.js";
 import type * as openai from "../openai.js";
@@ -36,7 +42,13 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  admin: typeof admin;
+  admin_loyalty: typeof admin_loyalty;
+  admin_orders: typeof admin_orders;
+  admin_products: typeof admin_products;
+  admin_sports: typeof admin_sports;
   crons: typeof crons;
+  "lib/requireAdmin": typeof lib_requireAdmin;
   loyalty: typeof loyalty;
   notes: typeof notes;
   openai: typeof openai;

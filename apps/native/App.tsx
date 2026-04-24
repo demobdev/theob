@@ -33,6 +33,10 @@ import PrivacyPolicyScreen from "./src/screens/PrivacyPolicyScreen";
 import NotificationSettingsScreen from "./src/screens/NotificationSettingsScreen";
 import MyTeamsScreen from "./src/screens/MyTeamsScreen";
 
+import OnboardingScreen from "./src/screens/OnboardingScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
+
 // Providers
 import ConvexClientProvider from "./ConvexClientProvider";
 import { CartProvider } from "./src/context/CartContext";
@@ -42,13 +46,23 @@ const Stack = createNativeStackNavigator();
 
 function AppNavigation() {
   const { isLoaded } = useAuth();
+  const [initialRoute, setInitialRoute] = useState<string | null>(null);
 
-  if (!isLoaded) {
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const hasSeen = await AsyncStorage.getItem("hasSeenOnboarding");
+      setInitialRoute(hasSeen === "true" ? "LandingScreen" : "OnboardingScreen");
+    };
+    checkOnboarding();
+  }, []);
+
+  if (!isLoaded || initialRoute === null) {
     return null;
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="LandingScreen">
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
+      <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} />
       <Stack.Screen name="LandingScreen" component={LandingScreen} />
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="LiveGamesScreen" component={LiveGamesScreen} />

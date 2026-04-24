@@ -1,7 +1,8 @@
-import { action, internalMutation, internalQuery } from "./_generated/server";
+import { action, internalMutation, internalQuery, ActionCtx } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { v } from "convex/values";
 import { syncUpcomingWeek } from "./sports/sportradar/sync";
+import { requireAdmin } from "./lib/requireAdmin";
 
 export const scheduledSync = action({
   args: {},
@@ -27,6 +28,32 @@ export const clearStaleGames = action({
     
     return { purgedCount: count };
   },
+});
+
+export const manualSync = action({
+  args: {},
+  handler: async (ctx: ActionCtx) => {
+    await requireAdmin(ctx);
+    console.log("Starting manual sports sync...");
+    const result = await syncUpcomingWeek(ctx, api);
+    return result;
+  }
+});
+
+export const purgeStale = action({
+  args: {},
+  handler: async (ctx: ActionCtx) => {
+    await requireAdmin(ctx);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    console.log(`Purging games older than ${yesterday.toISOString()}...`);
+    const count: number = await ctx.runMutation(api.sports_mutations.deleteStaleGames, { 
+      olderThan: yesterday.toISOString() 
+    });
+    
+    return { purgedCount: count };
+  }
 });
 
 // ── MLB Highlights ────────────────────────────────────────────────────────────

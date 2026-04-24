@@ -8,18 +8,123 @@ import {
   Image,
   SafeAreaView,
   Modal,
-  TextInput
+  TextInput,
+  Switch,
+  ImageBackground,
+  ScrollView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useCart, getUniqueKey } from "../context/CartContext";
 import { useOrder } from "../context/OrderContext";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import PreferencesModal from "../components/PreferencesModal";
 import { ensureAuth } from "../utils/authGuard";
+
+const RewardsCarousel = ({ navigation }) => {
+  const { appliedReward, applyReward } = useCart();
+  const availableRewards = useQuery(api.loyalty.getAvailableRewards) || [];
+
+  const handleToggle = (reward) => {
+    if (appliedReward?._id === reward._id) {
+      applyReward(null);
+    } else {
+      applyReward(reward);
+    }
+  };
+
+  return (
+    <View style={styles.carouselContainer}>
+      <Text style={styles.carouselTitle}>AVAILABLE OFFERS & REWARDS</Text>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.carouselScroll}
+      >
+        {availableRewards.map((reward) => (
+          <TouchableOpacity 
+            key={reward._id} 
+            activeOpacity={0.9}
+            onPress={() => reward.unlocked && handleToggle(reward)}
+            style={[
+              styles.rewardCard,
+              appliedReward?._id === reward._id && styles.rewardCardActive
+            ]}
+          >
+            {reward.isPromo ? (
+              <ImageBackground 
+                source={reward.image === "jumbo_wings" ? require("../../assets/images/menu/jumbo_wings.png") : require("../../assets/images/leather_black.jpg")}
+                style={styles.promoCardBg}
+                imageStyle={{ opacity: 0.9 }}
+                resizeMode="cover"
+              >
+                <View style={styles.promoOverlay}>
+                   <View style={styles.rewardStatus}>
+                      <View style={[styles.statusCircle, appliedReward?._id === reward._id && styles.statusCircleActive]}>
+                        {appliedReward?._id === reward._id && <Ionicons name="checkmark" size={14} color="#FFF" />}
+                      </View>
+                      <Text style={styles.statusLabel}>REWARD</Text>
+                   </View>
+                   
+                   <Text style={styles.rewardCardTitle}>{reward.title}</Text>
+                   
+                   <View style={styles.rewardFooter}>
+                     <Text style={styles.rewardCardDesc}>{reward.description}</Text>
+                     <Switch 
+                        value={appliedReward?._id === reward._id}
+                        onValueChange={() => handleToggle(reward)}
+                        trackColor={{ false: "#333", true: "#E31837" }}
+                        thumbColor="#FFF"
+                        ios_backgroundColor="#333"
+                        style={{ transform: [{ scaleX: 0.7 }, { scaleY: 0.7 }] }}
+                        disabled={!reward.unlocked}
+                     />
+                   </View>
+                </View>
+              </ImageBackground>
+            ) : (
+              <View style={styles.plainRewardContent}>
+                <View style={styles.rewardStatus}>
+                   <View style={[styles.statusCircle, appliedReward?._id === reward._id && styles.statusCircleActive]}>
+                     {appliedReward?._id === reward._id && <Ionicons name="checkmark" size={14} color="#FFF" />}
+                   </View>
+                   <Text style={styles.statusLabel}>REWARD</Text>
+                   {!reward.unlocked && (
+                     <View style={styles.lockedBadge}>
+                        <Ionicons name="lock-closed" size={10} color="#888" />
+                        <Text style={styles.lockedText}>{reward.pointsCost} PTS</Text>
+                     </View>
+                   )}
+                </View>
+
+                <View style={styles.rewardCenterContent}>
+                  <Text style={styles.plainRewardTitle}>{reward.title}</Text>
+                  <Ionicons name="trophy-outline" size={24} color="#D4AF37" />
+                </View>
+
+                <View style={styles.rewardFooter}>
+                  <Text style={styles.plainRewardDesc}>UNLOCKED AT {reward.pointsCost} PTS</Text>
+                  <Switch 
+                    value={appliedReward?._id === reward._id}
+                    onValueChange={() => handleToggle(reward)}
+                    trackColor={{ false: "#333", true: "#E31837" }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor="#333"
+                    style={{ transform: [{ scaleX: 0.7 }, { scaleY: 0.7 }] }}
+                    disabled={!reward.unlocked}
+                  />
+                </View>
+              </View>
+            )}
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
 
 const getImageSource = (imgStr) => {
   switch (imgStr) {
@@ -181,42 +286,44 @@ const CartScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {items.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Ionicons name="cart-outline" size={80} color="#333" />
-          <Text style={styles.emptyTitle}>YOUR TICKET IS EMPTY</Text>
-          <Text style={styles.emptySubtitle}>Start building your game-day order!</Text>
-          <TouchableOpacity 
-            style={styles.browseBtn}
-            onPress={() => navigation.navigate("HomeScreen")}
-          >
-            <Text style={styles.browseBtnText}>BROWSE MENU</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <>
-          <FlatList
-            data={items}
-            renderItem={renderItem}
-            keyExtractor={(item) => getUniqueKey(item)}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-          />
-
-          <View style={styles.footer}>
-            <View style={styles.priceRow}>
-              <Text style={styles.totalLabel}>TOTAL AMOUNT</Text>
-              <Text style={styles.totalValue}>${totalPrice.toFixed(2)}</Text>
-            </View>
+      <FlatList
+        data={items}
+        renderItem={renderItem}
+        keyExtractor={(item) => getUniqueKey(item)}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <RewardsCarousel navigation={navigation} />
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons name="cart-outline" size={80} color="#333" />
+            <Text style={styles.emptyTitle}>YOUR TICKET IS EMPTY</Text>
+            <Text style={styles.emptySubtitle}>Start building your game-day order!</Text>
             <TouchableOpacity 
-                style={styles.checkoutBtn}
-                onPress={() => ensureAuth(!!isSignedIn, navigation, () => setShowPreferences(true))}
+              style={styles.browseBtn}
+              onPress={() => navigation.navigate("HomeScreen")}
             >
-              <Text style={styles.checkoutText}>PROCEED TO CHECKOUT</Text>
-              <Ionicons name="arrow-forward" size={20} color="#000" style={{ marginLeft: 10 }} />
+              <Text style={styles.browseBtnText}>BROWSE MENU</Text>
             </TouchableOpacity>
           </View>
-        </>
+        }
+      />
+
+      {items.length > 0 && (
+        <View style={styles.footer}>
+          <View style={styles.priceRow}>
+            <Text style={styles.totalLabel}>TOTAL AMOUNT</Text>
+            <Text style={styles.totalValue}>${totalPrice.toFixed(2)}</Text>
+          </View>
+          <TouchableOpacity 
+              style={styles.checkoutBtn}
+              onPress={() => ensureAuth(!!isSignedIn, navigation, () => setShowPreferences(true))}
+          >
+            <Text style={styles.checkoutText}>PROCEED TO CHECKOUT</Text>
+            <Ionicons name="arrow-forward" size={20} color="#000" style={{ marginLeft: 10 }} />
+          </TouchableOpacity>
+        </View>
       )}
 
       <PreferencesModal 
@@ -603,6 +710,127 @@ const styles = StyleSheet.create({
     fontFamily: "MRegular",
     marginBottom: 10,
     backgroundColor: "#222"
+  },
+  carouselContainer: {
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  carouselTitle: {
+    color: "#888",
+    fontSize: 10,
+    fontFamily: "MBold",
+    letterSpacing: 1.5,
+    marginBottom: 15,
+    textTransform: "uppercase",
+  },
+  carouselScroll: {
+    paddingRight: 20,
+  },
+  rewardCard: {
+    width: 230,
+    height: 120,
+    backgroundColor: "#111",
+    borderRadius: 12,
+    marginRight: 15,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  rewardCardActive: {
+    borderColor: "#E31837",
+  },
+  promoCardBg: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  promoOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    padding: 12,
+    justifyContent: "space-between",
+  },
+  rewardStatus: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statusCircle: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: "#DDD",
+    backgroundColor: "#FFF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 8,
+  },
+  statusCircleActive: {
+    backgroundColor: "#E31837",
+    borderColor: "#E31837",
+  },
+  statusLabel: {
+    fontSize: 10,
+    fontFamily: "MBold",
+    color: "#FFF",
+    letterSpacing: 1,
+  },
+  rewardCardTitle: {
+    color: "#FFF",
+    fontFamily: "MBold",
+    fontSize: RFValue(14),
+    textTransform: "uppercase",
+  },
+  rewardFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  rewardCardDesc: {
+    color: "#DDD",
+    fontSize: 8,
+    fontFamily: "MRegular",
+    flex: 1,
+    marginRight: 10,
+  },
+  plainRewardContent: {
+    flex: 1,
+    padding: 12,
+    justifyContent: "space-between",
+    backgroundColor: "#FFF",
+  },
+  plainRewardTitle: {
+    color: "#000",
+    fontFamily: "MBold",
+    fontSize: RFValue(12),
+    textTransform: "uppercase",
+  },
+  plainRewardDesc: {
+    color: "#888",
+    fontSize: 8,
+    fontFamily: "MBold",
+    flex: 1,
+    marginRight: 10,
+  },
+  rewardCenterContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  lockedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F0F0F0",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    marginLeft: "auto",
+  },
+  lockedText: {
+    color: "#888",
+    fontSize: 9,
+    fontFamily: "MBold",
+    marginLeft: 4,
   }
 });
 

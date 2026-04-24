@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 type LogoProps = {
   theme?: "light" | "dark";
@@ -8,22 +9,28 @@ type LogoProps = {
   isIcon?: boolean;
 };
 
-export function TheobLogo({ theme = "light", className = "h-12", isIcon = false }: LogoProps) {
+export function TheobLogo({ className = "h-12", isIcon = false }: LogoProps) {
   if (isIcon) {
     return (
-      <img 
-        src="/theob-icon.JPEG" 
-        alt="UB Icon" 
-        className={`${className} object-contain`} 
-      />
+      <div className={`${className} relative aspect-square`}>
+        <Image 
+          src="/images/theob-letter-tp.png" 
+          alt="OB Icon" 
+          fill
+          className="object-contain" 
+        />
+      </div>
     );
   }
 
   return (
-    <img
-      src="/theob-main.png"
-      alt="Owner's Box Bar & Grill"
-      className={`${className} object-contain transition-all duration-500`}
-    />
+    <div className={`${className} relative aspect-[3/1]`}>
+      <Image
+        src="/images/theob-letter-tp.png"
+        alt="Owner's Box Bar & Grill"
+        fill
+        className="object-contain transition-all duration-500"
+      />
+    </div>
   );
 }

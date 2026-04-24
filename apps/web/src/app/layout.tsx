@@ -3,6 +3,7 @@ import { Inter, Montserrat, Lato } from "next/font/google";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 import ConvexClientProvider from "./ConvexClientProvider";
+import LocationFulfillmentModal from "@/components/menu/LocationFulfillmentModal";
 
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -21,7 +22,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(inter.className, montserrat.className, lato.className)}>
-        <ConvexClientProvider>{children}</ConvexClientProvider>
+        <ConvexClientProvider>
+          {children}
+          <LocationFulfillmentModal />
+        </ConvexClientProvider>
       </body>
     </html>
   );

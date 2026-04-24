@@ -1,4 +1,5 @@
 import { mutation, query } from "./_generated/server";
+console.log("LOYALTY MODULE LOADED");
 import { v } from "convex/values";
 import { Auth } from "convex/server";
 
@@ -244,5 +245,50 @@ export const checkBirthdayReward = mutation({
     }
 
     return { success: false, reason: "Not birthday or already granted" };
+  },
+});
+
+// Fetch all available rewards and special promos for the cart
+export const getAvailableRewards = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getUserId(ctx);
+    
+    // Base Promo: Owner's Wings (Always show for now, or check first order)
+    const basePromos = [
+      {
+        _id: "promo_wings",
+        title: "FREE OWNER'S WINGS",
+        description: "CLAIM ON YOUR FIRST PURCHASE",
+        rewardType: "free_item",
+        category: "Promos",
+        pointsCost: 0,
+        image: "jumbo_wings",
+        isPromo: true,
+        unlocked: true,
+      }
+    ];
+
+    if (!userId) return basePromos;
+
+    const profile = await ctx.db
+      .query("user_profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+
+    const points = profile?.points || 0;
+
+    const definitions = await ctx.db
+      .query("reward_definitions")
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .collect();
+
+    const userRewards = definitions.map(d => ({
+      ...d,
+      unlocked: points >= d.pointsCost,
+      isPromo: false
+    }));
+
+    return [...basePromos, ...userRewards];
   },
 });
