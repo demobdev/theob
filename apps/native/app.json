@@ -1,6 +1,7 @@
 {
   "expo": {
     "newArchEnabled": true,
+    "scheme": "theownersbox",
     "name": "The Owner's Box",
     "slug": "the-owners-box",
     "version": "1.0.0",
@@ -9,8 +10,8 @@
     "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0A0A0A"
+      "resizeMode": "cover",
+      "backgroundColor": "#000000"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -18,6 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.theownersbox.app",
+      "icon": "./assets/icons/icon-ob.icon",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -25,7 +27,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#000000"
       },
       "package": "com.theownersbox.app"
     },

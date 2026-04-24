@@ -11,6 +11,9 @@ import {
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useNavigation } from "@react-navigation/native";
+import { useQuery } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
+import { useUser } from "@clerk/clerk-expo";
 
 // THE OB Standard Colors
 const DARK = "#111111";
@@ -21,12 +24,14 @@ const TEXT_MUTED = "#888";
 
 const CollectPointsScreen = () => {
   const navigation = useNavigation<any>();
-  // Mock data for UI
-  const [points] = useState(20);
-  const [cards] = useState([
-    { id: 1, last4: "8757", brand: "visa" },
-    { id: 2, last4: "9393", brand: "visa" }
-  ]);
+  const { user } = useUser();
+  
+  // Real data from Convex
+  const profile = useQuery(api.loyalty.getUserProfile);
+  const paymentMethods = useQuery(api.payments.getPaymentMethods) || [];
+  
+  const points = profile?.points || 0;
+  const cards = paymentMethods;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -78,13 +83,20 @@ const CollectPointsScreen = () => {
 
           <View style={styles.cardsList}>
             {cards.map((card) => (
-              <View key={card.id} style={styles.cardRow}>
+              <View key={card._id} style={styles.cardRow}>
                 <View style={styles.cardBrandBox}>
-                  <FontAwesome5 name={"cc-visa"} size={20} color="#00579F" />
+                  <FontAwesome5 
+                    name={card.brand?.toLowerCase() === "visa" ? "cc-visa" : "credit-card"} 
+                    size={20} 
+                    color={card.brand?.toLowerCase() === "visa" ? "#00579F" : "#555"} 
+                  />
                 </View>
                 <Text style={styles.cardDigits}>.... .... .... {card.last4}</Text>
               </View>
             ))}
+            {cards.length === 0 && (
+              <Text style={styles.noCardsText}>No cards registered yet.</Text>
+            )}
           </View>
 
           <TouchableOpacity 
@@ -281,6 +293,13 @@ const styles = StyleSheet.create({
   linkAccent: {
     color: RED,
     fontFamily: "MRegular",
+  },
+  noCardsText: {
+    color: TEXT_MUTED,
+    fontFamily: "MRegular",
+    fontSize: RFValue(12),
+    textAlign: "center",
+    marginVertical: 10,
   }
 });
 

@@ -23,6 +23,36 @@ import { useUser } from "@clerk/clerk-expo";
 
 import BottomNavBar from "../components/BottomNavBar";
 
+/**
+ * Robust logo fallback system.
+ * If the database doesn't have a URL, we generate a high-res ESPN CDN URL.
+ */
+const getTeamLogo = (sport: string, abbr: string, fallbackUrl?: string) => {
+  if (fallbackUrl) return fallbackUrl;
+  if (!abbr) return null;
+  
+  const sportSlug = sport.toLowerCase();
+  let teamSlug = abbr.toLowerCase();
+  
+  // NBA Fixes
+  if (sport === 'NBA') {
+    if (teamSlug === 'gs') teamSlug = 'gsw';
+    if (teamSlug === 'la') teamSlug = 'lal';
+    if (teamSlug === 'ny') teamSlug = 'ny';
+    if (teamSlug === 'no') teamSlug = 'no';
+    if (teamSlug === 'uta') teamSlug = 'utah';
+  }
+  
+  // NHL Fixes
+  if (sport === 'NHL') {
+    if (teamSlug === 'la') teamSlug = 'lak';
+    if (teamSlug === 'tb') teamSlug = 'tbl';
+    if (teamSlug === 'nj') teamSlug = 'njd';
+  }
+  
+  return `https://a.espncdn.com/i/teamlogos/${sportSlug}/500/${teamSlug}.png`;
+};
+
 const { width } = Dimensions.get("window");
 
 const SPORTS = ["All", "NFL", "NBA", "MLB", "NHL", "GOLF"];
@@ -286,8 +316,12 @@ const LiveGamesScreen = ({ navigation }) => {
               {/* Away Team */}
               <View style={styles.heroTeamCol}>
                 <View style={styles.logoCircleLarge}>
-                    {item.awayTeam?.logoUrl ? (
-                        <Image source={{ uri: item.awayTeam.logoUrl }} style={styles.heroLogoLarge} resizeMode="contain" />
+                    {getTeamLogo(item.sport, item.awayTeam?.abbr, item.awayTeam?.logoUrl) ? (
+                        <Image 
+                            source={{ uri: getTeamLogo(item.sport, item.awayTeam?.abbr, item.awayTeam?.logoUrl) as string }} 
+                            style={styles.heroLogoLarge} 
+                            resizeMode="contain" 
+                        />
                     ) : (
                         <Text style={styles.logoFallbackTextLarge}>{item.awayTeam?.abbr}</Text>
                     )}
@@ -327,8 +361,12 @@ const LiveGamesScreen = ({ navigation }) => {
               {/* Home Team */}
               <View style={styles.heroTeamCol}>
                 <View style={styles.logoCircleLarge}>
-                    {item.homeTeam?.logoUrl ? (
-                        <Image source={{ uri: item.homeTeam.logoUrl }} style={styles.heroLogoLarge} resizeMode="contain" />
+                    {getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) ? (
+                        <Image 
+                            source={{ uri: getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) as string }} 
+                            style={styles.heroLogoLarge} 
+                            resizeMode="contain" 
+                        />
                     ) : (
                         <Text style={styles.logoFallbackTextLarge}>{item.homeTeam?.abbr}</Text>
                     )}
@@ -381,11 +419,23 @@ const LiveGamesScreen = ({ navigation }) => {
                   <View style={styles.listCenterCol}>
                       <View style={styles.listTeamUnit}>
                           <Text style={styles.listTeamAbbrMain}>{item.awayTeam?.abbr}</Text>
-                          {item.awayTeam?.logoUrl && <Image source={{ uri: item.awayTeam.logoUrl }} style={styles.listLogoMain} resizeMode="contain" />}
+                          {getTeamLogo(item.sport, item.awayTeam?.abbr, item.awayTeam?.logoUrl) && (
+                            <Image 
+                                source={{ uri: getTeamLogo(item.sport, item.awayTeam?.abbr, item.awayTeam?.logoUrl) as string }} 
+                                style={styles.listLogoMain} 
+                                resizeMode="contain" 
+                            />
+                          )}
                       </View>
                       <Text style={styles.listVersusText}>@</Text>
                       <View style={styles.listTeamUnit}>
-                          {item.homeTeam?.logoUrl && <Image source={{ uri: item.homeTeam.logoUrl }} style={styles.listLogoMain} resizeMode="contain" />}
+                          {getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) && (
+                            <Image 
+                                source={{ uri: getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) as string }} 
+                                style={styles.listLogoMain} 
+                                resizeMode="contain" 
+                            />
+                          )}
                           <Text style={styles.listTeamAbbrMain}>{item.homeTeam?.abbr}</Text>
                       </View>
                   </View>

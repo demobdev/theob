@@ -1,6 +1,7 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import * as SplashScreen from "expo-splash-screen";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth } from "@clerk/clerk-expo";
@@ -42,6 +43,9 @@ import ConvexClientProvider from "./ConvexClientProvider";
 import { CartProvider } from "./src/context/CartContext";
 import { OrderProvider } from "./src/context/OrderContext";
 
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
+
 const Stack = createNativeStackNavigator();
 
 function AppNavigation() {
@@ -50,8 +54,18 @@ function AppNavigation() {
 
   useEffect(() => {
     const checkOnboarding = async () => {
-      const hasSeen = await AsyncStorage.getItem("hasSeenOnboarding");
-      setInitialRoute(hasSeen === "true" ? "LandingScreen" : "OnboardingScreen");
+      try {
+        const hasSeen = await AsyncStorage.getItem("hasSeenOnboarding");
+        setInitialRoute(hasSeen === "true" ? "LandingScreen" : "OnboardingScreen");
+        
+        // Artificial delay to let the brand "breathe"
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the splash screen to hide
+        await SplashScreen.hideAsync();
+      }
     };
     checkOnboarding();
   }, []);
