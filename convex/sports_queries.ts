@@ -80,29 +80,33 @@ export const getUpcomingGames = query({
 /**
  * Returns ALL games for a given date regardless of status.
  * Powers the Games Page / War Room list to show completed, live, and upcoming games.
+ *
+ * Uses a timezone-aware window: games stored in UTC by TheSportsDB/API-Sports
+ * may be listed as the NEXT UTC day for ET evening games.
+ * We capture a wide window: [targetDate-1 T04:00Z, targetDate+2 T04:00Z]
+ * then post-filter to games whose local date (ET offset -4h) matches targetDate.
  */
 export const getGamesForDate = query({
   args: {
-    targetDate: v.string(), // e.g. "2026-04-20"
-    sportFilter: v.optional(v.string()), // "All", "NBA", etc.
+    targetDate: v.string(), // e.g. "2026-04-24"
+    sportFilter: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const startBounds = args.targetDate + "T04:00:00";
-    
-    const nextDay = new Date(args.targetDate);
-    nextDay.setDate(nextDay.getDate() + 1);
-    const nextDayStr = nextDay.toISOString().split('T')[0] + "T04:00:00";
+    // Wide UTC window: capture games stored anywhere from day-before midnight to day+2 morning
+    // This handles ET games that appear as next-day UTC
+    const dayStart = args.targetDate + "T00:00:00Z"; // midnight UTC of the date
+    const dayEnd   = args.targetDate + "T28:00:00Z"; // 28 hours later catches all ET games
 
     let games = await ctx.db.query("upcoming_games")
       .withIndex("by_startsAt", (q) =>
-        q.gte("startsAt", startBounds).lt("startsAt", nextDayStr)
+        q.gte("startsAt", dayStart).lt("startsAt", dayEnd)
       )
       .order("asc")
       .collect();
 
     // Post-filter by sport
     if (args.sportFilter && args.sportFilter !== "All") {
-      games = games.filter(g => g.sport === args.sportFilter);
+      games = games.filter((g: any) => g.sport === args.sportFilter);
     }
 
     return games;
@@ -111,42 +115,49 @@ export const getGamesForDate = query({
 
 /**
  * Returns today's games for the homepage ticker — live, closed (with scores), and upcoming.
- * Includes yesterday's still-live games that haven't gone stale.
+ * Also includes last night's finished games so the carousel always has content.
+ *
+ * Uses a wide UTC window to handle ET evening games stored as next-day UTC by APIs.
  */
 export const getTodayGames = query({
   args: {},
   handler: async (ctx) => {
     const now = new Date();
     const todayStr = now.toISOString().split("T")[0];
-    const startBounds = todayStr + "T04:00:00";
 
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const endBounds = tomorrow.toISOString().split("T")[0] + "T04:00:00";
+    // Wide window: today 00:00Z through 28 hours later
+    // This captures 8pm ET games stored as next-day UTC (00:00-03:59Z)
+    const windowStart = todayStr + "T00:00:00Z";
+    const windowEnd   = todayStr + "T28:00:00Z";
 
-    // Get all of today's games (any status)
     const todayGames = await ctx.db.query("upcoming_games")
       .withIndex("by_startsAt", (q) =>
-        q.gte("startsAt", startBounds).lt("startsAt", endBounds)
+        q.gte("startsAt", windowStart).lt("startsAt", windowEnd)
       )
       .order("asc")
       .collect();
 
-    // Also get any truly live games from yesterday that are still in progress
-    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
-    const allInProgress = await ctx.db.query("upcoming_games")
-      .filter((q) => q.eq(q.field("status"), "inprogress"))
-      .collect();
-    
-    const freshLiveFromYesterday = allInProgress.filter(
-      (g) => g.startsAt < startBounds && (!g.lastSyncedAt || g.lastSyncedAt > sixHoursAgo)
-    );
+    // Also pull yesterday's closed games for the carousel (final scores)
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr   = yesterday.toISOString().split("T")[0];
+    const yesterdayStart = yesterdayStr + "T00:00:00Z";
+    const yesterdayEnd   = yesterdayStr + "T28:00:00Z";
 
-    // Merge: live-from-yesterday first, then today's games (deduped)
+    const yesterdayGames = await ctx.db.query("upcoming_games")
+      .withIndex("by_startsAt", (q) =>
+        q.gte("startsAt", yesterdayStart).lt("startsAt", yesterdayEnd)
+      )
+      .order("asc")
+      .collect();
+
+    // Include yesterday's CLOSED games only (final scores)
+    const yesterdayClosed = yesterdayGames.filter((g: any) => g.status === "closed");
+
+    // Merge: yesterday finals first (context), then today's games
     const seen = new Set<string>();
     const merged: any[] = [];
-    
-    for (const g of [...freshLiveFromYesterday, ...todayGames]) {
+    for (const g of [...yesterdayClosed, ...todayGames]) {
       if (!seen.has(g._id)) {
         seen.add(g._id);
         merged.push(g);
@@ -154,6 +165,39 @@ export const getTodayGames = query({
     }
 
     return merged;
+  },
+});
+
+/**
+ * Returns yesterday's closed games with final scores.
+ * Used by the homepage carousel to show recent results.
+ */
+export const getYesterdayGames = query({
+  args: {
+    sportFilter: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const ydStr = yesterday.toISOString().split("T")[0];
+
+    const windowStart = ydStr + "T00:00:00Z";
+    const windowEnd   = ydStr + "T28:00:00Z";
+
+    let games = await ctx.db.query("upcoming_games")
+      .withIndex("by_startsAt", (q) =>
+        q.gte("startsAt", windowStart).lt("startsAt", windowEnd)
+      )
+      .order("asc")
+      .collect();
+
+    games = games.filter((g: any) => g.status === "closed");
+
+    if (args.sportFilter && args.sportFilter !== "All") {
+      games = games.filter((g: any) => g.sport === args.sportFilter);
+    }
+
+    return games;
   },
 });
 

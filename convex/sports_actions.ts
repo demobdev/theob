@@ -18,13 +18,13 @@ export const scheduledSync = action({
 export const clearStaleGames = action({
   args: {},
   handler: async (ctx): Promise<{ purgedCount: number }> => {
-    // Clear everything older than yesterday to purge the "Sept 27" mock data
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
+    // Keep 2 days of history so yesterday's final scores remain visible in the carousel
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
     
-    console.log(`Purging games older than ${yesterday.toISOString()}...`);
+    console.log(`Purging games older than ${twoDaysAgo.toISOString()} (keeping 2 days)...`);
     const count = (await ctx.runMutation(api.sports_mutations.deleteStaleGames, { 
-      olderThan: yesterday.toISOString() 
+      olderThan: twoDaysAgo.toISOString() 
     })) as number;
     
     return { purgedCount: count };

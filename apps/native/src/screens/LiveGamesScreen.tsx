@@ -22,6 +22,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useUser } from "@clerk/clerk-expo";
 
 import BottomNavBar from "../components/BottomNavBar";
+import TeamDetailSheet from "./TeamDetailSheet";
 
 /**
  * Robust logo fallback system.
@@ -102,6 +103,9 @@ const LiveGamesScreen = ({ navigation }) => {
   };
 
   const [selectedGame, setSelectedGame] = useState(null);
+  const [selectedTeamDetail, setSelectedTeamDetail] = useState<null | {
+    team: any; sport: string; opponent?: any; gameStatus?: string; startsAt?: string;
+  }>(null);
   const [showTVGuide, setShowTVGuide] = useState(false);
   const [listPage, setListPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
@@ -221,6 +225,27 @@ const LiveGamesScreen = ({ navigation }) => {
     }
   };
 
+  /**
+   * Returns a display label for a game's date relative to today.
+   * Used to distinguish yesterday's finals from today's games.
+   */
+  const getGameDayLabel = (startsAt: string): "TODAY" | "YESTERDAY" | string => {
+    if (!startsAt) return "";
+    const gameDate = new Date(startsAt);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const gameDateStr = gameDate.toISOString().split("T")[0];
+    const todayStr    = today.toISOString().split("T")[0];
+    const ydStr       = yesterday.toISOString().split("T")[0];
+
+    if (gameDateStr === todayStr) return "TODAY";
+    if (gameDateStr === ydStr)   return "YESTERDAY";
+    // Fallback: e.g. "APR 23"
+    return gameDate.toLocaleDateString([], { month: "short", day: "numeric" }).toUpperCase();
+  };
+
   const renderLeagueSection = (sport, games) => {
     const accentColor = getSportColor(sport);
     const hasGames = games && games.length > 0;
@@ -254,11 +279,50 @@ const LiveGamesScreen = ({ navigation }) => {
                 </View>
             </View>
             {hasGames ? (
-                games.map(game => (
-                    <View key={game._id || game.id}>
+                (() => {
+                  const todayStr = new Date().toISOString().split("T")[0];
+                  let shownYesterdayDivider = false;
+                  let shownTodayDivider = false;
+
+                  return games.map((game: any) => {
+                    const gameDay = getGameDayLabel(game.startsAt);
+                    const isYesterday = gameDay === "YESTERDAY";
+                    const isToday = gameDay === "TODAY";
+                    const elements: React.ReactNode[] = [];
+
+                    // Insert a "YESTERDAY — FINAL SCORES" divider before first yesterday game
+                    if (isYesterday && !shownYesterdayDivider) {
+                      shownYesterdayDivider = true;
+                      elements.push(
+                        <View key={`div-yd-${sport}`} style={styles.dateDivider}>
+                          <View style={styles.dateDividerLine} />
+                          <Text style={styles.dateDividerLabel}>⏪  YESTERDAY — FINAL SCORES</Text>
+                          <View style={styles.dateDividerLine} />
+                        </View>
+                      );
+                    }
+
+                    // Insert a "TODAY" divider when switching from yesterday → today
+                    if (isToday && shownYesterdayDivider && !shownTodayDivider) {
+                      shownTodayDivider = true;
+                      elements.push(
+                        <View key={`div-td-${sport}`} style={styles.dateDivider}>
+                          <View style={styles.dateDividerLine} />
+                          <Text style={[styles.dateDividerLabel, { color: '#FFA500' }]}>▶  TODAY</Text>
+                          <View style={styles.dateDividerLine} />
+                        </View>
+                      );
+                    }
+
+                    elements.push(
+                      <View key={game._id || game.id}>
                         {renderListGame({ item: game })}
-                    </View>
-                ))
+                      </View>
+                    );
+
+                    return elements;
+                  });
+                })()
             ) : (
                 <View style={[styles.offSeasonCard, !inSeason && { opacity: 0.7 }]}>
                     <Text style={styles.offSeasonTitle}>
@@ -314,7 +378,16 @@ const LiveGamesScreen = ({ navigation }) => {
         ) : (
             <View style={styles.heroTeamsRow}>
               {/* Away Team */}
-              <View style={styles.heroTeamCol}>
+              <TouchableOpacity
+                style={styles.heroTeamCol}
+                onPress={() => setSelectedTeamDetail({
+                  team: { ...item.awayTeam, logoUrl: getTeamLogo(item.sport, item.awayTeam?.abbr, item.awayTeam?.logoUrl) },
+                  sport: item.sport,
+                  opponent: { ...item.homeTeam, logoUrl: getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) },
+                  gameStatus: item.status,
+                  startsAt: item.startsAt,
+                })}
+              >
                 <View style={styles.logoCircleLarge}>
                     {getTeamLogo(item.sport, item.awayTeam?.abbr, item.awayTeam?.logoUrl) ? (
                         <Image 
@@ -327,7 +400,7 @@ const LiveGamesScreen = ({ navigation }) => {
                     )}
                 </View>
                 <Text style={styles.heroTeamNameLarge} numberOfLines={1}>{item.awayTeam?.name?.toUpperCase() || "TBA"}</Text>
-              </View>
+              </TouchableOpacity>
               
               {/* Center: Score or Time */}
               <View style={styles.heroCenterCol}>
@@ -359,7 +432,16 @@ const LiveGamesScreen = ({ navigation }) => {
               </View>
 
               {/* Home Team */}
-              <View style={styles.heroTeamCol}>
+              <TouchableOpacity
+                style={styles.heroTeamCol}
+                onPress={() => setSelectedTeamDetail({
+                  team: { ...item.homeTeam, logoUrl: getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) },
+                  sport: item.sport,
+                  opponent: { ...item.awayTeam, logoUrl: getTeamLogo(item.sport, item.awayTeam?.abbr, item.awayTeam?.logoUrl) },
+                  gameStatus: item.status,
+                  startsAt: item.startsAt,
+                })}
+              >
                 <View style={styles.logoCircleLarge}>
                     {getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) ? (
                         <Image 
@@ -372,7 +454,7 @@ const LiveGamesScreen = ({ navigation }) => {
                     )}
                 </View>
                 <Text style={styles.heroTeamNameLarge} numberOfLines={1}>{item.homeTeam?.name?.toUpperCase() || "TBA"}</Text>
-              </View>
+              </TouchableOpacity>
             </View>
         )}
         
@@ -417,7 +499,16 @@ const LiveGamesScreen = ({ navigation }) => {
 
                   {/* CENTER: MATCHUP */}
                   <View style={styles.listCenterCol}>
-                      <View style={styles.listTeamUnit}>
+                      <TouchableOpacity
+                        style={styles.listTeamUnit}
+                        onPress={() => setSelectedTeamDetail({
+                          team: { ...item.awayTeam, logoUrl: getTeamLogo(item.sport, item.awayTeam?.abbr, item.awayTeam?.logoUrl) },
+                          sport: item.sport,
+                          opponent: { ...item.homeTeam, logoUrl: getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) },
+                          gameStatus: item.status,
+                          startsAt: item.startsAt,
+                        })}
+                      >
                           <Text style={styles.listTeamAbbrMain}>{item.awayTeam?.abbr}</Text>
                           {getTeamLogo(item.sport, item.awayTeam?.abbr, item.awayTeam?.logoUrl) && (
                             <Image 
@@ -426,9 +517,18 @@ const LiveGamesScreen = ({ navigation }) => {
                                 resizeMode="contain" 
                             />
                           )}
-                      </View>
+                      </TouchableOpacity>
                       <Text style={styles.listVersusText}>@</Text>
-                      <View style={styles.listTeamUnit}>
+                      <TouchableOpacity
+                        style={styles.listTeamUnit}
+                        onPress={() => setSelectedTeamDetail({
+                          team: { ...item.homeTeam, logoUrl: getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) },
+                          sport: item.sport,
+                          opponent: { ...item.awayTeam, logoUrl: getTeamLogo(item.sport, item.awayTeam?.abbr, item.awayTeam?.logoUrl) },
+                          gameStatus: item.status,
+                          startsAt: item.startsAt,
+                        })}
+                      >
                           {getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) && (
                             <Image 
                                 source={{ uri: getTeamLogo(item.sport, item.homeTeam?.abbr, item.homeTeam?.logoUrl) as string }} 
@@ -437,20 +537,48 @@ const LiveGamesScreen = ({ navigation }) => {
                             />
                           )}
                           <Text style={styles.listTeamAbbrMain}>{item.homeTeam?.abbr}</Text>
-                      </View>
+                      </TouchableOpacity>
                   </View>
 
-                  {/* RIGHT: WIN PROB & FAVORITE */}
+                    {/* RIGHT: SCORE / STATUS */}
                   <View style={styles.listRightCol}>
                     {isFavoriteGame(item) && (
                       <View style={[styles.favBadge, { marginBottom: 8 }]}>
                         <Text style={styles.favBadgeText}>YOUR TEAM</Text>
                       </View>
                     )}
-                    <View style={styles.winProbContainer}>
+                    {(isLive || item.status === 'closed') && (
+                      <View style={styles.liveScoreBlock}>
+                        <Text style={styles.liveScoreNum}>
+                          {item.awayTeam?.score ?? item.awayTeam?.runs ?? '—'}
+                        </Text>
+                        <Text style={styles.liveScoreDash}>–</Text>
+                        <Text style={styles.liveScoreNum}>
+                          {item.homeTeam?.score ?? item.homeTeam?.runs ?? '—'}
+                        </Text>
+                      </View>
+                    )}
+                    {item.status === 'closed' ? (
+                      <View style={styles.finalBadgeSmall}>
+                        {/* Show dated FINAL for previous-day games to avoid confusion */}
+                        <Text style={styles.finalBadgeText}>
+                          {getGameDayLabel(item.startsAt) !== 'TODAY'
+                            ? `${getGameDayLabel(item.startsAt)} · FINAL`
+                            : 'FINAL'
+                          }
+                        </Text>
+                      </View>
+                    ) : isLive ? (
+                      <View style={styles.liveBadgeSmall}>
+                        <View style={styles.liveDotSmall} />
+                        <Text style={styles.liveBadgeSmallText}>LIVE</Text>
+                      </View>
+                    ) : (
+                      <View style={styles.winProbContainer}>
                         <View style={[styles.winProbBar, { width: '60%', backgroundColor: '#222' }]} />
-                        <Text style={styles.winProbText}>58.2%</Text>
-                    </View>
+                        <Text style={styles.winProbText}>TBD</Text>
+                      </View>
+                    )}
                   </View>
               </View>
           </TouchableOpacity>
@@ -843,6 +971,18 @@ const LiveGamesScreen = ({ navigation }) => {
          </View>
       </Modal>
 
+      {/* Team Detail Sheet */}
+      {selectedTeamDetail && (
+        <TeamDetailSheet
+          team={selectedTeamDetail.team}
+          sport={selectedTeamDetail.sport}
+          opponent={selectedTeamDetail.opponent}
+          gameStatus={selectedTeamDetail.gameStatus}
+          startsAt={selectedTeamDetail.startsAt}
+          onClose={() => setSelectedTeamDetail(null)}
+        />
+      )}
+
       <BottomNavBar activeTab="GAMES" navigation={navigation} />
     </View>
   );
@@ -852,6 +992,77 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#050505",
+  },
+  // Score display for closed/live games in list card
+  liveScoreBlock: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 4,
+  },
+  liveScoreNum: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  liveScoreDash: {
+    color: '#555',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  finalBadgeSmall: {
+    backgroundColor: '#222',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: '#444',
+  },
+  finalBadgeText: {
+    color: '#aaa',
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  liveBadgeSmall: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(227,24,55,0.15)',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  liveDotSmall: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#E31837',
+  },
+  liveBadgeSmallText: {
+    color: '#E31837',
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  // Date dividers — separate yesterday's finals from today's games
+  dateDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginVertical: 8,
+    paddingHorizontal: 4,
+  },
+  dateDividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#2a2a2a',
+  },
+  dateDividerLabel: {
+    color: '#666',
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 1.2,
   },
   topNav: {
     position: 'absolute',
