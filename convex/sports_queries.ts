@@ -126,47 +126,19 @@ export const getTodayGames = query({
     const todayStr = now.toISOString().split("T")[0];
 
     // Wide window: today 00:00Z through 28 hours later
-    // This captures 8pm ET games stored as next-day UTC (00:00-03:59Z)
+    // Captures 8pm ET games stored as next-day UTC (00:00-03:59Z)
     const windowStart = todayStr + "T00:00:00Z";
     const windowEnd   = todayStr + "T28:00:00Z";
 
-    const todayGames = await ctx.db.query("upcoming_games")
+    return await ctx.db.query("upcoming_games")
       .withIndex("by_startsAt", (q) =>
         q.gte("startsAt", windowStart).lt("startsAt", windowEnd)
       )
       .order("asc")
       .collect();
-
-    // Also pull yesterday's closed games for the carousel (final scores)
-    const yesterday = new Date(now);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr   = yesterday.toISOString().split("T")[0];
-    const yesterdayStart = yesterdayStr + "T00:00:00Z";
-    const yesterdayEnd   = yesterdayStr + "T28:00:00Z";
-
-    const yesterdayGames = await ctx.db.query("upcoming_games")
-      .withIndex("by_startsAt", (q) =>
-        q.gte("startsAt", yesterdayStart).lt("startsAt", yesterdayEnd)
-      )
-      .order("asc")
-      .collect();
-
-    // Include yesterday's CLOSED games only (final scores)
-    const yesterdayClosed = yesterdayGames.filter((g: any) => g.status === "closed");
-
-    // Merge: yesterday finals first (context), then today's games
-    const seen = new Set<string>();
-    const merged: any[] = [];
-    for (const g of [...yesterdayClosed, ...todayGames]) {
-      if (!seen.has(g._id)) {
-        seen.add(g._id);
-        merged.push(g);
-      }
-    }
-
-    return merged;
   },
 });
+
 
 /**
  * Returns yesterday's closed games with final scores.

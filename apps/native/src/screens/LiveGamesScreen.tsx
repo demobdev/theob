@@ -225,26 +225,6 @@ const LiveGamesScreen = ({ navigation }) => {
     }
   };
 
-  /**
-   * Returns a display label for a game's date relative to today.
-   * Used to distinguish yesterday's finals from today's games.
-   */
-  const getGameDayLabel = (startsAt: string): "TODAY" | "YESTERDAY" | string => {
-    if (!startsAt) return "";
-    const gameDate = new Date(startsAt);
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
-
-    const gameDateStr = gameDate.toISOString().split("T")[0];
-    const todayStr    = today.toISOString().split("T")[0];
-    const ydStr       = yesterday.toISOString().split("T")[0];
-
-    if (gameDateStr === todayStr) return "TODAY";
-    if (gameDateStr === ydStr)   return "YESTERDAY";
-    // Fallback: e.g. "APR 23"
-    return gameDate.toLocaleDateString([], { month: "short", day: "numeric" }).toUpperCase();
-  };
 
   const renderLeagueSection = (sport, games) => {
     const accentColor = getSportColor(sport);
@@ -279,50 +259,11 @@ const LiveGamesScreen = ({ navigation }) => {
                 </View>
             </View>
             {hasGames ? (
-                (() => {
-                  const todayStr = new Date().toISOString().split("T")[0];
-                  let shownYesterdayDivider = false;
-                  let shownTodayDivider = false;
-
-                  return games.map((game: any) => {
-                    const gameDay = getGameDayLabel(game.startsAt);
-                    const isYesterday = gameDay === "YESTERDAY";
-                    const isToday = gameDay === "TODAY";
-                    const elements: React.ReactNode[] = [];
-
-                    // Insert a "YESTERDAY — FINAL SCORES" divider before first yesterday game
-                    if (isYesterday && !shownYesterdayDivider) {
-                      shownYesterdayDivider = true;
-                      elements.push(
-                        <View key={`div-yd-${sport}`} style={styles.dateDivider}>
-                          <View style={styles.dateDividerLine} />
-                          <Text style={styles.dateDividerLabel}>⏪  YESTERDAY — FINAL SCORES</Text>
-                          <View style={styles.dateDividerLine} />
-                        </View>
-                      );
-                    }
-
-                    // Insert a "TODAY" divider when switching from yesterday → today
-                    if (isToday && shownYesterdayDivider && !shownTodayDivider) {
-                      shownTodayDivider = true;
-                      elements.push(
-                        <View key={`div-td-${sport}`} style={styles.dateDivider}>
-                          <View style={styles.dateDividerLine} />
-                          <Text style={[styles.dateDividerLabel, { color: '#FFA500' }]}>▶  TODAY</Text>
-                          <View style={styles.dateDividerLine} />
-                        </View>
-                      );
-                    }
-
-                    elements.push(
-                      <View key={game._id || game.id}>
+                games.map((game: any) => (
+                    <View key={game._id || game.id}>
                         {renderListGame({ item: game })}
-                      </View>
-                    );
-
-                    return elements;
-                  });
-                })()
+                    </View>
+                ))
             ) : (
                 <View style={[styles.offSeasonCard, !inSeason && { opacity: 0.7 }]}>
                     <Text style={styles.offSeasonTitle}>
@@ -560,13 +501,7 @@ const LiveGamesScreen = ({ navigation }) => {
                     )}
                     {item.status === 'closed' ? (
                       <View style={styles.finalBadgeSmall}>
-                        {/* Show dated FINAL for previous-day games to avoid confusion */}
-                        <Text style={styles.finalBadgeText}>
-                          {getGameDayLabel(item.startsAt) !== 'TODAY'
-                            ? `${getGameDayLabel(item.startsAt)} · FINAL`
-                            : 'FINAL'
-                          }
-                        </Text>
+                        <Text style={styles.finalBadgeText}>FINAL</Text>
                       </View>
                     ) : isLive ? (
                       <View style={styles.liveBadgeSmall}>
