@@ -49,13 +49,21 @@ const minutesUntilOpen = (): number => {
 const RewardsCarousel = ({ navigation }) => {
   const { appliedReward, applyReward } = useCart();
   const availableRewards = useQuery(api.loyalty.getAvailableRewards) || [];
+  const { isSignedIn } = useAuth();
 
   const handleToggle = (reward) => {
-    if (appliedReward?._id === reward._id) {
-      applyReward(null);
-    } else {
-      applyReward(reward);
-    }
+    ensureAuth(
+      !!isSignedIn,
+      navigation,
+      () => {
+        if (appliedReward?._id === reward._id) {
+          applyReward(null);
+        } else {
+          applyReward(reward);
+        }
+      },
+      "Sign in to claim offers and rewards!"
+    );
   };
 
   return (
@@ -378,7 +386,7 @@ const CartScreen = ({ navigation }) => {
               </View>
               <TouchableOpacity
                 style={styles.checkoutBtn}
-                onPress={() => ensureAuth(!!isSignedIn, navigation, () => setShowPreferences(true))}
+                onPress={() => setShowPreferences(true)}
               >
                 <Text style={styles.checkoutText}>PROCEED TO CHECKOUT</Text>
                 <Ionicons name="arrow-forward" size={20} color="#000" style={{ marginLeft: 10 }} />
