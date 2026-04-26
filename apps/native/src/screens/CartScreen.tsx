@@ -922,10 +922,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   plainRewardTitle: {
+    flex: 1,
     color: "#000",
     fontFamily: "MBold",
     fontSize: RFValue(12),
     textTransform: "uppercase",
+    marginRight: 10,
   },
   plainRewardDesc: {
     color: "#888",
