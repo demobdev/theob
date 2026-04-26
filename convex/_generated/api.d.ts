@@ -23,6 +23,7 @@ import type * as payments from "../payments.js";
 import type * as products from "../products.js";
 import type * as seed from "../seed.js";
 import type * as seedMenu from "../seedMenu.js";
+import type * as seedMenuExtras from "../seedMenuExtras.js";
 import type * as seedRewards from "../seedRewards.js";
 import type * as sports_apisports_client from "../sports/apisports/client.js";
 import type * as sports_apisports_normalize from "../sports/apisports/normalize.js";
@@ -62,6 +63,7 @@ declare const fullApi: ApiFromModules<{
   products: typeof products;
   seed: typeof seed;
   seedMenu: typeof seedMenu;
+  seedMenuExtras: typeof seedMenuExtras;
   seedRewards: typeof seedRewards;
   "sports/apisports/client": typeof sports_apisports_client;
   "sports/apisports/normalize": typeof sports_apisports_normalize;

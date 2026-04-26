@@ -23,6 +23,8 @@ type CartContextType = {
   totalPrice: number;
   subtotal: number;
   discount: number;
+  cartExpired: boolean;
+  dismissExpiredNotice: () => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -33,17 +35,31 @@ export const getUniqueKey = (item: Omit<CartItem, "quantity"> | CartItem) => {
 };
 
 const CART_STORAGE_KEY = "@theob_cart_items";
+const CART_TIMESTAMP_KEY = "@theob_cart_saved_at";
+const CART_EXPIRY_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [appliedReward, setAppliedReward] = useState<any | null>(null);
+  const [cartExpired, setCartExpired] = useState(false);
 
-  // Load cart on mount
+  // Load cart on mount — auto-clear if older than 6 hours
   React.useEffect(() => {
     const loadCart = async () => {
       try {
-        const saved = await AsyncStorage.getItem(CART_STORAGE_KEY);
-        if (saved) {
+        const [saved, savedAt] = await Promise.all([
+          AsyncStorage.getItem(CART_STORAGE_KEY),
+          AsyncStorage.getItem(CART_TIMESTAMP_KEY),
+        ]);
+        if (saved && savedAt) {
+          const age = Date.now() - parseInt(savedAt, 10);
+          if (age > CART_EXPIRY_MS) {
+            await AsyncStorage.multiRemove([CART_STORAGE_KEY, CART_TIMESTAMP_KEY]);
+            setCartExpired(true);
+            return;
+          }
+          setItems(JSON.parse(saved));
+        } else if (saved) {
           setItems(JSON.parse(saved));
         }
       } catch (e) {
@@ -53,11 +69,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadCart();
   }, []);
 
-  // Save cart on change
+  // Save cart + timestamp on every change
   React.useEffect(() => {
     const saveCart = async () => {
       try {
         await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+        await AsyncStorage.setItem(CART_TIMESTAMP_KEY, String(Date.now()));
       } catch (e) {
         console.error("Failed to save cart", e);
       }
@@ -101,7 +118,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const clearCart = () => {
     setItems([]);
     setAppliedReward(null);
+    AsyncStorage.multiRemove([CART_STORAGE_KEY, CART_TIMESTAMP_KEY]).catch(() => {});
   };
+
+  const dismissExpiredNotice = () => setCartExpired(false);
 
   const applyReward = (reward: any) => {
     setAppliedReward(reward);
@@ -168,6 +188,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         totalPrice,
         subtotal,
         discount,
+        cartExpired,
+        dismissExpiredNotice,
       }}
     >
       {children}

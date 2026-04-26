@@ -11,7 +11,8 @@ import {
   TextInput,
   Switch,
   ImageBackground,
-  ScrollView
+  ScrollView,
+  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -19,10 +20,31 @@ import { useCart, getUniqueKey } from "../context/CartContext";
 import { useOrder } from "../context/OrderContext";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import PreferencesModal from "../components/PreferencesModal";
 import { ensureAuth } from "../utils/authGuard";
+
+/**
+ * Kitchen hours: 11 AM – 10 PM local time.
+ * Returns true if ordering is currently allowed.
+ */
+const isKitchenOpen = (): boolean => {
+  const now = new Date();
+  const hour = now.getHours(); // 0–23 local time
+  return hour >= 11 && hour < 22; // 11:00 AM to 9:59 PM (closes at 10 PM)
+};
+
+/** Returns minutes until kitchen opens (only valid when kitchen is closed). */
+const minutesUntilOpen = (): number => {
+  const now = new Date();
+  const h = now.getHours();
+  if (h < 11) {
+    return (11 - h) * 60 - now.getMinutes();
+  }
+  // After 10 PM — opens at 11 AM next day
+  return (24 - h + 11) * 60 - now.getMinutes();
+};
 
 const RewardsCarousel = ({ navigation }) => {
   const { appliedReward, applyReward } = useCart();
@@ -173,16 +195,29 @@ const getImageSource = (imgStr) => {
 
 const CartScreen = ({ navigation }) => {
   const { isSignedIn } = useAuth();
-  const { items, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
-  const { 
-    fulfillmentMethod, 
-    phoneNumber, 
-    scheduledTime, 
-    vehicleInfo, 
-    deliveryAddress 
+  const {
+    items, updateQuantity, removeFromCart, totalPrice, clearCart,
+    cartExpired, dismissExpiredNotice,
+  } = useCart();
+  const {
+    fulfillmentMethod, phoneNumber, scheduledTime, vehicleInfo, deliveryAddress
   } = useOrder();
-  
+
   const [showPreferences, setShowPreferences] = useState(false);
+  const [showExpiredToast, setShowExpiredToast] = useState(false);
+  const kitchenOpen = isKitchenOpen();
+
+  // Show expired cart toast once, then dismiss after 3 seconds
+  useEffect(() => {
+    if (cartExpired) {
+      setShowExpiredToast(true);
+      const timer = setTimeout(() => {
+        setShowExpiredToast(false);
+        dismissExpiredNotice();
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [cartExpired]);
 
   const renderItem = ({ item }: { item: any }) => {
     const itemUniqueId = getUniqueKey(item);
@@ -310,25 +345,52 @@ const CartScreen = ({ navigation }) => {
         }
       />
 
-      {items.length > 0 && (
-        <View style={styles.footer}>
-          <View style={styles.priceRow}>
-            <Text style={styles.totalLabel}>TOTAL AMOUNT</Text>
-            <Text style={styles.totalValue}>${totalPrice.toFixed(2)}</Text>
-          </View>
-          <TouchableOpacity 
-              style={styles.checkoutBtn}
-              onPress={() => ensureAuth(!!isSignedIn, navigation, () => setShowPreferences(true))}
-          >
-            <Text style={styles.checkoutText}>PROCEED TO CHECKOUT</Text>
-            <Ionicons name="arrow-forward" size={20} color="#000" style={{ marginLeft: 10 }} />
-          </TouchableOpacity>
+      {/* Expired cart toast */}
+      {showExpiredToast && (
+        <View style={styles.expiredToast}>
+          <Ionicons name="time-outline" size={16} color="#FFA500" />
+          <Text style={styles.expiredToastText}>
+            Your previous cart expired after 6 hours
+          </Text>
         </View>
       )}
 
-      <PreferencesModal 
-        visible={showPreferences} 
-        onClose={() => setShowPreferences(false)} 
+      {items.length > 0 && (
+        <View style={styles.footer}>
+          {!kitchenOpen ? (
+            /* ---- KITCHEN CLOSED BANNER ---- */
+            <View style={styles.kitchenClosedBanner}>
+              <Ionicons name="moon" size={20} color="#FFA500" />
+              <View style={styles.kitchenClosedText}>
+                <Text style={styles.kitchenClosedTitle}>KITCHEN IS CLOSED</Text>
+                <Text style={styles.kitchenClosedSub}>
+                  Online ordering is available 11 AM – 10 PM{"\n"}
+                  Opens in ~{minutesUntilOpen()} min
+                </Text>
+              </View>
+            </View>
+          ) : (
+            /* ---- CHECKOUT FLOW ---- */
+            <>
+              <View style={styles.priceRow}>
+                <Text style={styles.totalLabel}>TOTAL AMOUNT</Text>
+                <Text style={styles.totalValue}>${totalPrice.toFixed(2)}</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.checkoutBtn}
+                onPress={() => ensureAuth(!!isSignedIn, navigation, () => setShowPreferences(true))}
+              >
+                <Text style={styles.checkoutText}>PROCEED TO CHECKOUT</Text>
+                <Ionicons name="arrow-forward" size={20} color="#000" style={{ marginLeft: 10 }} />
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      )}
+
+      <PreferencesModal
+        visible={showPreferences}
+        onClose={() => setShowPreferences(false)}
       />
     </SafeAreaView>
   );
@@ -511,7 +573,59 @@ const styles = StyleSheet.create({
     fontFamily: "MBold",
     letterSpacing: 1,
   },
-  
+
+  // Kitchen closed banner
+  kitchenClosedBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,165,0,0.08)",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255,165,0,0.25)",
+    padding: 16,
+    gap: 14,
+  },
+  kitchenClosedText: {
+    flex: 1,
+  },
+  kitchenClosedTitle: {
+    color: "#FFA500",
+    fontSize: RFValue(13),
+    fontFamily: "MBold",
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  kitchenClosedSub: {
+    color: "#888",
+    fontSize: RFValue(11),
+    fontFamily: "MRegular",
+    lineHeight: 16,
+  },
+
+  // Expired cart toast
+  expiredToast: {
+    position: "absolute",
+    top: 80,
+    left: 20,
+    right: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "#1A1A1A",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255,165,0,0.3)",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    zIndex: 999,
+  },
+  expiredToastText: {
+    color: "#ccc",
+    fontSize: RFValue(11),
+    fontFamily: "MRegular",
+    flex: 1,
+  },
+
   /* PREFERENCES MODAL STYLES */
   modalOverlay: {
     flex: 1,
