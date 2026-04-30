@@ -13,6 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useCart } from "../context/CartContext";
+import { usePostHog } from "posthog-react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -57,6 +58,7 @@ const getImageSource = (imgStr) => {
 };
 
 const ProductDetailScreen = ({ route, navigation }) => {
+  const posthog = usePostHog();
   const { product } = route.params;
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -127,6 +129,12 @@ const ProductDetailScreen = ({ route, navigation }) => {
             selectedModifiers: selectedModifiers
         });
     }
+    posthog?.capture("product_added_to_cart", {
+      product_name: product.name,
+      product_id: product._id,
+      price: calculateTotalPrice(),
+      quantity,
+    });
     navigation.goBack();
   };
 

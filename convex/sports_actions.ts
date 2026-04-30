@@ -1,15 +1,15 @@
 import { action, internalMutation, internalQuery, ActionCtx } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { v } from "convex/values";
-import { syncUpcomingWeek } from "./sports/sportradar/sync";
 import { syncUpcomingWeekWithFallback } from "./sports/fallback_sync";
 import { requireAdmin } from "./lib/requireAdmin";
+import { syncEspnGames } from "./sports/espn/sync";
 
 export const scheduledSync = action({
   args: {},
   handler: async (ctx) => {
-    console.log("Starting scheduled sports sync (Today + 7 Days)...");
-    const result = await syncUpcomingWeek(ctx, api);
+    console.log("Starting scheduled ESPN sports sync...");
+    const result = await syncEspnGames(ctx);
     console.log(`Sync completed. Synced ${result.synced} games. Errors: ${result.errors.length}`);
     return result;
   },

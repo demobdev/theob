@@ -24,7 +24,7 @@ This document tracks all critical requirements and "Work in Progress" items need
 
 ### 🍔 Menu Management
 - [ ] **Admin Portal**: Build the web-based admin interface to allow managers to change prices or mark items as "Out of Stock" instantly.
-- [ ] **Store Hours**: Implement logic to disable "Online Ordering" when the kitchen is closed.
+- [x] **Store Hours**: Implement logic to disable "Online Ordering" when the kitchen is closed.
 
 ### 📈 Loyalty & Marketing
 - [ ] **Birthday Rewards**: Automate the delivery of the $5 off reward on the user's birthday.

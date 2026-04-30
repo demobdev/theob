@@ -205,7 +205,7 @@ export function normalizeGolfTournament(tournament: any): UpcomingGame {
   return {
     id: crypto.randomUUID(),
     externalId: tournament.id,
-    sport: "GOLF",
+    sport: "GOLF" as any,
     league: "PGA Tour",
     status: mapStatus(tournament.status || "scheduled"),
     startsAt: tournament.start_date,

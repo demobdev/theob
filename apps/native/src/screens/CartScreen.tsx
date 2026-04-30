@@ -24,6 +24,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import PreferencesModal from "../components/PreferencesModal";
 import { ensureAuth } from "../utils/authGuard";
+import { usePostHog } from "posthog-react-native";
 
 /**
  * Kitchen hours: 11 AM – 10 PM local time.
@@ -47,6 +48,7 @@ const minutesUntilOpen = (): number => {
 };
 
 const RewardsCarousel = ({ navigation }) => {
+  const posthog = usePostHog();
   const { appliedReward, applyReward } = useCart();
   const availableRewards = useQuery(api.loyalty.getAvailableRewards) || [];
   const { isSignedIn } = useAuth();
@@ -60,6 +62,11 @@ const RewardsCarousel = ({ navigation }) => {
           applyReward(null);
         } else {
           applyReward(reward);
+          posthog?.capture("reward_applied_to_cart", {
+            reward_id: reward._id,
+            reward_title: reward.title,
+            points_cost: reward.pointsCost,
+          });
         }
       },
       "Sign in to claim offers and rewards!"
@@ -202,6 +209,7 @@ const getImageSource = (imgStr) => {
 };
 
 const CartScreen = ({ navigation }) => {
+  const posthog = usePostHog();
   const { isSignedIn } = useAuth();
   const {
     items, updateQuantity, removeFromCart, totalPrice, clearCart,
@@ -289,7 +297,7 @@ const CartScreen = ({ navigation }) => {
         subtotal: subtotal,
         tax: tax,
         total: total,
-        destination: fulfillmentMethod === "pickup_instore" ? "In-Store Pickup" : 
+        destination: fulfillmentMethod === "pickup_instore" ? "In-Store Pickup" :
                      fulfillmentMethod === "pickup_curbside" ? "Curbside Pickup" : "Delivery",
         location: "1757 Woodruff Rd. STE A, Greenville, SC 29607",
         customerPhone: phoneNumber,
@@ -302,10 +310,22 @@ const CartScreen = ({ navigation }) => {
         })
       });
 
+      posthog?.capture("order_placed", {
+        subtotal,
+        tax,
+        total,
+        item_count: items.length,
+        fulfillment_method: fulfillmentMethod,
+      });
       alert(`Order Placed Successfully!`);
       clearCart();
       navigation.navigate("HomeScreen");
     } catch (err) {
+      posthog?.capture("$exception", {
+        $exception_type: "OrderError",
+        $exception_message: err.message,
+        $exception_source: "CartScreen",
+      });
       alert("Error placing order: " + err.message);
     }
   };
@@ -386,7 +406,13 @@ const CartScreen = ({ navigation }) => {
               </View>
               <TouchableOpacity
                 style={styles.checkoutBtn}
-                onPress={() => setShowPreferences(true)}
+                onPress={() => {
+                  posthog?.capture("checkout_started", {
+                    item_count: items.length,
+                    subtotal: totalPrice,
+                  });
+                  setShowPreferences(true);
+                }}
               >
                 <Text style={styles.checkoutText}>PROCEED TO CHECKOUT</Text>
                 <Ionicons name="arrow-forward" size={20} color="#000" style={{ marginLeft: 10 }} />

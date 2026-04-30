@@ -12,13 +12,21 @@ import {
   XCircle, 
   MoreHorizontal,
   ChevronRight,
-  UserPlus
+  UserPlus,
+  Star,
+  Gift,
+  History,
+  Info,
+  ExternalLink,
+  ShieldCheck,
+  Calendar
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function LoyaltyPage() {
   const [activeTab, setActiveTab] = useState("receipts");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
 
   const tabs = [
     { id: "receipts", name: "Receipt Queue", icon: Receipt },
@@ -59,9 +67,23 @@ export default function LoyaltyPage() {
       {/* Content Area */}
       <div className="min-h-[600px]">
         {activeTab === "receipts" && <ReceiptQueue />}
-        {activeTab === "members" && <MemberDirectory searchTerm={searchTerm} setSearchTerm={setSearchTerm} />}
+        {activeTab === "members" && (
+          <MemberDirectory 
+            searchTerm={searchTerm} 
+            setSearchTerm={setSearchTerm} 
+            onViewProfile={(id: string) => setSelectedMemberId(id)} 
+          />
+        )}
         {activeTab === "rewards" && <RewardDefinitions />}
       </div>
+
+      {/* Profile Modal */}
+      {selectedMemberId && (
+        <GuestProfileModal 
+          userId={selectedMemberId} 
+          onClose={() => setSelectedMemberId(null)} 
+        />
+      )}
     </div>
   );
 }
@@ -124,9 +146,8 @@ function ReceiptQueue() {
   );
 }
 
-function MemberDirectory({ searchTerm, setSearchTerm }: any) {
+function MemberDirectory({ searchTerm, setSearchTerm, onViewProfile }: any) {
   const members = useQuery(api.admin_loyalty.searchMembers, { searchTerm });
-  const adjust = useMutation(api.admin_loyalty.adjustPoints);
 
   return (
     <div className="space-y-6">
@@ -147,7 +168,7 @@ function MemberDirectory({ searchTerm, setSearchTerm }: any) {
               <tr className="bg-[#0a0a0a] border-b border-[#1a1a1a]">
                 <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Member</th>
                 <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-center">Points</th>
-                <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-center">Lifetime</th>
+                <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-center">Status</th>
                 <th className="p-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
@@ -157,7 +178,7 @@ function MemberDirectory({ searchTerm, setSearchTerm }: any) {
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gradient-to-br from-gray-800 to-gray-900 rounded-full flex items-center justify-center border border-[#222]">
-                        <Users size={14} className="text-gray-400" />
+                        <Users size={14} className={m.isVIP ? "text-[#FFA500]" : "text-gray-400"} />
                       </div>
                       <div>
                         <p className="text-white font-bold text-xs">{m.userId.substring(0, 15)}...</p>
@@ -166,20 +187,26 @@ function MemberDirectory({ searchTerm, setSearchTerm }: any) {
                     </div>
                   </td>
                   <td className="p-4 text-center">
-                    <span className="text-[#FFA500] font-black text-sm tracking-tighter">{m.points || 0}</span>
+                    <div className="flex flex-col items-center">
+                      <span className="text-[#FFA500] font-black text-sm tracking-tighter">{m.points || 0}</span>
+                      <span className="text-gray-600 text-[8px] font-bold uppercase">Bal</span>
+                    </div>
                   </td>
                   <td className="p-4 text-center">
-                    <span className="text-gray-400 font-bold text-xs tracking-tighter">{m.lifetimePoints || 0}</span>
+                    {m.isVIP ? (
+                      <span className="bg-orange-900/20 text-[#FFA500] text-[8px] font-black px-2 py-0.5 rounded uppercase border border-orange-500/30">
+                        {m.vipLevel || "LEGEND"}
+                      </span>
+                    ) : (
+                      <span className="text-gray-600 text-[8px] font-bold uppercase">MEMBER</span>
+                    )}
                   </td>
                   <td className="p-4 text-right">
                     <button 
-                      onClick={() => {
-                        const pts = prompt("Adjust points (negative for deduction):");
-                        if (pts) adjust({ userId: m.userId, points: parseInt(pts), reason: "Manual Admin Adjustment" });
-                      }}
-                      className="text-[10px] font-black uppercase text-[#FFA500] hover:underline"
+                      onClick={() => onViewProfile(m.userId)}
+                      className="text-[10px] font-black uppercase text-[#FFA500] hover:underline flex items-center gap-1 ml-auto"
                     >
-                      Adjust
+                      View Profile <ChevronRight size={12} />
                     </button>
                   </td>
                 </tr>
@@ -233,6 +260,170 @@ function RewardDefinitions() {
             </div>
          </div>
        ))}
+    </div>
+  );
+}
+
+function GuestProfileModal({ userId, onClose }: { userId: string; onClose: () => void }) {
+  const members = useQuery(api.admin_loyalty.searchMembers, { searchTerm: userId });
+  const orders = useQuery(api.admin_orders.getMemberOrders, { userId });
+  const toggleVIP = useMutation(api.admin_loyalty.toggleVIP);
+  const adjustPoints = useMutation(api.admin_loyalty.adjustPoints);
+  
+  const profile = members?.find(m => m.userId === userId);
+
+  if (!profile) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
+      <div className="relative bg-[#050505] border border-[#1a1a1a] w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+        
+        {/* Header Section */}
+        <div className="p-8 border-b border-[#1a1a1a] bg-[#0a0a0a] flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-6">
+             <div className="w-16 h-16 bg-[#161618] rounded-2xl flex items-center justify-center border border-[#222] shadow-inner">
+                <Users size={32} className={profile.isVIP ? "text-[#FFA500]" : "text-gray-600"} />
+             </div>
+             <div>
+                <h2 className="text-2xl font-black text-white tracking-tighter uppercase">{profile.userId.substring(0, 16)}...</h2>
+                <p className="text-[#FFA500] text-[10px] font-black uppercase tracking-[0.2em]">{profile.phone || "NO PHONE ATTACHED"}</p>
+             </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+             <div className="flex flex-col items-end">
+                <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest">Lifetime Spend</span>
+                <span className="text-white font-black text-xl tracking-tighter">{profile.lifetimePoints || 0} <span className="text-xs text-gray-600 uppercase">PTS</span></span>
+             </div>
+             <div className="h-10 w-px bg-[#1a1a1a]" />
+             <div className="flex flex-col items-end">
+                <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest">Current Balance</span>
+                <span className="text-[#FFA500] font-black text-xl tracking-tighter">{profile.points || 0} <span className="text-xs text-orange-900 uppercase">PTS</span></span>
+             </div>
+          </div>
+        </div>
+
+        {/* Action Bar */}
+        <div className="bg-[#0f0f11] px-8 py-4 border-b border-[#1a1a1a] flex flex-wrap items-center gap-4">
+           <button 
+            onClick={() => toggleVIP({ userId, isVIP: !profile.isVIP, vipLevel: "LEGEND" })}
+            className={cn(
+              "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border flex items-center gap-2 transition-all",
+              profile.isVIP ? "bg-orange-500 text-black border-orange-400" : "bg-black text-gray-500 border-[#222] hover:border-[#FFA500]/50"
+            )}
+           >
+              <Star size={12} fill={profile.isVIP ? "black" : "transparent"} />
+              {profile.isVIP ? "MEMBER IS LEGEND" : "MAKE LEGEND"}
+           </button>
+
+           <button 
+            onClick={() => {
+              const amount = prompt("Send points reward (e.g. 500 for Free App):");
+              if (amount) adjustPoints({ userId, points: parseInt(amount), reason: "Admin Gifted Reward" });
+            }}
+            className="px-4 py-2 bg-black border border-[#222] text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:border-green-500/50 transition-all"
+           >
+              <Gift size={12} className="text-green-500" />
+              SEND REWARD
+           </button>
+
+           <div className="flex-1" />
+
+           <button className="text-gray-600 text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors">
+              BAN USER
+           </button>
+        </div>
+
+        {/* Content Section */}
+        <div className="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+           
+           {/* Left: User Details */}
+           <div className="space-y-6">
+              <div>
+                 <h4 className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    <Info size={12} /> Account Details
+                 </h4>
+                 <div className="bg-[#0a0a0a] border border-[#161618] rounded-2xl p-4 space-y-4">
+                    <div className="flex justify-between">
+                       <span className="text-gray-600 text-[10px] font-bold uppercase">Member Since</span>
+                       <span className="text-white text-xs font-bold">{new Date(profile._creationTime).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                       <span className="text-gray-600 text-[10px] font-bold uppercase">Birthday</span>
+                       <span className="text-white text-xs font-bold">{profile.birthMonth || "???"} {profile.birthDay || "???"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                       <span className="text-gray-600 text-[10px] font-bold uppercase">Vehicle</span>
+                       <span className="text-white text-xs font-bold uppercase">{profile.vehicle?.color} {profile.vehicle?.make}</span>
+                    </div>
+                 </div>
+              </div>
+
+              <div>
+                 <h4 className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    <ShieldCheck size={12} /> Compliance
+                 </h4>
+                 <div className="bg-[#0a0a0a] border border-[#161618] rounded-2xl p-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                       <div className={cn("w-2 h-2 rounded-full", profile.marketingOptIn ? "bg-green-500" : "bg-red-500")} />
+                       <span className="text-gray-400 text-[10px] font-bold uppercase">Marketing Emails</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                       <div className={cn("w-2 h-2 rounded-full", profile.smsConsent ? "bg-green-500" : "bg-red-500")} />
+                       <span className="text-gray-400 text-[10px] font-bold uppercase">SMS Notifications</span>
+                    </div>
+                 </div>
+              </div>
+           </div>
+
+           {/* Right: Order History */}
+           <div className="lg:col-span-2">
+              <h4 className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                 <History size={12} /> Order History
+              </h4>
+              <div className="space-y-3">
+                 {orders?.length === 0 ? (
+                   <div className="bg-[#0a0a0a] border border-dashed border-[#1a1a1a] rounded-2xl py-20 text-center">
+                      <p className="text-gray-600 text-[10px] font-black uppercase tracking-widest">No orders found</p>
+                   </div>
+                 ) : (
+                   orders?.map((order) => (
+                     <div key={order._id} className="bg-[#0a0a0a] border border-[#161618] rounded-2xl p-4 flex items-center justify-between hover:border-[#222] transition-colors">
+                        <div className="flex items-center gap-4">
+                           <div className="w-10 h-10 bg-[#161618] rounded-xl flex items-center justify-center border border-[#222]">
+                              <ShoppingBag size={16} className="text-[#FFA500]" />
+                           </div>
+                           <div>
+                              <div className="flex items-center gap-2">
+                                 <span className="text-white font-bold text-xs">ORDER #{order._id.substring(order._id.length - 6).toUpperCase()}</span>
+                                 <span className="text-gray-600 text-[9px] font-bold uppercase tracking-widest">{new Date(order._creationTime).toLocaleDateString()}</span>
+                              </div>
+                              <p className="text-gray-500 text-[10px] font-bold uppercase mt-0.5">{order.items.length} items • {order.destination}</p>
+                           </div>
+                        </div>
+                        <div className="text-right">
+                           <p className="text-white font-black text-sm tracking-tighter">${order.total.toFixed(2)}</p>
+                           <p className="text-green-500 text-[8px] font-black uppercase tracking-widest">{order.status}</p>
+                        </div>
+                     </div>
+                   ))
+                 )}
+              </div>
+           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 bg-black border-t border-[#1a1a1a] flex justify-end">
+           <button 
+            onClick={onClose}
+            className="px-6 py-2 bg-[#161618] text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-[#222] transition-colors"
+           >
+              Close Profile
+           </button>
+        </div>
+
+      </div>
     </div>
   );
 }

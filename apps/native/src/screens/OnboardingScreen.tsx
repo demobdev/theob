@@ -16,10 +16,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Video, ResizeMode } from "expo-av";
+import { usePostHog } from "posthog-react-native";
 
 const { width, height } = Dimensions.get("window");
 
 const OnboardingScreen = ({ navigation }) => {
+  const posthog = usePostHog();
   const [activeSlide, setActiveSlide] = useState(0);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
@@ -69,6 +71,10 @@ const OnboardingScreen = ({ navigation }) => {
   ];
 
   const handleFinish = async () => {
+    posthog?.capture("onboarding_completed", {
+      dont_show_again: dontShowAgain,
+      slides_seen: activeSlide + 1,
+    });
     if (dontShowAgain) {
       await AsyncStorage.setItem("hasSeenOnboarding", "true");
     }

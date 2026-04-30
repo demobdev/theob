@@ -27,15 +27,26 @@ export const overrideHeadliner = mutation({
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
     
-    // If setting a new primetime, clear existing ones first to ensure unique headliner
+    const targetGame = await ctx.db.get(args.gameId);
+    if (!targetGame) throw new Error("Game not found");
+
+    // If setting a new primetime, clear existing ones for the SAME SPORT and SAME DAY
+    // to ensure unique headliner per sport/day combo if desired, or just let them stack.
+    // For now, let's just make it day-specific.
     if (args.isPrimeTime) {
+      const dayStart = targetGame.startsAt.split('T')[0];
       const existing = await ctx.db
         .query("upcoming_games")
+        .withIndex("by_startsAt", (q) => q.gte("startsAt", `${dayStart}T00:00:00Z`).lte("startsAt", `${dayStart}T23:59:59Z`))
         .filter((q) => q.eq(q.field("isPrimeTime"), true))
         .collect();
       
       for (const game of existing) {
-        await ctx.db.patch(game._id, { isPrimeTime: false });
+        // Only clear if same sport (optional - user can decide if they want multiple sports in carousel)
+        // Let's clear if same sport to keep one "Headliner" per sport per day.
+        if (game.sport === targetGame.sport) {
+            await ctx.db.patch(game._id, { isPrimeTime: false });
+        }
       }
     }
 

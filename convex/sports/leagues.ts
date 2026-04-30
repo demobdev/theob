@@ -44,12 +44,40 @@ export const LEAGUES: Record<SportKey, LeagueConfig> = {
     sportradarLeagueKey: "nhl",
     apiVersion: "v7",
   },
+  SOCCER: {
+    sport: "soccer",
+    key: "SOCCER",
+    label: "MLS",
+    sportradarLeagueKey: "mls",
+    apiVersion: "v7",
+  },
+  WNBA: {
+    sport: "basketball",
+    key: "WNBA",
+    label: "WNBA",
+    sportradarLeagueKey: "wnba", // placeholder
+    apiVersion: "v7",
+  },
+  F1: {
+    sport: "racing",
+    key: "F1",
+    label: "Formula 1",
+    sportradarLeagueKey: "f1", // placeholder
+    apiVersion: "v7",
+  },
   GOLF: {
     sport: "golf",
     key: "GOLF",
     label: "PGA Tour",
-    sportradarLeagueKey: "pga",
-    apiVersion: "v3",
+    sportradarLeagueKey: "pga", // placeholder
+    apiVersion: "v7",
+  },
+  TENNIS: {
+    sport: "tennis",
+    key: "TENNIS",
+    label: "ATP/WTA",
+    sportradarLeagueKey: "atp", // placeholder
+    apiVersion: "v7",
   },
 } as const;
 
@@ -72,13 +100,20 @@ export function isSportInSeason(sport: SportKey, date: Date = new Date()): boole
       return month >= 9 || month <= 5;
       
     case "MLB":
-      // Baseball: Late Feb (1) through early Nov (10)
+    case "SOCCER":
+      // Baseball/Soccer: Late Feb (1) through early Nov (10)
       return month >= 1 && month <= 10;
       
+    case "WNBA":
+      // WNBA: May (4) through October (9)
+      return month >= 4 && month <= 9;
+
+    case "F1":
     case "GOLF":
-      // PGA operates largely year round
-      return true;
-      
+    case "TENNIS":
+      // These are generally active for most of the year (Feb-Nov)
+      return month >= 1 && month <= 10;
+
     default:
       return true;
   }

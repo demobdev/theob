@@ -9,6 +9,7 @@
  */
 
 import type * as admin from "../admin.js";
+import type * as admin_categories from "../admin_categories.js";
 import type * as admin_loyalty from "../admin_loyalty.js";
 import type * as admin_orders from "../admin_orders.js";
 import type * as admin_products from "../admin_products.js";
@@ -16,19 +17,26 @@ import type * as admin_sports from "../admin_sports.js";
 import type * as crons from "../crons.js";
 import type * as lib_requireAdmin from "../lib/requireAdmin.js";
 import type * as loyalty from "../loyalty.js";
+import type * as maintenance from "../maintenance.js";
 import type * as notes from "../notes.js";
 import type * as openai from "../openai.js";
 import type * as orders from "../orders.js";
 import type * as payments from "../payments.js";
 import type * as products from "../products.js";
+import type * as scratch_sports from "../scratch_sports.js";
 import type * as seed from "../seed.js";
 import type * as seedMenu from "../seedMenu.js";
 import type * as seedMenuExtras from "../seedMenuExtras.js";
 import type * as seedRewards from "../seedRewards.js";
+import type * as settings from "../settings.js";
 import type * as sports_apisports_client from "../sports/apisports/client.js";
 import type * as sports_apisports_normalize from "../sports/apisports/normalize.js";
+import type * as sports_espn_client from "../sports/espn/client.js";
+import type * as sports_espn_sync from "../sports/espn/sync.js";
+import type * as sports_espn_transform from "../sports/espn/transform.js";
 import type * as sports_fallback_sync from "../sports/fallback_sync.js";
 import type * as sports_leagues from "../sports/leagues.js";
+import type * as sports_mock_generator from "../sports/mock_generator.js";
 import type * as sports_sportradar_client from "../sports/sportradar/client.js";
 import type * as sports_sportradar_images from "../sports/sportradar/images.js";
 import type * as sports_sportradar_normalize from "../sports/sportradar/normalize.js";
@@ -49,6 +57,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   admin: typeof admin;
+  admin_categories: typeof admin_categories;
   admin_loyalty: typeof admin_loyalty;
   admin_orders: typeof admin_orders;
   admin_products: typeof admin_products;
@@ -56,19 +65,26 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   "lib/requireAdmin": typeof lib_requireAdmin;
   loyalty: typeof loyalty;
+  maintenance: typeof maintenance;
   notes: typeof notes;
   openai: typeof openai;
   orders: typeof orders;
   payments: typeof payments;
   products: typeof products;
+  scratch_sports: typeof scratch_sports;
   seed: typeof seed;
   seedMenu: typeof seedMenu;
   seedMenuExtras: typeof seedMenuExtras;
   seedRewards: typeof seedRewards;
+  settings: typeof settings;
   "sports/apisports/client": typeof sports_apisports_client;
   "sports/apisports/normalize": typeof sports_apisports_normalize;
+  "sports/espn/client": typeof sports_espn_client;
+  "sports/espn/sync": typeof sports_espn_sync;
+  "sports/espn/transform": typeof sports_espn_transform;
   "sports/fallback_sync": typeof sports_fallback_sync;
   "sports/leagues": typeof sports_leagues;
+  "sports/mock_generator": typeof sports_mock_generator;
   "sports/sportradar/client": typeof sports_sportradar_client;
   "sports/sportradar/images": typeof sports_sportradar_images;
   "sports/sportradar/normalize": typeof sports_sportradar_normalize;

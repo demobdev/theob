@@ -4,6 +4,12 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import ConvexClientProvider from "./ConvexClientProvider";
 import LocationFulfillmentModal from "@/components/menu/LocationFulfillmentModal";
+import { PHProvider } from "./PHProvider";
+import dynamic from "next/dynamic";
+
+const PostHogPageView = dynamic(() => import("./PostHogPageView"), {
+  ssr: false,
+});
 
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -22,10 +28,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(inter.className, montserrat.className, lato.className)}>
-        <ConvexClientProvider>
-          {children}
-          <LocationFulfillmentModal />
-        </ConvexClientProvider>
+        <PHProvider>
+          <PostHogPageView />
+          <ConvexClientProvider>
+            {children}
+            <LocationFulfillmentModal />
+          </ConvexClientProvider>
+        </PHProvider>
       </body>
     </html>
   );

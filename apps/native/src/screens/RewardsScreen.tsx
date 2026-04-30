@@ -23,6 +23,7 @@ import BottomNavBar from "../components/BottomNavBar";
 import { useCart } from "../context/CartContext";
 import QRCode from "react-native-qrcode-svg";
 import { ensureAuth } from "../utils/authGuard";
+import { usePostHog } from "posthog-react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -39,6 +40,7 @@ const getRewardImage = (title = "") => {
 };
 
 const RewardsScreen = ({ navigation }) => {
+  const posthog = usePostHog();
   const { totalItems } = useCart();
   const { user } = useUser();
   const { isSignedIn } = useAuth();
@@ -70,6 +72,7 @@ const RewardsScreen = ({ navigation }) => {
     try {
       const result = await claimBirthday();
       if (result.success) {
+        posthog?.capture("birthday_reward_claimed", { points_awarded: 150 });
         Alert.alert("🎉 HAPPY BIRTHDAY!", `150 PTS have been added to your Roster balance. Enjoy your day!`, [{ text: "AWESOME" }]);
       } else {
         Alert.alert("Hold on", result.reason === "Already granted" ? "You've already claimed your gift for this year!" : "It's not your birthday yet!");
@@ -106,7 +109,7 @@ const RewardsScreen = ({ navigation }) => {
                     <Text style={styles.pointsMain}>{points.toLocaleString()}</Text>
                     <Text style={styles.pointsSub}>TOTAL POINTS AVAILABLE</Text>
                 </View>
-                <TouchableOpacity style={styles.scanActionBtn} onPress={() => ensureAuth(!!isSignedIn, navigation, () => setMemberQrVisible(true))}>
+                <TouchableOpacity style={styles.scanActionBtn} onPress={() => ensureAuth(!!isSignedIn, navigation, () => { posthog?.capture("member_qr_viewed"); setMemberQrVisible(true); })}>
                     <Ionicons name="qr-code" size={18} color="#FFF" />
                     <Text style={styles.scanActionBtnText}>SCAN</Text>
                 </TouchableOpacity>
@@ -141,9 +144,10 @@ const RewardsScreen = ({ navigation }) => {
 
         {/* FEATURED PROMO BANNER */}
         {promoActive && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.promoBanner}
             onPress={() => {
+              posthog?.capture("promo_banner_tapped", { promo_title: "$5 Off The Owner's Wings" });
               const promoReward = rewards.find(r => r.title === "$5 Off The Owner's Wings");
               if (promoReward) {
                 ensureAuth(!!isSignedIn, navigation, () => navigation.navigate("RedeemInStoreScreen", { rewardId: promoReward._id }));

@@ -21,6 +21,7 @@ import PreferencesModal from "../components/PreferencesModal";
 import BottomNavBar from "../components/BottomNavBar";
 import { useCart } from "../context/CartContext";
 import { useUser } from "@clerk/clerk-expo";
+import { useOrder } from "../context/OrderContext";
 import QRCode from "react-native-qrcode-svg";
 
 const { width } = Dimensions.get("window");
@@ -97,9 +98,15 @@ const RosterStatusCard = ({ profile, user, navigation }) => {
 const LandingScreen = ({ navigation }) => {
   const { totalItems } = useCart();
   const { user } = useUser();
+  const { userTimezone, requestLocationPermission } = useOrder();
   const [preferencesVisible, setPreferencesVisible] = useState(false);
   const [birthdayModalVisible, setBirthdayModalVisible] = useState(false);
   const [birthdayPoints, setBirthdayPoints] = useState(0);
+
+  // Request location permission on mount to ensure timezone is accurate
+  useEffect(() => {
+    requestLocationPermission();
+  }, []);
   
   const checkBirthday = useMutation(api.loyalty.checkBirthdayReward);
   const profile = useQuery(api.loyalty.getUserProfile);
@@ -120,7 +127,7 @@ const LandingScreen = ({ navigation }) => {
   };
 
   // Sports Logic — show today's games (live, final, upcoming)
-  const todayGames = useQuery(api.sports_queries.getTodayGames) || [];
+  const todayGames = useQuery(api.sports_queries.getTodayGames, { timezone: userTimezone }) || [];
   const liveGames = todayGames.filter(g => g.status === "inprogress");
   // Sort: favorite team games bubble to front; take up to 10
   const gamesToDisplay = [...todayGames]
@@ -208,6 +215,9 @@ const LandingScreen = ({ navigation }) => {
             <View style={styles.teamBrand}>
                 {game.awayTeam?.logoUrl && <Image source={{ uri: game.awayTeam.logoUrl }} style={styles.teamLogoMini} />}
                 <Text style={styles.teamNameText}>{game.awayTeam?.abbr}</Text>
+                {favoriteTeams[game.sport]?.includes(game.awayTeam?.abbr) && (
+                  <Ionicons name="star" size={12} color="#FFA500" style={{ marginLeft: 4 }} />
+                )}
             </View>
             <Text style={styles.scoreText}>{game.awayTeam?.score ?? "-"}</Text>
           </View>
@@ -215,6 +225,9 @@ const LandingScreen = ({ navigation }) => {
             <View style={styles.teamBrand}>
                 {game.homeTeam?.logoUrl && <Image source={{ uri: game.homeTeam.logoUrl }} style={styles.teamLogoMini} />}
                 <Text style={styles.teamNameText}>{game.homeTeam?.abbr}</Text>
+                {favoriteTeams[game.sport]?.includes(game.homeTeam?.abbr) && (
+                  <Ionicons name="star" size={12} color="#FFA500" style={{ marginLeft: 4 }} />
+                )}
             </View>
             <Text style={styles.scoreText}>{game.homeTeam?.score ?? "-"}</Text>
           </View>

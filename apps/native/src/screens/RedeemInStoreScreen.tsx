@@ -19,10 +19,12 @@ import { api } from "../../../../convex/_generated/api";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useUser } from "@clerk/clerk-expo";
 import QRCode from "react-native-qrcode-svg";
+import { usePostHog } from "posthog-react-native";
 
 const { width } = Dimensions.get("window");
 
 const RedeemInStoreScreen = ({ route, navigation }) => {
+  const posthog = usePostHog();
   const { rewardId } = route.params;
   const { user } = useUser();
   const [redeeming, setRedeeming] = useState(false);
@@ -59,6 +61,12 @@ const RedeemInStoreScreen = ({ route, navigation }) => {
         const result = await redeem({ rewardId });
         if (result.success) {
             setRedemptionCode(result.newBalance.toString().padStart(6, '0'));
+            posthog?.capture("reward_redeemed", {
+              reward_id: rewardId,
+              reward_title: reward?.title,
+              redemption_method: "in_store",
+              new_points_balance: result.newBalance,
+            });
             setSuccess(true);
         }
     } catch (e: any) {
@@ -66,6 +74,11 @@ const RedeemInStoreScreen = ({ route, navigation }) => {
         const errorMessage = e?.message || "Something went wrong. Please try again.";
         // Clean up the Convex error prefix if it exists
         const cleanMessage = errorMessage.replace("[CONVEX M(loyalty:redeemReward)] Server Error\nUncaught Error: ", "");
+        posthog?.capture("$exception", {
+          $exception_type: "RedemptionError",
+          $exception_message: cleanMessage,
+          $exception_source: "RedeemInStoreScreen",
+        });
         Alert.alert("Redemption Failed", cleanMessage);
     } finally {
         setRedeeming(false);

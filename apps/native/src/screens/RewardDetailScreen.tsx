@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -16,6 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useUser } from "@clerk/clerk-expo";
 import { api } from "../../../../convex/_generated/api";
 import { RFValue } from "react-native-responsive-fontsize";
+import { usePostHog } from "posthog-react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -24,13 +25,26 @@ const getRewardImageLarge = (key?: any) => {
 };
 
 const RewardDetailScreen = ({ route, navigation }) => {
+  const posthog = usePostHog();
   const { rewardId } = route.params;
   const profile = useQuery(api.loyalty.getUserProfile);
   const reward = (useQuery(api.loyalty.getRewardDefinitions) as any[])?.find(r => r._id === rewardId);
 
-  if (!reward) return null;
-
   const currentPoints = profile?.points || 0;
+
+  useEffect(() => {
+    if (reward) {
+      posthog?.capture("reward_detail_viewed", {
+        reward_id: rewardId,
+        reward_title: reward.title,
+        reward_category: reward.category,
+        points_cost: reward.pointsCost,
+        is_locked: currentPoints < reward.pointsCost,
+      });
+    }
+  }, [reward?._id]);
+
+  if (!reward) return null;
   const isLocked = currentPoints < reward.pointsCost;
   const pointsNeeded = reward.pointsCost - currentPoints;
   const progress = Math.min(currentPoints / reward.pointsCost, 1);

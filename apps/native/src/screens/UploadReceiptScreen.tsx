@@ -15,8 +15,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { RFValue } from "react-native-responsive-fontsize";
+import { usePostHog } from "posthog-react-native";
 
 const UploadReceiptScreen = ({ navigation }) => {
+  const posthog = usePostHog();
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date().toLocaleDateString());
   const [isUploading, setIsUploading] = useState(false);
@@ -35,7 +37,10 @@ const UploadReceiptScreen = ({ navigation }) => {
             amount: parseFloat(amount),
             receiptDate: date,
         });
-        
+        posthog?.capture("receipt_submitted", {
+          amount: parseFloat(amount),
+          receipt_date: date,
+        });
         Alert.alert(
             "Submission Successful",
             "Your receipt has been submitted for review. Points will be awarded once verified.",

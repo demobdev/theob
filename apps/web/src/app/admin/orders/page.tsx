@@ -10,7 +10,11 @@ import {
   CheckCircle2, 
   Timer,
   MoreVertical,
-  AlertCircle
+  AlertCircle,
+  Zap,
+  Flame,
+  Power,
+  Sliders
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,8 +29,10 @@ const statusColors: any = {
 export default function OrdersFeedPage() {
   const orders = useQuery(api.admin_orders.getLiveOrders);
   const updateStatus = useMutation(api.admin_orders.updateOrderStatus);
+  const settings = useQuery(api.settings.getSettings);
+  const updateSettings = useMutation(api.settings.updateSettings);
 
-  if (!orders) return <div className="p-8 animate-pulse space-y-4">{[1,2,3].map(i => <div key={i} className="h-40 bg-[#111] rounded-xl" />)}</div>;
+  if (!orders || !settings) return <div className="p-8 animate-pulse space-y-4">{[1,2,3].map(i => <div key={i} className="h-40 bg-[#111] rounded-xl" />)}</div>;
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
@@ -41,6 +47,90 @@ export default function OrdersFeedPage() {
            <p className="text-[10px] font-black uppercase text-gray-600 tracking-widest">Active Orders</p>
            <p className="text-white font-black text-xl">{orders.filter(o => o.status !== "completed" && o.status !== "cancelled").length}</p>
         </div>
+      </div>
+
+      {/* KITCHEN CONTROLS */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+         {/* Pacing Dial */}
+         <div className="lg:col-span-2 bg-[#0f0f11] border border-[#1a1a1a] rounded-2xl p-6 flex flex-col md:flex-row items-center gap-8">
+            <div className="flex items-center gap-4">
+               <div className="w-12 h-12 bg-orange-900/20 rounded-xl flex items-center justify-center border border-orange-500/30">
+                  <Flame className="text-[#FFA500]" size={24} />
+               </div>
+               <div>
+                  <h3 className="text-white font-black text-sm uppercase tracking-tight">Kitchen Pacing</h3>
+                  <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">Adjust Lead Times</p>
+               </div>
+            </div>
+            
+            <div className="flex-1 w-full space-y-4">
+               <div className="flex justify-between items-end">
+                  <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">Current Quote:</span>
+                  <span className="text-[#FFA500] font-black text-2xl tracking-tighter">{settings.currentWaitTimeMinutes} <span className="text-xs uppercase">mins</span></span>
+               </div>
+               <input 
+                  type="range" 
+                  min="5" 
+                  max="90" 
+                  step="5"
+                  value={settings.currentWaitTimeMinutes}
+                  onChange={(e) => updateSettings({ currentWaitTimeMinutes: parseInt(e.target.value) })}
+                  className="w-full h-2 bg-[#1a1a1a] rounded-lg appearance-none cursor-pointer accent-[#FFA500]"
+               />
+               <div className="flex justify-between text-[8px] font-black text-gray-700 uppercase tracking-widest">
+                  <span>Fast (5m)</span>
+                  <span>Average (20m)</span>
+                  <span>Slammed (45m+)</span>
+               </div>
+            </div>
+         </div>
+
+         {/* Emergency Stop */}
+         <div className={cn(
+            "rounded-2xl p-6 border transition-all flex flex-col justify-between gap-4",
+            settings.emergencyStop 
+              ? "bg-red-900/10 border-red-500/50 shadow-[0_0_30px_rgba(239,68,68,0.1)]" 
+              : "bg-[#0f0f11] border-[#1a1a1a]"
+         )}>
+            <div className="flex items-center justify-between">
+               <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "w-10 h-10 rounded-lg flex items-center justify-center border",
+                    settings.emergencyStop ? "bg-red-500 text-black border-red-400" : "bg-[#161618] text-gray-500 border-[#222]"
+                  )}>
+                     <Power size={20} />
+                  </div>
+                  <div>
+                     <h3 className="text-white font-black text-sm uppercase tracking-tight">Emergency Stop</h3>
+                     <p className="text-gray-500 text-[9px] font-bold uppercase tracking-widest">Toggle Store Status</p>
+                  </div>
+               </div>
+               <button 
+                onClick={() => updateSettings({ emergencyStop: !settings.emergencyStop, status: !settings.emergencyStop ? "closed" : "open" })}
+                className={cn(
+                  "w-12 h-6 rounded-full relative transition-colors p-1",
+                  settings.emergencyStop ? "bg-red-500" : "bg-[#1a1a1a]"
+                )}
+               >
+                  <div className={cn(
+                    "w-4 h-4 bg-white rounded-full transition-transform",
+                    settings.emergencyStop ? "translate-x-6" : "translate-x-0"
+                  )} />
+               </button>
+            </div>
+            
+            {settings.emergencyStop ? (
+              <div className="flex items-center gap-2 text-red-500 animate-pulse">
+                 <AlertCircle size={14} />
+                 <span className="text-[10px] font-black uppercase tracking-widest">Orders are currently BLOCKED</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-green-500">
+                 <CheckCircle2 size={14} />
+                 <span className="text-[10px] font-black uppercase tracking-widest">Receiving Orders Normally</span>
+              </div>
+            )}
+         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6">

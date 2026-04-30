@@ -4,8 +4,9 @@ export const seedRewards = mutation({
   args: {},
   handler: async (ctx) => {
     const rewards = [
-      // NOTE: "Free Owner's Wings" is handled as a hardcoded promo in getAvailableRewards
-      // to show with the wings image. Do NOT add a DB reward for it here — causes duplicates.
+      // "$5 Off The Owner's Wings" is a 0-pt always-unlocked discount — intentionally distinct
+      // from the "FREE OWNER'S WINGS" promo card (which has the wings image background).
+      { title: "$5 Off The Owner's Wings", pointsCost: 0, rewardType: "discount", category: "Promotions", isActive: true },
       { title: "Free Fountain Drink", pointsCost: 25, rewardType: "free_item", category: "Tier 1 — Easy Wins", isActive: true },
       { title: "Free Fries or Side", pointsCost: 50, rewardType: "free_item", category: "Tier 1 — Easy Wins", isActive: true },
       { title: "Free Bar Sandwich", pointsCost: 125, rewardType: "free_item", category: "Tier 2 — The Staples", isActive: true },

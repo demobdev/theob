@@ -27,3 +27,15 @@ export const updateOrderStatus = mutation({
     return { success: true };
   },
 });
+
+export const getMemberOrders = query({
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    return await ctx.db
+      .query("orders")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .order("desc")
+      .collect();
+  },
+});

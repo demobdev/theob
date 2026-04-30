@@ -1,4 +1,4 @@
-export type SportKey = "NFL" | "NCAAF" | "NBA" | "MLB" | "NHL" | "GOLF";
+export type SportKey = "NFL" | "NCAAF" | "NBA" | "MLB" | "NHL" | "SOCCER" | "WNBA" | "F1" | "GOLF" | "TENNIS";
 
 export type GameStatus = "scheduled" | "inprogress" | "closed" | "cancelled" | "postponed";
 
@@ -10,6 +10,7 @@ export interface TeamInfo {
   // Season record (from daily-games.xsd teamType win/loss attributes)
   wins?: number | null;
   losses?: number | null;
+  draws?: number | null;
   // Live game stats
   runs?: number | null;   // MLB
   hits?: number | null;   // MLB
@@ -60,6 +61,7 @@ export interface UpcomingGame {
   doubleHeader?: boolean | null; // Is this a doubleheader?
   attendance?: number | null;    // Post-game announced attendance
   isFeatured?: boolean;
+  isPrimeTime?: boolean;
   featuredRank?: number | null;
   editorialNote?: string | null;
   lastSyncedAt?: string;

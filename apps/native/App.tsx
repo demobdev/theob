@@ -42,6 +42,7 @@ import { useEffect, useState } from "react";
 import ConvexClientProvider from "./ConvexClientProvider";
 import { CartProvider } from "./src/context/CartContext";
 import { OrderProvider } from "./src/context/OrderContext";
+import { PostHogProvider } from "posthog-react-native";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -111,19 +112,25 @@ import TextureOverlay from "./src/components/TextureOverlay";
 
 export default function App() {
   return (
-    <ConvexClientProvider>
-      <CartProvider>
-        <OrderProvider>
-          <SafeAreaProvider>
-            <NavigationContainer>
-              <TextureOverlay>
-                <AppNavigation />
-              </TextureOverlay>
-              <StatusBar style="auto" />
-            </NavigationContainer>
-          </SafeAreaProvider>
-        </OrderProvider>
-      </CartProvider>
-    </ConvexClientProvider>
+    <PostHogProvider
+      apiKey={process.env.EXPO_PUBLIC_POSTHOG_KEY ?? ""}
+      options={{ host: process.env.EXPO_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com" }}
+      autocapture={false}
+    >
+      <ConvexClientProvider>
+        <CartProvider>
+          <OrderProvider>
+            <SafeAreaProvider>
+              <NavigationContainer>
+                <TextureOverlay>
+                  <AppNavigation />
+                </TextureOverlay>
+                <StatusBar style="auto" />
+              </NavigationContainer>
+            </SafeAreaProvider>
+          </OrderProvider>
+        </CartProvider>
+      </ConvexClientProvider>
+    </PostHogProvider>
   );
 }

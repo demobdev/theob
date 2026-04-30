@@ -53,7 +53,8 @@ const TeamTile = ({
 
 const MyTeamsScreen = ({ navigation }: any) => {
   const { user, isLoaded } = useUser();
-  const sportGroups = useQuery(api.sports_queries.getUniqueTeams) ?? [];
+  const sportGroups = useQuery(api.sports_queries.getUniqueTeams);
+  console.log("[MyTeamsScreen] sportGroups:", sportGroups?.length, "groups found");
 
   // favorites shape: { NBA: ["LAL","GSW"], NFL: ["CAR"], ... }
   const [favorites, setFavorites] = useState<Record<string, string[]>>({});
@@ -124,7 +125,7 @@ const MyTeamsScreen = ({ navigation }: any) => {
   );
 
   const selectedTeamObjects: any[] = [];
-  sportGroups.forEach(group => {
+  sportGroups?.forEach(group => {
     const favs = favorites[group.sport] || [];
     favs.forEach(favAbbr => {
       const t = group.teams.find(team => team.abbr === favAbbr);
@@ -177,7 +178,12 @@ const MyTeamsScreen = ({ navigation }: any) => {
 
       {/* Team Picker */}
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {sportGroups.length === 0 ? (
+        {sportGroups === undefined ? (
+          <View style={styles.emptyState}>
+            <ActivityIndicator color="#FFA500" size="large" />
+            <Text style={[styles.emptySubtitle, { marginTop: 12 }]}>Fetching teams...</Text>
+          </View>
+        ) : sportGroups.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="trophy-outline" size={48} color="#333" />
             <Text style={styles.emptyTitle}>No teams yet</Text>

@@ -21,8 +21,10 @@ export default defineSchema({
         name: v.string(),
         abbr: v.optional(v.string()),
         logoUrl: v.optional(v.string()),
+        logoUrlSmall: v.optional(v.string()),
         wins: v.optional(v.number()),
         losses: v.optional(v.number()),
+        draws: v.optional(v.number()),
         runs: v.optional(v.number()),
         hits: v.optional(v.number()),
         errors: v.optional(v.number()),
@@ -43,8 +45,10 @@ export default defineSchema({
         name: v.string(),
         abbr: v.optional(v.string()),
         logoUrl: v.optional(v.string()),
+        logoUrlSmall: v.optional(v.string()),
         wins: v.optional(v.number()),
         losses: v.optional(v.number()),
+        draws: v.optional(v.number()),
         runs: v.optional(v.number()),
         hits: v.optional(v.number()),
         errors: v.optional(v.number()),
@@ -97,6 +101,7 @@ export default defineSchema({
     icon: v.optional(v.string()),
     order: v.optional(v.number()),
     pointMultiplier: v.optional(v.number()),
+    isVisible: v.optional(v.boolean()),
   }),
   products: defineTable({
     name: v.string(),
@@ -144,6 +149,8 @@ export default defineSchema({
     })),
     smsConsent: v.optional(v.boolean()),
     marketingOptIn: v.optional(v.boolean()),
+    isVIP: v.optional(v.boolean()),
+    vipLevel: v.optional(v.string()),
   }).index("by_userId", ["userId"]),
 
   reward_definitions: defineTable({
@@ -233,5 +240,12 @@ export default defineSchema({
     nickname: v.optional(v.string()), // e.g. "My Visa"
     createdAt: v.string(),
   }).index("by_userId", ["userId"]),
+
+  store_settings: defineTable({
+    status: v.string(), // "open" | "closed" | "busy"
+    currentWaitTimeMinutes: v.number(),
+    emergencyStop: v.boolean(),
+    lastUpdated: v.string(),
+  }),
 });
 

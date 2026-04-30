@@ -21,6 +21,7 @@ import { Video } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
 import { useUser } from "@clerk/clerk-expo";
 
+import { useOrder } from "../context/OrderContext";
 import BottomNavBar from "../components/BottomNavBar";
 import TeamDetailSheet from "./TeamDetailSheet";
 
@@ -58,21 +59,52 @@ const { width } = Dimensions.get("window");
 
 const SPORTS = ["All", "NFL", "NBA", "MLB", "NHL", "GOLF"];
 
-const getNext7Days = () => {
+/**
+ * Helper to get the local YYYY-MM-DD string for a specific date in a specific timezone.
+ */
+const getLocalDateString = (date: Date, timeZone: string) => {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  return formatter.format(date);
+};
+
+/**
+ * No longer used for query windowing — the backend getGamesForDate
+ * handles its own server-side UTC windowing when startUtc/endUtc are omitted.
+ * Kept as a no-op to avoid breaking any other callers.
+ */
+const getUtcRangeForLocalDay = (_localDateStr: string, _timeZone: string): [undefined, undefined] => {
+  return [undefined, undefined];
+};
+
+const getNext7Days = (timeZone: string) => {
   const days = [];
-  const today = new Date();
   const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
+  // Get "Today" in the target timezone
+  const todayLocalStr = getLocalDateString(new Date(), timeZone);
+  const [ty, tm, td] = todayLocalStr.split('-').map(Number);
+  
+  // We use this as a reference point to generate the next 7 local days
+  const referenceDate = new Date(ty, tm - 1, td);
+
   for (let i = 0; i < 7; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    const dateStr = d.toISOString().split("T")[0];
-    const isToday = i === 0;
+    const d = new Date(referenceDate);
+    d.setDate(referenceDate.getDate() + i);
+    
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
     
     days.push({
       id: dateStr,
-      label: isToday ? "TODAY" : dayNames[d.getDay()],
+      label: i === 0 ? "TODAY" : dayNames[d.getDay()],
       subLabel: `${monthNames[d.getMonth()]} ${d.getDate()}`,
       fullDate: dateStr,
     });
@@ -81,7 +113,9 @@ const getNext7Days = () => {
 };
 
 const LiveGamesScreen = ({ navigation }) => {
-  const daysString = useMemo(() => getNext7Days(), []);
+  const { userTimezone: rawTimezone } = useOrder();
+  const userTimezone = rawTimezone || 'America/New_York'; // Fallback if context hasn't loaded
+  const daysString = useMemo(() => getNext7Days(userTimezone), [userTimezone]);
   
   const { user } = useUser();
   const [selectedDate, setSelectedDate] = useState(daysString[0].fullDate);
@@ -110,11 +144,21 @@ const LiveGamesScreen = ({ navigation }) => {
   const [listPage, setListPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
+  const [localStartUtc, localEndUtc] = useMemo(() => {
+    return getUtcRangeForLocalDay(selectedDate, userTimezone);
+  }, [selectedDate, userTimezone]);
+
   // Main query: ALL games for selected date (live, closed, scheduled)
+  console.log('[LiveGamesScreen] Query args:', { targetDate: selectedDate, sportFilter: selectedSport, timezone: userTimezone });
   const allGamesForDate = useQuery(api.sports_queries.getGamesForDate, {
     targetDate: selectedDate,
+    startUtc: localStartUtc,
+    endUtc: localEndUtc,
     sportFilter: selectedSport,
+    timezone: userTimezone,
   });
+  console.log('[LiveGamesScreen] allGamesForDate:', allGamesForDate?.length ?? 'undefined (loading)');
+
   const allTeamsBySport = useQuery(api.sports_queries.getUniqueTeams);
 
   // Carousel: uses same data, filtered by sport already
@@ -146,18 +190,18 @@ const LiveGamesScreen = ({ navigation }) => {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const carouselRef = useRef<FlatList>(null);
 
-  const majorLeagues = ["NFL", "NBA", "MLB", "NHL"];
+  // Define sorting priority
+  const majorLeagues = ['NBA', 'NHL', 'MLB', 'NFL', 'NCAAF', 'WNBA', 'SOCCER', 'GOLF', 'F1', 'TENNIS'];
 
   const groupedGames = useMemo(() => {
     if (!allGamesForDate) return {};
     
-    // Apply team filter, then paginate
+    // Apply team filter
     const teamFiltered = selectedTeam
       ? allGamesForDate.filter((g: any) =>
           g.awayTeam?.abbr === selectedTeam || g.homeTeam?.abbr === selectedTeam
         )
       : allGamesForDate;
-    const paginated = teamFiltered.slice(0, listPage * ITEMS_PER_PAGE);
 
     const groups = {};
     
@@ -168,23 +212,30 @@ const LiveGamesScreen = ({ navigation }) => {
         majorLeagues.forEach(l => groups[l] = []);
     }
 
-    paginated.forEach(game => {
+    // Group EVERY game first (don't slice yet)
+    teamFiltered.forEach(game => {
       const sport = game.sport || "OTHER";
       if (!groups[sport]) groups[sport] = [];
       groups[sport].push(game);
     });
 
-    // Priority Sort within each group
+    // Sort within each group
     Object.keys(groups).forEach(sport => {
         groups[sport].sort((a, b) => {
             const aFav = isFavoriteGame(a) ? 1 : 0;
             const bFav = isFavoriteGame(b) ? 1 : 0;
-            return bFav - aFav;
+            if (aFav !== bFav) return bFav - aFav;
+            
+            // Secondary sort by startsAt
+            return new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime();
         });
+        
+        // Optional: Slicing here if we want per-group pagination, 
+        // but for now let's just show all games for the selected day/league
     });
 
     return groups;
-  }, [allGamesForDate, selectedSport, listPage, selectedTeam]);
+  }, [allGamesForDate, selectedSport, selectedTeam]);
 
   const getSportColor = (sport) => {
       switch(sport) {
@@ -212,12 +263,15 @@ const LiveGamesScreen = ({ navigation }) => {
     const month = new Date().getMonth(); // 0-11 (April = 3)
     switch (sport) {
       case "NFL":
+      case "NCAAF":
         return month >= 7 || month <= 1; // Aug - Feb
       case "NBA":
       case "NHL":
         return month >= 9 || month <= 5; // Oct - June
       case "MLB":
         return month >= 1 && month <= 10; // Feb - Nov
+      case "SOCCER":
+        return true; // Soccer is usually year-round across leagues
       case "GOLF":
         return true;
       default:

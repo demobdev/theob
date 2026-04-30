@@ -32,7 +32,7 @@ export async function syncUpcomingWeek(ctx: any, api: any): Promise<{ synced: nu
         const config = LEAGUES[leagueKey];
         let normalizedGames: UpcomingGame[] = [];
 
-        if (leagueKey === "GOLF") {
+        if (leagueKey === ("GOLF" as any)) {
           // Golf is different - season schedule is fine, only sync it once a week
           if (i > 0) continue; 
           const endpoint = buildGolfScheduleUrl(config.sportradarLeagueKey, config.apiVersion, year);

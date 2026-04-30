@@ -151,3 +151,28 @@ export const updateReward = mutation({
     return { success: true };
   },
 });
+
+export const toggleVIP = mutation({
+  args: {
+    userId: v.string(),
+    isVIP: v.boolean(),
+    vipLevel: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const profile = await ctx.db
+      .query("user_profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .unique();
+
+    if (!profile) throw new Error("Profile not found");
+
+    await ctx.db.patch(profile._id, {
+      isVIP: args.isVIP,
+      vipLevel: args.vipLevel,
+    });
+
+    return { success: true };
+  },
+});

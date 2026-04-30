@@ -2,6 +2,38 @@ import { query } from "./_generated/server";
 import { v } from "convex/values";
 
 /**
+ * Helper to get the local date string (YYYY-MM-DD) for a given UTC ISO string and timezone.
+ * Defaults to Eastern Time (America/New_York).
+ */
+function getLocalDateString(utcString: string, timeZone: string = 'America/New_York') {
+  const date = new Date(utcString);
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', { 
+      timeZone, 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit' 
+    }).formatToParts(date);
+    const y = parts.find(p => p.type === 'year')?.value;
+    const m = parts.find(p => p.type === 'month')?.value;
+    const d = parts.find(p => p.type === 'day')?.value;
+    return `${y}-${m}-${d}`;
+  } catch (e) {
+    // Fallback to ET if timezone is invalid
+    const parts = new Intl.DateTimeFormat('en-US', { 
+      timeZone: 'America/New_York', 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit' 
+    }).formatToParts(date);
+    const y = parts.find(p => p.type === 'year')?.value;
+    const m = parts.find(p => p.type === 'month')?.value;
+    const d = parts.find(p => p.type === 'day')?.value;
+    return `${y}-${m}-${d}`;
+  }
+}
+
+/**
  * Returns truly live games, excluding stale "inprogress" records
  * that haven't been synced in over 6 hours (likely finished).
  */
@@ -30,30 +62,34 @@ export const getUpcomingGames = query({
     limit: v.optional(v.number()),
     targetDate: v.optional(v.string()), // e.g. "2026-04-19"
     sportFilter: v.optional(v.string()), // e.g. "All", "MLB", "NBA"
+    timezone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     let games: any[] = [];
 
     // Prioritize querying by exact date range if provided
     if (args.targetDate) {
-        // Assume US Eastern time for boundaries: adds 4 hours to UTC (roughly handles EST/EDT crossover)
-        // e.g. "2026-04-19" -> >= "2026-04-19T04:00:00Z" and < "2026-04-20T04:00:00Z"
-        const startBounds = args.targetDate + "T04:00:00";
-        
-        const nextDay = new Date(args.targetDate);
-        nextDay.setDate(nextDay.getDate() + 1);
-        const nextDayStr = nextDay.toISOString().split('T')[0] + "T04:00:00";
+        // Query a wide UTC window (-1 day to +2 days) to guarantee we catch the local day
+        const targetDateObj = new Date(args.targetDate + "T12:00:00Z"); // Noon UTC
+        const startWindow = new Date(targetDateObj.getTime() - 24 * 60 * 60 * 1000).toISOString();
+        const endWindow = new Date(targetDateObj.getTime() + 48 * 60 * 60 * 1000).toISOString();
 
         let q = ctx.db.query("upcoming_games")
             .withIndex("by_startsAt", (q) => 
-                q.gte("startsAt", startBounds).lt("startsAt", nextDayStr)
+                q.gte("startsAt", startWindow).lt("startsAt", endWindow)
             );
-        games = await q.order("asc").take(args.limit ?? 200);
+        const wideGames = await q.order("asc").collect();
+        
+        // Post-filter to exact Local Date
+        games = wideGames.filter(g => getLocalDateString(g.startsAt, args.timezone) === args.targetDate);
         
         // Post-filter by sport
         if (args.sportFilter && args.sportFilter !== "All") {
             games = games.filter(g => g.sport === args.sportFilter);
         }
+        
+        // Limit
+        games = games.slice(0, args.limit ?? 200);
     } else {
         // If no date provided, query by sport or everything, ascending from now
         const nowStr = new Date().toISOString();
@@ -63,7 +99,7 @@ export const getUpcomingGames = query({
                 .filter(q => q.gte(q.field("startsAt"), nowStr))
                 .take(args.limit ?? 200);
             
-            // Re-sort ascending (Convex doesn't sort by anything but insertion order on by_sport index easily unless collected)
+            // Re-sort ascending
             games.sort((a: any, b: any) => a.startsAt.localeCompare(b.startsAt));
         } else {
             games = await ctx.db.query("upcoming_games")
@@ -80,29 +116,44 @@ export const getUpcomingGames = query({
 /**
  * Returns ALL games for a given date regardless of status.
  * Powers the Games Page / War Room list to show completed, live, and upcoming games.
- *
- * Uses a timezone-aware window: games stored in UTC by TheSportsDB/API-Sports
- * may be listed as the NEXT UTC day for ET evening games.
- * We capture a wide window: [targetDate-1 T04:00Z, targetDate+2 T04:00Z]
- * then post-filter to games whose local date (ET offset -4h) matches targetDate.
  */
 export const getGamesForDate = query({
   args: {
     targetDate: v.string(), // e.g. "2026-04-24"
+    startUtc: v.optional(v.string()), // e.g. "2026-04-24T07:00:00.000Z" (local midnight in UTC)
+    endUtc: v.optional(v.string()),
     sportFilter: v.optional(v.string()),
+    timezone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // Wide UTC window: capture games stored anywhere from day-before midnight to day+2 morning
-    // This handles ET games that appear as next-day UTC
-    const dayStart = args.targetDate + "T00:00:00Z"; // midnight UTC of the date
-    const dayEnd   = args.targetDate + "T28:00:00Z"; // 28 hours later catches all ET games
-
-    let games = await ctx.db.query("upcoming_games")
-      .withIndex("by_startsAt", (q) =>
-        q.gte("startsAt", dayStart).lt("startsAt", dayEnd)
-      )
-      .order("asc")
-      .collect();
+    let games: any[] = [];
+    
+    if (args.startUtc && args.endUtc) {
+      // 1. Client-Side Windowing (Timezone-Aware Bounds)
+      games = await ctx.db.query("upcoming_games")
+        .withIndex("by_startsAt", (q) =>
+          q.gte("startsAt", args.startUtc!).lt("startsAt", args.endUtc!)
+        )
+        .order("asc")
+        .collect();
+        
+      // Secondary filter to ensure no boundary leaks if the UTC window was slightly off
+      games = games.filter(g => getLocalDateString(g.startsAt, args.timezone) === args.targetDate);
+    } else {
+      // 2. Server-Side Windowing
+      const targetDateObj = new Date(args.targetDate + "T12:00:00Z");
+      const windowStart = new Date(targetDateObj.getTime() - 24 * 60 * 60 * 1000).toISOString();
+      const windowEnd = new Date(targetDateObj.getTime() + 48 * 60 * 60 * 1000).toISOString();
+  
+      games = await ctx.db.query("upcoming_games")
+        .withIndex("by_startsAt", (q) =>
+          q.gte("startsAt", windowStart).lt("startsAt", windowEnd)
+        )
+        .order("asc")
+        .collect();
+  
+      games = games.filter((g: any) => getLocalDateString(g.startsAt, args.timezone) === args.targetDate);
+    }
 
     // Post-filter by sport
     if (args.sportFilter && args.sportFilter !== "All") {
@@ -116,26 +167,30 @@ export const getGamesForDate = query({
 /**
  * Returns today's games for the homepage ticker — live, closed (with scores), and upcoming.
  * Also includes last night's finished games so the carousel always has content.
- *
- * Uses a wide UTC window to handle ET evening games stored as next-day UTC by APIs.
  */
 export const getTodayGames = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    timezone: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const tz = args.timezone || 'America/New_York';
+    const todayStr = getLocalDateString(new Date().toISOString(), tz);
+    
+    // Query a wide window to catch today's games in the target timezone
     const now = new Date();
-    const todayStr = now.toISOString().split("T")[0];
+    const startWindow = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const endWindow = new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString();
 
-    // Wide window: today 00:00Z through 28 hours later
-    // Captures 8pm ET games stored as next-day UTC (00:00-03:59Z)
-    const windowStart = todayStr + "T00:00:00Z";
-    const windowEnd   = todayStr + "T28:00:00Z";
-
-    return await ctx.db.query("upcoming_games")
+    const games = await ctx.db
+      .query("upcoming_games")
       .withIndex("by_startsAt", (q) =>
-        q.gte("startsAt", windowStart).lt("startsAt", windowEnd)
+        q.gte("startsAt", startWindow).lt("startsAt", endWindow)
       )
       .order("asc")
       .collect();
+
+    // Post-filter to the exact local day
+    return games.filter((g) => getLocalDateString(g.startsAt, tz) === todayStr);
   },
 });
 
@@ -147,14 +202,18 @@ export const getTodayGames = query({
 export const getYesterdayGames = query({
   args: {
     sportFilter: v.optional(v.string()),
+    timezone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const ydStr = yesterday.toISOString().split("T")[0];
+    const tz = args.timezone ?? 'America/New_York';
+    const now = new Date();
+    // Calculate "yesterday" in local time by subtracting 24h
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const ydStr = getLocalDateString(yesterday.toISOString(), tz);
 
-    const windowStart = ydStr + "T00:00:00Z";
-    const windowEnd   = ydStr + "T28:00:00Z";
+    const targetDateObj = new Date(ydStr + "T12:00:00Z");
+    const windowStart = new Date(targetDateObj.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const windowEnd = new Date(targetDateObj.getTime() + 48 * 60 * 60 * 1000).toISOString();
 
     let games = await ctx.db.query("upcoming_games")
       .withIndex("by_startsAt", (q) =>
@@ -163,7 +222,8 @@ export const getYesterdayGames = query({
       .order("asc")
       .collect();
 
-    games = games.filter((g: any) => g.status === "closed");
+    // Strict local post-filter and closed check
+    games = games.filter((g: any) => g.status === "closed" && getLocalDateString(g.startsAt, tz) === ydStr);
 
     if (args.sportFilter && args.sportFilter !== "All") {
       games = games.filter((g: any) => g.sport === args.sportFilter);

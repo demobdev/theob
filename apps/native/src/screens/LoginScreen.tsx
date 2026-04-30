@@ -16,6 +16,7 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import { useOAuth, useSignIn, useSignUp } from "@clerk/clerk-expo";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { usePostHog } from "posthog-react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -30,6 +31,7 @@ const TEXT_MUTED = "#888";
 type AuthMode = "options" | "email-signin" | "email-signup" | "verify";
 
 const LoginScreen = ({ navigation }: any) => {
+  const posthog = usePostHog();
   const [mode, setMode]               = useState<AuthMode>("options");
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState<string | null>(null);
@@ -56,6 +58,7 @@ const LoginScreen = ({ navigation }: any) => {
       const { createdSessionId, setActive } = await flow();
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
+        posthog?.capture("sign_in_completed", { method: provider });
         navigation.navigate("LandingScreen");
       }
     } catch (err: any) {
@@ -115,6 +118,11 @@ const LoginScreen = ({ navigation }: any) => {
         const result = await signUp.attemptEmailAddressVerification({ code });
         if (result.status === "complete" && setSignUpActive) {
           await setSignUpActive({ session: result.createdSessionId });
+          posthog?.identify((result as any).createdUserId || email, {
+            $set: { email, first_name: firstName, last_name: lastName },
+            $set_once: { sign_up_date: new Date().toISOString() },
+          });
+          posthog?.capture("sign_up_completed", { method: "email" });
           navigation.navigate("LandingScreen");
         } else if (result.status === "missing_requirements") {
           const missingArr = (result as any).missingFields || (result as any).unverifiedFields || [];
@@ -127,6 +135,8 @@ const LoginScreen = ({ navigation }: any) => {
         const result = await signIn.attemptFirstFactor({ strategy: "email_code", code });
         if (result.status === "complete" && setSignInActive) {
           await setSignInActive({ session: result.createdSessionId });
+          posthog?.identify(email, { $set: { email } });
+          posthog?.capture("sign_in_completed", { method: "email" });
           navigation.navigate("LandingScreen");
         } else {
           setError(`Status: "${result.status}" — incomplete.`);

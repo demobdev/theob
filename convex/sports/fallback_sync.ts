@@ -32,25 +32,45 @@ export async function syncSportForDate(
   const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
   const config = LEAGUES[sport];
 
+  // ── GOLF HANDLING (Special Case) ──────────────────────────────────────────
+  if (sport === "GOLF") {
+    try {
+      const endpoint = buildGolfScheduleUrl(
+        "pga",
+        config.apiVersion,
+        year
+      );
+      const payload = await sportradarFetch<any>(endpoint, sport);
+      const tournaments = payload.tournaments || [];
+      
+      // Filter for tournaments that are active on this specific date
+      const targetTime = new Date(`${dateStr}T12:00:00Z`).getTime();
+      const active = tournaments.filter((t: any) => {
+        const start = new Date(t.start_date).getTime();
+        const end = new Date(t.end_date).getTime();
+        return targetTime >= start && targetTime <= end;
+      });
+
+      const normalized = active.map(normalizeGolfTournament);
+      console.log(`[Sportradar Golf ✓] ${dateStr}: ${normalized.length} tournaments`);
+      return { games: normalized, source: "sportradar" };
+    } catch (err: any) {
+      console.warn(`[Sportradar Golf ✗] ${dateStr}: ${err.message}`);
+    }
+  }
+
   // ── SOURCE 1: Sportradar ──────────────────────────────────────────────────
   try {
     let normalizedGames: UpcomingGame[] = [];
 
-    if (sport === "GOLF") {
-      const endpoint = buildGolfScheduleUrl(config.sportradarLeagueKey, config.apiVersion, year);
-      const payload = await sportradarFetch<any>(endpoint, sport);
-      const tournaments = payload.tournaments || [];
-      normalizedGames = tournaments.map(normalizeGolfTournament);
-    } else {
-      const endpoint = buildDailyScheduleUrl(
-        config.sportradarLeagueKey,
-        config.apiVersion,
-        year, month, day
-      );
-      const payload = await sportradarFetch<any>(endpoint, sport);
-      const rawGames = payload.games || [];
-      normalizedGames = rawGames.map((g: any) => normalizeGame(g, sport, config.label));
-    }
+    const endpoint = buildDailyScheduleUrl(
+      config.sportradarLeagueKey,
+      config.apiVersion,
+      year, month, day
+    );
+    const payload = await sportradarFetch<any>(endpoint, sport);
+    const rawGames = payload.games || [];
+    normalizedGames = rawGames.map((g: any) => normalizeGame(g, sport, config.label));
 
     console.log(`[Sportradar ✓] ${sport} ${dateStr}: ${normalizedGames.length} games`);
     return { games: normalizedGames, source: "sportradar" };
@@ -60,8 +80,7 @@ export async function syncSportForDate(
   }
 
   // ── SOURCE 2: API-Sports ──────────────────────────────────────────────────
-  if (sport !== "GOLF") { // API-Sports doesn't have Golf
-    try {
+  try {
       await sleep(300); // small buffer between sources
       const rawGames = await fetchApiSportsGamesForDate(sport, dateStr);
       const normalizedGames = rawGames.map((g: any) => normalizeApiSportsGame(g, sport));
@@ -72,11 +91,9 @@ export async function syncSportForDate(
     } catch (asErr: any) {
       console.warn(`[API-Sports ✗] ${sport} ${dateStr}: ${asErr.message} → Trying TheSportsDB...`);
     }
-  }
 
   // ── SOURCE 3: TheSportsDB (Last Resort) ───────────────────────────────────
-  if (sport !== "GOLF") {
-    try {
+  try {
       await sleep(300);
       const rawEvents = await fetchTheSportsDBEvents(sport, dateStr);
       const normalizedGames = rawEvents
@@ -89,7 +106,6 @@ export async function syncSportForDate(
     } catch (tsdbErr: any) {
       console.error(`[TheSportsDB ✗] ${sport} ${dateStr}: All sources failed. ${tsdbErr.message}`);
     }
-  }
 
   // All sources failed — return empty rather than crash the whole sync
   console.error(`[ALL SOURCES FAILED] ${sport} ${dateStr}`);

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Location from 'expo-location';
+import * as Localization from 'expo-localization';
 
 export type FulfillmentMethod = "pickup_instore" | "pickup_curbside" | "delivery_partner";
 export type ScheduleMode = "asap" | "scheduled";
@@ -28,6 +30,8 @@ export interface OrderContextState {
     instructions: string;
   };
   shopNotice: string | null;
+  userTimezone: string;
+  userCoords: { latitude: number; longitude: number } | null;
 }
 
 interface OrderContextType extends OrderContextState {
@@ -38,6 +42,7 @@ interface OrderContextType extends OrderContextState {
   setVehicle: (info: { make: string; model: string; color: string }) => void;
   setDeliveryAddress: (address: OrderContextState["deliveryAddress"]) => void;
   setShopNotice: (notice: string | null) => void;
+  requestLocationPermission: () => Promise<boolean>;
   isOrderContextSetup: boolean;
 }
 
@@ -67,7 +72,9 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       zip: "",
       instructions: "",
     },
-    shopNotice: "Kitchen closes at 10:30 PM tonight.", // Example shop notice
+    shopNotice: "Kitchen closes at 10:30 PM tonight.",
+    userTimezone: Localization.getCalendars()[0]?.timeZone || "America/New_York",
+    userCoords: null,
   });
 
   const [isOrderContextSetup, setIsOrderContextSetup] = useState(false);
@@ -78,7 +85,13 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       try {
         const saved = await AsyncStorage.getItem("@theob_order_context");
         if (saved) {
-          setState(prev => ({ ...prev, ...JSON.parse(saved) }));
+          const parsed = JSON.parse(saved);
+          setState(prev => ({ 
+            ...prev, 
+            ...parsed,
+            // Always refresh timezone on mount from system
+            userTimezone: Localization.getCalendars()[0]?.timeZone || prev.userTimezone 
+          }));
         }
         setIsOrderContextSetup(true);
       } catch (e) {
@@ -93,6 +106,29 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       await AsyncStorage.setItem("@theob_order_context", JSON.stringify(newState));
     } catch (e) {
       console.error("Failed to save order context", e);
+    }
+  };
+
+  const requestLocationPermission = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        const location = await Location.getCurrentPositionAsync({});
+        const newState = {
+          ...state,
+          userCoords: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude
+          }
+        };
+        setState(newState);
+        saveState(newState);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.warn("Error requesting location", e);
+      return false;
     }
   };
 
@@ -147,6 +183,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setVehicle,
         setDeliveryAddress,
         setShopNotice,
+        requestLocationPermission,
         isOrderContextSetup,
       }}
     >
@@ -162,3 +199,4 @@ export const useOrder = () => {
   }
   return context;
 };
+

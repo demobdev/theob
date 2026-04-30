@@ -13,7 +13,12 @@ import {
   MoreVertical,
   Check,
   LayoutGrid,
-  List
+  List,
+  GripVertical,
+  ChevronUp,
+  ChevronDown,
+  Trash2,
+  Tag
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -28,12 +33,18 @@ export default function MenuManagementPage() {
   const generateUploadUrl = useMutation(api.admin_products.generateUploadUrl);
   const updateProductImage = useMutation(api.admin_products.updateProductImage);
 
+  const [activeTab, setActiveTab] = useState<"products" | "categories">("products");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isAdding, setIsAdding] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [isUploading, setIsUploading] = useState(false);
+
+  // Category mutations
+  const updateCategory = useMutation(api.admin_categories.updateCategory);
+  const reorderCategories = useMutation(api.admin_categories.reorderCategories);
+  const deleteCategory = useMutation(api.admin_categories.deleteCategory);
 
   const filteredProducts = products?.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -48,20 +59,46 @@ export default function MenuManagementPage() {
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black tracking-tighter text-white">MENU CONTROL</h1>
+          <h1 className="text-3xl font-black tracking-tighter text-white uppercase">{activeTab} Control</h1>
           <p className="text-gray-500 font-bold text-xs tracking-widest uppercase mt-2">
-            Manage Inventory & Live Pricing
+            Manage {activeTab} & Live Settings
           </p>
         </div>
-        <button 
-          onClick={() => setIsAdding(true)}
-          className="bg-[#FFA500] text-black px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-orange-400 transition-colors"
-        >
-          Add Product
-        </button>
+        
+        <div className="flex items-center gap-4">
+          <div className="flex bg-[#0f0f11] border border-[#1a1a1a] p-1 rounded-xl mr-4">
+            <button 
+              onClick={() => setActiveTab("products")}
+              className={cn(
+                "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                activeTab === "products" ? "bg-[#161618] text-[#FFA500]" : "text-gray-500 hover:text-white"
+              )}
+            >
+              Products
+            </button>
+            <button 
+              onClick={() => setActiveTab("categories")}
+              className={cn(
+                "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                activeTab === "categories" ? "bg-[#161618] text-[#FFA500]" : "text-gray-500 hover:text-white"
+              )}
+            >
+              Categories
+            </button>
+          </div>
+
+          <button 
+            onClick={() => setIsAdding(true)}
+            className="bg-[#FFA500] text-black px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-orange-400 transition-colors"
+          >
+            Add {activeTab === "products" ? "Product" : "Category"}
+          </button>
+        </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4">
+      {activeTab === "products" ? (
+        <div className="space-y-6">
+        <div className="flex flex-col md:flex-row gap-4">
          <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" size={18} />
             <input 
@@ -132,7 +169,7 @@ export default function MenuManagementPage() {
                        <button 
                         onClick={() => {
                           const newPrice = prompt("Enter new price:", p.price.toString());
-                          if (newPrice) updatePrice({ productId: p._id, newPrice: parseFloat(newPrice) });
+                          if (newPrice) updateProduct({ productId: p._id, updates: { ...p, price: parseFloat(newPrice) } });
                         }}
                         className="text-white font-black text-sm tracking-tighter hover:text-[#FFA500] transition-colors"
                        >
@@ -219,6 +256,15 @@ export default function MenuManagementPage() {
              </div>
            ))}
         </div>
+      )}
+    </div>
+  ) : (
+        <CategoryManagement 
+          categories={categories} 
+          updateCategory={updateCategory}
+          reorderCategories={reorderCategories}
+          deleteCategory={deleteCategory}
+        />
       )}
 
       {/* MODALS */}
@@ -370,5 +416,105 @@ export default function MenuManagementPage() {
       )}
     </div>
     </>
+  );
+}
+
+function CategoryManagement({ categories, updateCategory, reorderCategories, deleteCategory }: any) {
+  const sortedCategories = [...categories].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  const handleMove = async (index: number, direction: 'up' | 'down') => {
+    const newCategories = [...sortedCategories];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newCategories.length) return;
+
+    const [moved] = newCategories.splice(index, 1);
+    newCategories.splice(targetIndex, 0, moved);
+
+    const orderings = newCategories.map((c, i) => ({
+      id: c._id,
+      order: i,
+    }));
+
+    await reorderCategories({ orderings });
+  };
+
+  return (
+    <div className="bg-[#0f0f11] border border-[#1a1a1a] rounded-2xl overflow-hidden shadow-2xl">
+      <div className="p-6 border-b border-[#1a1a1a] bg-[#0a0a0a]">
+         <h3 className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em]">Menu Category Hierarchy</h3>
+      </div>
+      <div className="divide-y divide-[#161618]">
+        {sortedCategories.map((cat, idx) => (
+          <div key={cat._id} className="p-4 flex items-center justify-between hover:bg-[#111] transition-colors group">
+            <div className="flex items-center gap-6">
+              <div className="flex flex-col gap-1">
+                 <button 
+                  onClick={() => handleMove(idx, 'up')}
+                  disabled={idx === 0}
+                  className="text-gray-700 hover:text-[#FFA500] disabled:opacity-0 transition-colors"
+                 >
+                    <ChevronUp size={16} />
+                 </button>
+                 <button 
+                  onClick={() => handleMove(idx, 'down')}
+                  disabled={idx === sortedCategories.length - 1}
+                  className="text-gray-700 hover:text-[#FFA500] disabled:opacity-0 transition-colors"
+                 >
+                    <ChevronDown size={16} />
+                 </button>
+              </div>
+              
+              <div className="w-10 h-10 bg-[#161618] rounded-xl border border-[#222] flex items-center justify-center text-[#FFA500]">
+                 <Tag size={18} />
+              </div>
+
+              <div>
+                <div className="flex items-center gap-3">
+                   <h4 className="text-white font-black text-sm uppercase tracking-tight">{cat.name}</h4>
+                   <span className="text-[8px] font-black bg-[#161618] px-2 py-0.5 rounded text-gray-500 uppercase">ORDER: {cat.order || 0}</span>
+                </div>
+                <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest mt-0.5">
+                   {cat.pointMultiplier ? `${cat.pointMultiplier}x points` : 'standard points'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6">
+               <div className="flex flex-col items-end gap-1">
+                  <span className="text-gray-700 text-[8px] font-black uppercase tracking-widest">Visibility</span>
+                  <button 
+                    onClick={() => updateCategory({ categoryId: cat._id, updates: { isVisible: !cat.isVisible } })}
+                    className={cn(
+                      "px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest border transition-all",
+                      cat.isVisible !== false 
+                        ? "bg-green-900/10 text-green-500 border-green-500/30" 
+                        : "bg-red-900/10 text-red-500 border-red-500/30"
+                    )}
+                  >
+                    {cat.isVisible !== false ? "Visible" : "Hidden"}
+                  </button>
+               </div>
+
+               <div className="h-8 w-px bg-[#1a1a1a]" />
+
+               <button 
+                onClick={async () => {
+                  if (confirm(`Delete ${cat.name}? This cannot be undone.`)) {
+                    try {
+                      await deleteCategory({ categoryId: cat._id });
+                    } catch (e: any) {
+                      alert(e.message);
+                    }
+                  }
+                }}
+                className="p-2 text-gray-700 hover:text-red-500 transition-colors"
+               >
+                  <Trash2 size={16} />
+               </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
