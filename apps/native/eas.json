@@ -18,7 +18,13 @@
     "production": {
       "node": "20.18.0",
       "autoIncrement": true,
-      "distribution": "store"
+      "distribution": "store",
+      "env": {
+        "EXPO_PUBLIC_CONVEX_URL": "https://quiet-mole-11.convex.cloud",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_c2hhcnAtY29yYWwtNjguY2xlcmsuYWNjb3VudHMuZGV2JA",
+        "EXPO_PUBLIC_POSTHOG_KEY": "phc_uYtrfxdPwVUpX4S5SHnMzqVRyqDEmZphmKm8MEFFw8sj",
+        "EXPO_PUBLIC_POSTHOG_HOST": "https://us.i.posthog.com"
+      }
     }
   },
   "submit": {
