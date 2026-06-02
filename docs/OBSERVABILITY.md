@@ -19,8 +19,8 @@ Both are **optional at dev time** (no DSN/key = disabled, app still runs).
 
 In [sentry.io](https://sentry.io):
 
-1. **the-owners-box-native** (React Native) — for Expo Android/iOS builds  
-2. **the-owners-box-web** (Next.js) — for admin/marketing site  
+1. **ob** (React Native) @ org **wvfm-labs** — for Expo Android/iOS builds  
+2. **ownersbox-web** or **javascript-nextjs** (Next.js) — for admin/marketing site (optional)  
 
 Copy each project’s **DSN** (`https://...@....ingest.sentry.io/...`).
 
@@ -46,7 +46,7 @@ cd c:\dev\theob\apps\native
 npx eas-cli secret:create --scope project --name EXPO_PUBLIC_SENTRY_DSN --value "https://..." --type string
 npx eas-cli secret:create --scope project --name SENTRY_AUTH_TOKEN --value "sntrys_..." --type string
 npx eas-cli secret:create --scope project --name SENTRY_ORG --value "your-org-slug" --type string
-npx eas-cli secret:create --scope project --name SENTRY_PROJECT --value "the-owners-box-native" --type string
+npx eas-cli secret:create --scope project --name SENTRY_PROJECT --value "ob" --type string
 ```
 
 `SENTRY_AUTH_TOKEN` is a [Sentry user auth token](https://sentry.io/settings/account/api/auth-tokens/) with `project:releases` and `org:read`. The `@sentry/react-native/expo` plugin uploads source maps during **production** EAS builds when this token is set.

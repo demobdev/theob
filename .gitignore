@@ -40,3 +40,6 @@ yarn-error.log*
 
 # Cursor MCP (may contain PostHog phx personal API keys)
 .cursor/mcp.json
+
+# Sentry auth token for local source map upload
+apps/native/sentry.properties

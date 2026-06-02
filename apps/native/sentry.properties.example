@@ -1,0 +1,6 @@
+# Copy to sentry.properties for local release builds (gitignored).
+# EAS builds use SENTRY_AUTH_TOKEN secret instead.
+defaults.url=https://sentry.io/
+defaults.org=wvfm-labs
+defaults.project=ob
+auth.token=YOUR_SENTRY_AUTH_TOKEN

@@ -13,12 +13,20 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "SENTRY_ORG": "wvfm-labs",
+        "SENTRY_PROJECT": "ob"
       }
     },
     "production": {
       "node": "20.18.0",
       "autoIncrement": true,
-      "distribution": "store"
+      "distribution": "store",
+      "env": {
+        "SENTRY_ORG": "wvfm-labs",
+        "SENTRY_PROJECT": "ob"
+      }
     }
   },
   "submit": {

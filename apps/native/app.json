@@ -44,7 +44,13 @@
         }
       ],
       "expo-localization",
-      "@sentry/react-native/expo"
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "wvfm-labs",
+          "project": "ob"
+        }
+      ]
     ],
     "extra": {
       "eas": {
