@@ -22,6 +22,8 @@ Cloud builds do **not** use your local `.env.local`. Add:
 ```powershell
 eas secret:create --scope project --name EXPO_PUBLIC_CONVEX_URL --value "https://quiet-mole-11.convex.cloud" --type string
 eas secret:create --scope project --name EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY --value "pk_test_..." --type string
+eas secret:create --scope project --name EXPO_PUBLIC_POSTHOG_KEY --value "phc_..." --type string
+eas secret:create --scope project --name EXPO_PUBLIC_POSTHOG_HOST --value "https://us.i.posthog.com" --type string
 ```
 
 Use production Clerk/Convex URLs when you cut over.

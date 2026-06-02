@@ -23,6 +23,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@clerk/clerk-expo";
+import { usePostHog } from "posthog-react-native";
 import PreferencesModal from "../components/PreferencesModal";
 import { ensureAuth } from "../utils/authGuard";
 import {
@@ -213,6 +214,7 @@ const getImageSource = (imgStr) => {
 
 const CartScreen = ({ navigation }) => {
   const { isSignedIn } = useAuth();
+  const posthog = usePostHog();
   const {
     items, updateQuantity, removeFromCart, totalPrice, clearCart,
     cartExpired, dismissExpiredNotice,
@@ -334,6 +336,13 @@ const CartScreen = ({ navigation }) => {
         ...(fulfillmentMethod === "pickup_curbside" && {
           carDetails: vehicleInfo,
         }),
+      });
+
+      posthog.capture("order_placed", {
+        fulfillment_method: fulfillmentMethod,
+        item_count: items.length,
+        subtotal,
+        total,
       });
 
       Alert.alert(

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import ConvexClientProvider from "./ConvexClientProvider";
 import LocationFulfillmentModal from "@/components/menu/LocationFulfillmentModal";
+import PostHogAuthSync from "@/components/PostHogAuthSync";
 
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn(inter.className, montserrat.className, lato.className)}>
         <ConvexClientProvider>
+          <PostHogAuthSync />
           {children}
           <LocationFulfillmentModal />
         </ConvexClientProvider>

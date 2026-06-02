@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useRef } from "react";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  type NavigationContainerRef,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth } from "@clerk/clerk-expo";
+import { PostHogProvider } from "posthog-react-native";
+import { posthog } from "./src/config/posthog";
+import PostHogUserSync from "./src/components/PostHogUserSync";
 
 // Import Screens
 import LandingScreen from "./src/screens/LandingScreen";
@@ -110,20 +116,49 @@ function AppNavigation() {
 import TextureOverlay from "./src/components/TextureOverlay";
 
 export default function App() {
+  const navigationRef = useRef<NavigationContainerRef<Record<string, unknown>>>(null);
+  const routeNameRef = useRef<string | undefined>(undefined);
+
   return (
     <ConvexClientProvider>
-      <CartProvider>
-        <OrderProvider>
-          <SafeAreaProvider>
-            <NavigationContainer>
-              <TextureOverlay>
-                <AppNavigation />
-              </TextureOverlay>
-              <StatusBar style="auto" />
-            </NavigationContainer>
-          </SafeAreaProvider>
-        </OrderProvider>
-      </CartProvider>
+      <PostHogProvider
+        client={posthog}
+        autocapture={{
+          captureScreens: false,
+          captureTouches: true,
+        }}
+      >
+        <PostHogUserSync />
+        <CartProvider>
+          <OrderProvider>
+            <SafeAreaProvider>
+              <NavigationContainer
+                ref={navigationRef}
+                onReady={() => {
+                  routeNameRef.current =
+                    navigationRef.current?.getCurrentRoute()?.name;
+                }}
+                onStateChange={() => {
+                  const previous = routeNameRef.current;
+                  const current =
+                    navigationRef.current?.getCurrentRoute()?.name;
+                  if (current && previous !== current) {
+                    posthog.screen(current, {
+                      previous_screen: previous ?? null,
+                    });
+                  }
+                  routeNameRef.current = current;
+                }}
+              >
+                <TextureOverlay>
+                  <AppNavigation />
+                </TextureOverlay>
+                <StatusBar style="auto" />
+              </NavigationContainer>
+            </SafeAreaProvider>
+          </OrderProvider>
+        </CartProvider>
+      </PostHogProvider>
     </ConvexClientProvider>
   );
 }
