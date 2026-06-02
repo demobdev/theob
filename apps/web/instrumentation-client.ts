@@ -8,7 +8,8 @@ if (key && !key.includes("your_")) {
   posthog.init(key, {
     api_host: "/ingest",
     ui_host: "https://us.posthog.com",
-    defaults: "2026-01-30",
+    defaults: "2026-05-30",
+    person_profiles: "identified_only",
     capture_exceptions: true,
     debug: process.env.NODE_ENV === "development",
   });

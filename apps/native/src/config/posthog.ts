@@ -15,6 +15,7 @@ export const posthog = new PostHog(apiKey ?? "placeholder", {
   host,
   disabled: !isConfigured,
   captureAppLifecycleEvents: true,
+  personProfiles: "identified_only",
   debug: __DEV__,
 });
 
