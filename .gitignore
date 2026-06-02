@@ -16,6 +16,7 @@ build
 
 # expo
 .expo
+.expo-verify
 
 # misc
 .DS_Store
@@ -36,3 +37,6 @@ yarn-error.log*
 
 # turbo
 .turbo
+
+# Cursor MCP (may contain PostHog phx personal API keys)
+.cursor/mcp.json
