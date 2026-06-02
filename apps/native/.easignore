@@ -1,0 +1,9 @@
+# Shrink EAS upload (monorepo root is archived from apps/native)
+../../.agents/**
+../../.git/**
+../../apps/web/**
+../../www-sonnysbbq-com/**
+**/.cursor/**
+**/node_modules/.cache/**
+**/*.md
+!README.md

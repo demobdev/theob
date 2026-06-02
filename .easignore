@@ -1,0 +1,10 @@
+# Monorepo: shrink EAS archive (run eas build from apps/native)
+.agents/
+.cursor/
+.git/
+apps/web/
+www-sonnysbbq-com/
+**/.turbo/
+**/node_modules/.cache/
+*.md
+!apps/native/README.md

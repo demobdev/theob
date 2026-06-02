@@ -47,6 +47,7 @@
       [
         "@sentry/react-native/expo",
         {
+          "url": "https://sentry.io/",
           "organization": "wvfm-labs",
           "project": "ob"
         }
