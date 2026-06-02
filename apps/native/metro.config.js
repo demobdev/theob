@@ -25,8 +25,25 @@ config.resolver.extraNodeModules = {
 // 4. Properly resolve standard monorepo modules
 config.resolver.sourceExts = [...config.resolver.sourceExts, "mjs", "cjs"];
 
-// 5. Watch workspace root to allow resolving from the consolidated convex dir
-config.watchFolders = [workspaceRoot];
+// 5. Watch only convex/ (not whole monorepo — avoids ENOENT on .agents/skills, etc.)
+config.watchFolders = [path.resolve(workspaceRoot, "convex")];
+
+// Ignore agent skills, local convex cache, and other non-app paths if they appear in the tree
+const blockList = [
+  /\.agents\/.*/,
+  /\/\.convex\//,
+  /\/packages\/backend\//,
+  /\/apps\/web\//,
+  /\/www-sonnysbbq-com\//,
+];
+config.resolver.blockList = [
+  ...(Array.isArray(config.resolver.blockList)
+    ? config.resolver.blockList
+    : config.resolver.blockList
+      ? [config.resolver.blockList]
+      : []),
+  ...blockList,
+];
 
 // 6. Wrap with NativeWind configuration
 module.exports = withNativeWind(config, {

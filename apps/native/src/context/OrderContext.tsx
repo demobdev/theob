@@ -48,7 +48,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     fulfillmentMethod: "pickup_instore",
     locationId: "greenville_01",
     locationName: "Greenville",
-    locationAddress: "123 Main St, Greenville, SC",
+    locationAddress: "1757 Woodruff Rd. STE A, Greenville, SC 29607",
     scheduleMode: "asap",
     scheduledTime: null,
     phoneNumber: "",

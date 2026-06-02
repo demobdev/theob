@@ -3,7 +3,12 @@
   "private": true,
   "packageManager": "npm@10.8.2",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=web-app",
+    "dev:backend": "convex dev",
+    "dev:native": "npm run start --workspace=native",
+    "dev:web": "npm run dev --workspace=web-app",
+    "seed": "convex run seedMenu:populate && convex run seedRewards:seedRewards",
+    "sync:env": "node scripts/sync-convex-env.mjs",
     "ios": "npm run ios --workspace=native",
     "android": "npm run android --workspace=native",
     "build": "turbo run build",

@@ -14,14 +14,28 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { useOrder } from "../context/OrderContext";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import { formatAsapWindow, GREENVILLE } from "../constants/location";
 
 const { height } = Dimensions.get("window");
 
-const PreferencesModal = ({ visible, onClose }) => {
+type PreferencesModalProps = {
+  visible: boolean;
+  onClose: () => void;
+  onPlaceOrder?: () => void;
+  placingOrder?: boolean;
+};
+
+const PreferencesModal = ({
+  visible,
+  onClose,
+  onPlaceOrder,
+  placingOrder = false,
+}: PreferencesModalProps) => {
   const { 
     fulfillmentMethod, setFulfillmentMethod,
     phoneNumber, setPhone,
     scheduledTime, setScheduledTime,
+    setSchedule,
     vehicleInfo, setVehicle,
     deliveryAddress, setDeliveryAddress
   } = useOrder();
@@ -60,18 +74,19 @@ const PreferencesModal = ({ visible, onClose }) => {
 
   // Compute dynamic pickup/delivery time based on current time
   const getDynamicTimeStr = () => {
-    if (timeMode === "SCHEDULE") return "Tap to schedule a future date...";
-    
-    // Assume 15-30 minute prep/delivery window from NOW
-    const now = new Date();
-    const start = new Date(now.getTime() + 15 * 60000);
-    const end = new Date(now.getTime() + 30 * 60000);
-    
-    const formatTime = (d: Date) => 
-      d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-      
-    // e.g. "Today, 10:30 AM - 10:45 AM"
-    return `Today, ${formatTime(start)} - ${formatTime(end)}`;
+    if (timeMode === "SCHEDULE") return scheduledTime ?? "Tap to schedule a future date...";
+    return formatAsapWindow();
+  };
+
+  const persistPreferences = () => {
+    if (timeMode === "TODAY") {
+      const window = formatAsapWindow();
+      setScheduledTime(window);
+      setSchedule("asap", window);
+    } else if (scheduledTime) {
+      setSchedule("scheduled", scheduledTime);
+    }
+    onClose();
   };
 
   const generateTimeSlots = (day: string) => {
@@ -86,15 +101,18 @@ const PreferencesModal = ({ visible, onClose }) => {
     if (isToday) {
       const currentHour = now.getHours();
       const currentMin = now.getMinutes();
-      
-      // If past 10 PM today, no slots available
-      if (currentHour >= 22) return [];
-      
-      // otherwise, start from next 30-min block
-      if (currentHour >= 11) {
-        startHour = currentHour;
-        startMin = currentMin < 30 ? 30 : 0;
-        if (startMin === 0) startHour += 1;
+
+      if (currentHour >= GREENVILLE.kitchenCloseHour) return [];
+
+      const earliest = new Date(
+        now.getTime() + GREENVILLE.scheduleLeadMinutes * 60_000,
+      );
+      startHour = earliest.getHours();
+      startMin = earliest.getMinutes() < 30 ? 30 : 0;
+      if (startMin === 0) startHour += 1;
+      if (startHour < 11) {
+        startHour = 11;
+        startMin = 0;
       }
     }
     
@@ -241,10 +259,30 @@ const PreferencesModal = ({ visible, onClose }) => {
                 </View>
             </View>
 
-            {/* UPDATE BUTTON - RED AS REQUESTED FOR ACTION */}
-            <TouchableOpacity style={styles.updateBtn} onPress={() => onClose()}>
-                <Text style={styles.updateBtnText}>Update order</Text>
+            {fulfillmentMethod === "delivery_partner" && (
+              <Text style={styles.deliveryNotice}>
+                Delivery orders go through DoorDash, Uber Eats, or Grubhub — not in-app checkout.
+              </Text>
+            )}
+
+            <TouchableOpacity style={styles.updateBtn} onPress={persistPreferences}>
+                <Text style={styles.updateBtnText}>Save preferences</Text>
             </TouchableOpacity>
+
+            {onPlaceOrder && fulfillmentMethod !== "delivery_partner" && (
+              <TouchableOpacity
+                style={[styles.placeOrderBtn, placingOrder && styles.placeOrderBtnDisabled]}
+                onPress={() => {
+                  persistPreferences();
+                  onPlaceOrder();
+                }}
+                disabled={placingOrder}
+              >
+                <Text style={styles.placeOrderBtnText}>
+                  {placingOrder ? "Placing order…" : "Place order"}
+                </Text>
+              </TouchableOpacity>
+            )}
           </ScrollView>
         </TouchableOpacity>
       </TouchableOpacity>
@@ -583,7 +621,31 @@ const styles = StyleSheet.create({
     fontFamily: "MBold",
     fontSize: 16,
   },
-  
+  deliveryNotice: {
+    color: "#FFA500",
+    fontSize: RFValue(11),
+    fontFamily: "MRegular",
+    marginTop: 12,
+    lineHeight: 18,
+  },
+  placeOrderBtn: {
+    backgroundColor: "#E31837",
+    height: 56,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 12,
+  },
+  placeOrderBtnDisabled: {
+    opacity: 0.6,
+  },
+  placeOrderBtnText: {
+    color: "#fff",
+    fontFamily: "MBold",
+    fontSize: 16,
+    letterSpacing: 1,
+  },
+
   /* SUB-MODAL FOR CURBSIDE & DELIVERY */
   modalOverlay: {
     flex: 1,

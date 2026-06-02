@@ -23,7 +23,15 @@
   },
   "submit": {
     "production": {
-      "ios": {}
+      "ios": {},
+      "android": {
+        "track": "internal"
+      }
+    },
+    "preview": {
+      "android": {
+        "track": "internal"
+      }
     }
   }
 }

@@ -1,5 +1,15 @@
 # Fullstack monorepo template feat. Expo, Turbo, Next.js, Convex, Clerk
 
+## The Owner's Box (OB / THEOB)
+
+This repo powers **The Owner's Box** restaurant — Expo mobile (`apps/native`), Next.js web (`apps/web`), and Convex backend (`convex/`). For day-to-day commands, env setup, Android emulator, and seeding, see **[COMMANDS.md](./COMMANDS.md)**.
+
+- `npm run dev:backend` — Convex from repo root
+- `npm run dev:native` / `npm run android` — OB mobile app
+- `npm run dev:web` — Next.js web
+
+---
+
 This is a modern TypeScript monorepo template with AI web and native apps
 featuring:
 

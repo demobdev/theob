@@ -13,6 +13,7 @@ import {
   ImageBackground,
   ScrollView,
   Animated,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -24,6 +25,15 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import PreferencesModal from "../components/PreferencesModal";
 import { ensureAuth } from "../utils/authGuard";
+import {
+  validateOrderForCheckout,
+  destinationLabel,
+} from "../utils/orderValidation";
+import {
+  GREENVILLE,
+  formatAsapWindow,
+  estimatedReadyAtIso,
+} from "../constants/location";
 
 /**
  * Kitchen hours: 11 AM – 10 PM local time.
@@ -213,6 +223,7 @@ const CartScreen = ({ navigation }) => {
 
   const [showPreferences, setShowPreferences] = useState(false);
   const [showExpiredToast, setShowExpiredToast] = useState(false);
+  const [placingOrder, setPlacingOrder] = useState(false);
   const kitchenOpen = isKitchenOpen();
 
   // Show expired cart toast once, then dismiss after 3 seconds
@@ -276,37 +287,66 @@ const CartScreen = ({ navigation }) => {
   const placeOrder = useMutation(api.orders.placeOrder);
 
   const handleCheckout = async () => {
-    // Hide preferences modal when proceeding
     setShowPreferences(false);
 
+    const validation = validateOrderForCheckout({
+      isSignedIn: !!isSignedIn,
+      fulfillmentMethod,
+      phoneNumber,
+      vehicleInfo,
+      itemCount: items.length,
+      kitchenOpen,
+    });
+    if (!validation.ok) {
+      Alert.alert("Cannot place order", validation.message);
+      if (
+        validation.message.includes("phone") ||
+        validation.message.includes("vehicle") ||
+        validation.message.includes("Sign in")
+      ) {
+        setShowPreferences(true);
+      }
+      return;
+    }
+
+    setPlacingOrder(true);
     try {
       const subtotal = totalPrice;
-      const tax = subtotal * 0.0825; // Example tax
+      const tax = subtotal * 0.0825;
       const total = subtotal + tax;
+      const pickupTime =
+        scheduledTime && scheduledTime !== "ASAP"
+          ? scheduledTime
+          : formatAsapWindow();
 
       await placeOrder({
         items: items,
         subtotal: subtotal,
         tax: tax,
         total: total,
-        destination: fulfillmentMethod === "pickup_instore" ? "In-Store Pickup" : 
-                     fulfillmentMethod === "pickup_curbside" ? "Curbside Pickup" : "Delivery",
-        location: "1757 Woodruff Rd. STE A, Greenville, SC 29607",
+        destination: destinationLabel(fulfillmentMethod),
+        fulfillmentMethod,
+        locationId: GREENVILLE.id,
+        location: GREENVILLE.fullAddress,
         customerPhone: phoneNumber,
-        pickupTime: scheduledTime || "ASAP",
+        pickupTime,
+        estimatedReadyAt: estimatedReadyAtIso(),
         ...(fulfillmentMethod === "pickup_curbside" && {
-          carDetails: vehicleInfo
+          carDetails: vehicleInfo,
         }),
-        ...(fulfillmentMethod === "delivery_partner" && {
-          deliveryAddress: deliveryAddress
-        })
       });
 
-      alert(`Order Placed Successfully!`);
+      Alert.alert(
+        "Order placed",
+        `Kitchen estimate: ${pickupTime}. We'll notify you when it's ready for pickup.`,
+      );
       clearCart();
       navigation.navigate("HomeScreen");
-    } catch (err) {
-      alert("Error placing order: " + err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      Alert.alert("Order failed", message);
+    } finally {
+      setPlacingOrder(false);
     }
   };
 
@@ -399,6 +439,8 @@ const CartScreen = ({ navigation }) => {
       <PreferencesModal
         visible={showPreferences}
         onClose={() => setShowPreferences(false)}
+        onPlaceOrder={handleCheckout}
+        placingOrder={placingOrder}
       />
     </SafeAreaView>
   );

@@ -21,8 +21,10 @@ export default defineSchema({
         name: v.string(),
         abbr: v.optional(v.string()),
         logoUrl: v.optional(v.string()),
+        logoUrlSmall: v.optional(v.string()),
         wins: v.optional(v.number()),
         losses: v.optional(v.number()),
+        draws: v.optional(v.number()),
         runs: v.optional(v.number()),
         hits: v.optional(v.number()),
         errors: v.optional(v.number()),
@@ -43,8 +45,10 @@ export default defineSchema({
         name: v.string(),
         abbr: v.optional(v.string()),
         logoUrl: v.optional(v.string()),
+        logoUrlSmall: v.optional(v.string()),
         wins: v.optional(v.number()),
         losses: v.optional(v.number()),
+        draws: v.optional(v.number()),
         runs: v.optional(v.number()),
         hits: v.optional(v.number()),
         errors: v.optional(v.number()),
@@ -184,14 +188,21 @@ export default defineSchema({
     total: v.number(),
     pointsAwarded: v.number(),
     
-    // Xenial POS Required Fields
-    destination: v.optional(v.string()), // "In-Store Pickup", "Delivery", "Curbside"
-    location: v.optional(v.string()), // e.g. "Greenville"
+    // Xenial / Genius POS fields
+    destination: v.optional(v.string()), // "In-Store Pickup", "Curbside Pickup"
+    fulfillmentMethod: v.optional(v.string()), // pickup_instore | pickup_curbside
+    locationId: v.optional(v.string()), // greenville_01
+    location: v.optional(v.string()),
     customerPhone: v.optional(v.string()),
-    pickupTime: v.optional(v.string()), // e.g., "10:30 am - 10:45 am"
+    pickupTime: v.optional(v.string()), // display label e.g. "Today, 6:30 PM - 6:45 PM"
+    estimatedReadyAt: v.optional(v.string()), // ISO — kitchen promise or POS ready time
     paymentStatus: v.optional(v.string()), // "pending", "paid"
     status: v.optional(v.string()), // "pending", "preparing", "ready", "completed", "cancelled"
     createdAt: v.optional(v.string()),
+    posOrderId: v.optional(v.string()),
+    posStatus: v.optional(v.string()),
+    posSyncError: v.optional(v.string()),
+    posLastSyncedAt: v.optional(v.string()),
     
     // Fulfillment Details
     carDetails: v.optional(

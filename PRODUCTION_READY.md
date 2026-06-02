@@ -15,8 +15,8 @@ This document tracks all critical requirements and "Work in Progress" items need
 - [ ] **Terms & Privacy**: Update `TermsScreen.tsx` and `PrivacyPolicyScreen.tsx` with actual legal copy.
 
 ### 🏟️ Live Data
-- [ ] **Sportradar API**: Move from demo/mock scores to a live Sportradar subscription for real-time War Room updates.
-- [ ] **Redundancy**: Implement a fallback data source if the primary sports API hits rate limits.
+- [ ] **ESPN scoreboard APIs**: Primary War Room data source (replacing Sportradar). See `convex/sports/ESPN_MIGRATION.md`.
+- [ ] **Redundancy**: Keep API-Sports / TheSportsDB as fallback only where ESPN gaps exist (e.g. golf).
 
 ---
 
