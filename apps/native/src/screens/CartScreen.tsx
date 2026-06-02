@@ -30,6 +30,7 @@ import {
   validateOrderForCheckout,
   destinationLabel,
 } from "../utils/orderValidation";
+import { reportError } from "../utils/reportError";
 import {
   GREENVILLE,
   formatAsapWindow,
@@ -352,6 +353,7 @@ const CartScreen = ({ navigation }) => {
       clearCart();
       navigation.navigate("HomeScreen");
     } catch (err: unknown) {
+      reportError(err, { flow: "place_order" });
       const message = err instanceof Error ? err.message : String(err);
       Alert.alert("Order failed", message);
     } finally {

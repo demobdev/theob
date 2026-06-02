@@ -10,6 +10,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth } from "@clerk/clerk-expo";
 import { PostHogProvider } from "posthog-react-native";
 import { posthog } from "./src/config/posthog";
+import { Sentry } from "./src/config/sentry";
 import PostHogUserSync from "./src/components/PostHogUserSync";
 
 // Import Screens
@@ -115,7 +116,7 @@ function AppNavigation() {
 
 import TextureOverlay from "./src/components/TextureOverlay";
 
-export default function App() {
+function App() {
   const navigationRef = useRef<NavigationContainerRef<Record<string, unknown>>>(null);
   const routeNameRef = useRef<string | undefined>(undefined);
 
@@ -162,3 +163,5 @@ export default function App() {
     </ConvexClientProvider>
   );
 }
+
+export default Sentry.wrap(App);

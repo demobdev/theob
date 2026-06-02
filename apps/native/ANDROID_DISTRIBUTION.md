@@ -28,6 +28,8 @@ eas secret:create --scope project --name EXPO_PUBLIC_POSTHOG_HOST --value "https
 
 Use production Clerk/Convex URLs when you cut over.
 
+**Observability (recommended before first AAB):** see [`docs/OBSERVABILITY.md`](../../docs/OBSERVABILITY.md) — `EXPO_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`, PostHog key.
+
 **Genius integrator keys stay on Convex only** — never EAS secrets for those.
 
 ### 3. Google Play Console

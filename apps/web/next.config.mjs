@@ -1,3 +1,5 @@
+import { withSentryConfig } from "@sentry/nextjs";
+
 const posthogHost =
   process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
 const posthogAssetsHost = posthogHost.replace(
@@ -48,4 +50,13 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+const hasSentryUpload = Boolean(process.env.SENTRY_AUTH_TOKEN);
+
+export default hasSentryUpload
+  ? withSentryConfig(nextConfig, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT ?? "the-owners-box-web",
+      silent: !process.env.CI,
+      widenClientFileUpload: true,
+    })
+  : nextConfig;

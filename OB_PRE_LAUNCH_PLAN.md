@@ -80,10 +80,10 @@ Audit of **The Owner's Box** (`apps/native` + `convex` + `apps/web`) for issues 
 - **Issue:** Terms/Privacy screens likely template text.
 - **Plan:** Legal review → update [`TermsScreen.tsx`](apps/native/src/screens/TermsScreen.tsx) / [`PrivacyPolicyScreen.tsx`](apps/native/src/screens/PrivacyPolicyScreen.tsx).
 
-### 10. No crash/error monitoring
+### 10. Crash/error monitoring
 
-- **Issue:** No Sentry/PostHog in native app.
-- **Plan:** Add Sentry Expo plugin + source maps; optional PostHog product events.
+- **Status:** Sentry + PostHog wired — see [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md).
+- **Before AAB:** Set EAS secrets for `EXPO_PUBLIC_SENTRY_DSN` and `SENTRY_AUTH_TOKEN` (source maps).
 
 ### 11. Identity key consistency
 

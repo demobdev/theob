@@ -1,5 +1,6 @@
 import { Component, ReactNode } from "react";
 import NextLink from "next/link";
+import * as Sentry from "@sentry/nextjs";
 
 // NOTE: Once you get Clerk working you can remove this error boundary
 export class ErrorBoundary extends Component<
@@ -54,7 +55,9 @@ export class ErrorBoundary extends Component<
     throw error;
   }
 
-  componentDidCatch() {}
+  componentDidCatch(error: unknown) {
+    Sentry.captureException(error);
+  }
 
   render() {
     if (this.state.error !== null) {

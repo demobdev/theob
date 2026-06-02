@@ -1,3 +1,4 @@
+import "./sentry.client.config";
 import posthog from "posthog-js";
 
 const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
