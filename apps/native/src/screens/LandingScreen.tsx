@@ -105,32 +105,7 @@ const LandingScreen = ({ navigation }) => {
   const checkBirthday = useMutation(api.loyalty.checkBirthdayReward);
   const profile = useQuery(api.loyalty.getUserProfile);
   
-  // Read favorite teams from Clerk metadata
-  const favoriteTeams = (user?.unsafeMetadata?.favoriteTeams as Record<string, string[]>) ?? {};
-  const hasFavorites = Object.values(favoriteTeams).some((arr) => arr.length > 0);
-
-  // Helper: does this game feature a favorite team?
-  const isFavoriteGame = (game: any): boolean => {
-    const sport = game.sport;
-    const favs = favoriteTeams[sport] ?? [];
-    if (favs.length === 0) return false;
-    return (
-      favs.includes(game.homeTeam?.abbr) ||
-      favs.includes(game.awayTeam?.abbr)
-    );
-  };
-
-  // Sports Logic — show today's games (live, final, upcoming)
   const todayGames = useQuery(api.sports_queries.getTodayGames) || [];
-  const liveGames = todayGames.filter(g => g.status === "inprogress");
-  // Sort: favorite team games bubble to front; take up to 10
-  const gamesToDisplay = [...todayGames]
-    .sort((a, b) => {
-      const aFav = isFavoriteGame(a) ? 1 : 0;
-      const bFav = isFavoriteGame(b) ? 1 : 0;
-      return bFav - aFav;
-    })
-    .slice(0, 10);
 
   const categories = useQuery(api.products.getCategories) || [];
 
@@ -185,60 +160,6 @@ const LandingScreen = ({ navigation }) => {
       case "brunch": return require("../../assets/images/menu/chicken_waffles.png");
       default: return require("../../assets/images/menu/jumbo_wings.png");
     }
-  };
-
-  const renderLiveGame = (game) => {
-    const isLive = game.status === "inprogress";
-    const isFav = isFavoriteGame(game);
-    return (
-      <TouchableOpacity 
-          key={game._id} 
-          style={[styles.statsCard, isFav && styles.statsCardFav]}
-          onPress={() => navigation.navigate("LiveGamesScreen")}
-      >
-        <View style={styles.statsCardTop}>
-          <Text style={styles.statsLeague}>{game.sport}</Text>
-          {isFav && (
-            <View style={styles.favBadge}>
-              <Text style={styles.favBadgeText}>★ YOUR TEAM</Text>
-            </View>
-          )}
-        </View>
-        <View style={styles.statsTeams}>
-          <View style={styles.teamLine}>
-            <View style={styles.teamBrand}>
-                {game.awayTeam?.logoUrl && <Image source={{ uri: game.awayTeam.logoUrl }} style={styles.teamLogoMini} />}
-                <Text style={styles.teamNameText}>{game.awayTeam?.abbr}</Text>
-            </View>
-            <Text style={styles.scoreText}>{game.awayTeam?.score ?? "-"}</Text>
-          </View>
-          <View style={styles.teamLine}>
-            <View style={styles.teamBrand}>
-                {game.homeTeam?.logoUrl && <Image source={{ uri: game.homeTeam.logoUrl }} style={styles.teamLogoMini} />}
-                <Text style={styles.teamNameText}>{game.homeTeam?.abbr}</Text>
-            </View>
-            <Text style={styles.scoreText}>{game.homeTeam?.score ?? "-"}</Text>
-          </View>
-        </View>
-        
-        <View style={styles.statusRow}>
-            {isLive ? (
-                <View style={styles.liveStatusBtn}>
-                    <View style={styles.greenPulse} />
-                    <Text style={styles.liveStatusText}>LIVE NOW</Text>
-                </View>
-            ) : game.status === "closed" ? (
-                <View style={styles.finalStatusBtn}>
-                    <Text style={styles.finalStatusText}>FINAL</Text>
-                </View>
-            ) : (
-                <Text style={styles.startTimeText}>
-                    {new Date(game.startsAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
-                </Text>
-            )}
-        </View>
-      </TouchableOpacity>
-    );
   };
 
   return (
@@ -376,18 +297,6 @@ const LandingScreen = ({ navigation }) => {
 
         {/* ROSTER STATUS CARD */}
         <RosterStatusCard profile={profile} user={user} navigation={navigation} />
-
-        {/* SPORTS TICKER - WITH LOGOS AND SCORES */}
-        <View style={styles.section}>
-          <View style={styles.statsHeaderRow}>
-
-             <Text style={styles.sectionTitle}>{liveGames.length > 0 ? "LIVE NOW" : "UPCOMING GAMES"}</Text>
-             {liveGames.length > 0 && <View style={styles.livePulse} />}
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statsScroll}>
-            {gamesToDisplay.map(game => renderLiveGame(game))}
-          </ScrollView>
-        </View>
 
         <TonightAtTheOB
           games={todayGames}
@@ -807,133 +716,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFA500",
     width: 24,
   },
-  section: {
-    paddingHorizontal: 20,
-    marginTop: 35,
-  },
-  statsHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    marginTop: 35,
-    marginBottom: 18,
-  },
   sectionTitle: {
     color: "#666",
     fontFamily: "MBold",
     fontSize: 9,
     letterSpacing: 2,
     marginRight: 8,
-  },
-  livePulse: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#E31837",
-  },
-  statsScroll: {
-    gap: 12,
-  },
-  statsCard: {
-    backgroundColor: "#1C1C1E",
-    width: 165,
-    marginRight: 12,
-    padding: 15,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: "#333",
-  },
-  // Favorite team card — gold left border accent
-  statsCardFav: {
-    borderColor: "#FFA500",
-    borderLeftWidth: 3,
-  },
-  statsCardTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  statsLeague: {
-    color: "#FFA500",
-    fontFamily: "MBold",
-    fontSize: 9,
-  },
-  favBadge: {
-    backgroundColor: "#FFA500",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    alignSelf: "flex-start",
-  },
-  favBadgeText: {
-    color: "#000",
-    fontFamily: "MBold",
-    fontSize: 7,
-    letterSpacing: 0.5,
-  },
-  statsTeams: {
-    gap: 10,
-  },
-  teamLine: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  teamBrand: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  teamLogoMini: {
-    width: 24,
-    height: 24,
-    resizeMode: "contain",
-  },
-  teamNameText: {
-    color: "#fff",
-    fontFamily: "MBold",
-    fontSize: 15,
-  },
-  scoreText: {
-    color: "#fff",
-    fontFamily: "MBold",
-    fontSize: 16,
-  },
-  liveStatusBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  liveStatusText: {
-    color: '#4ade80',
-    fontFamily: 'MBold',
-    fontSize: 9,
-    letterSpacing: 1,
-  },
-  greenPulse: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#4ade80',
-    marginRight: 6,
-  },
-  finalStatusBtn: {
-    marginTop: 10,
-  },
-  finalStatusText: {
-    color: '#888',
-    fontFamily: 'MBold',
-    fontSize: 9,
-  },
-  statusRow: {
-    marginTop: 5,
-  },
-  startTimeText: {
-    color: "#666",
-    fontFamily: "MRegular",
-    fontSize: 9,
-    marginTop: 10,
   },
   sectionBottom: {
     paddingHorizontal: 20,
