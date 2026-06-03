@@ -19,6 +19,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import PreferencesModal from "../components/PreferencesModal";
 import BottomNavBar from "../components/BottomNavBar";
+import TonightAtTheOB from "../components/TonightAtTheOB";
 import { useCart } from "../context/CartContext";
 import { useUser } from "@clerk/clerk-expo";
 import QRCode from "react-native-qrcode-svg";
@@ -387,6 +388,11 @@ const LandingScreen = ({ navigation }) => {
             {gamesToDisplay.map(game => renderLiveGame(game))}
           </ScrollView>
         </View>
+
+        <TonightAtTheOB
+          games={todayGames}
+          onViewSchedule={() => navigation.navigate("LiveGamesScreen")}
+        />
 
         {/* BOTTOM CATEGORIES */}
         <View style={styles.sectionBottom}>
