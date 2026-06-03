@@ -13,6 +13,7 @@ export const ESPN_PATHS: Record<
   MLB: { sport: "baseball", league: "mlb", label: "MLB" },
   NHL: { sport: "hockey", league: "nhl", label: "NHL" },
   GOLF: { sport: "golf", league: "pga", label: "PGA Tour" },
+  UFC: { sport: "mma", league: "ufc", label: "UFC" },
 };
 
 export type EspnScoreboardResponse = {

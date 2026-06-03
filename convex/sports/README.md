@@ -23,6 +23,8 @@ Sportradar remains in `sportradar/` for legacy/manual use only; scheduled sync d
 
 **Endpoint reference:** [pseudo-r/Public-ESPN-API](https://github.com/pseudo-r/Public-ESPN-API) · details: [ESPN_MIGRATION.md](ESPN_MIGRATION.md).
 
+**UFC:** Synced via ESPN MMA scoreboard only (`mma/ufc`). One row per fight night; no API-Sports/TSDB fallback.
+
 ## Env vars (minimal)
 
 | Key | Required? |

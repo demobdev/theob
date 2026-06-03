@@ -82,7 +82,12 @@ function normalizeCompetitor(
     null;
   const score = competitor.score != null ? Number(competitor.score) : null;
   const record = parseRecordSummary(competitor);
-  const apiLogo = extractEspnLogoUrl(competitor.team);
+  const apiLogo =
+    extractEspnLogoUrl(competitor.team) ??
+    (competitor.athlete as { headshot?: { href?: string }; flag?: { href?: string } })
+      ?.headshot?.href ??
+    (competitor.athlete as { flag?: { href?: string } })?.flag?.href ??
+    null;
   const logoUrl = apiLogo ?? getEspnLogoUrl(sport, abbr);
 
   return {
@@ -205,6 +210,70 @@ export function normalizeEspnGolfEvent(event: {
   };
 }
 
+type EspnMmaEvent = {
+  id: string;
+  date: string;
+  name?: string;
+  status?: { type?: { state?: string; name?: string } };
+  competitions?: Array<{
+    id?: string;
+    date?: string;
+    status?: { type?: { state?: string; name?: string } };
+    competitors?: EspnCompetitor[];
+    venue?: {
+      fullName?: string;
+      address?: { city?: string; state?: string };
+    };
+    broadcasts?: Array<{ names?: string[]; shortName?: string }>;
+  }>;
+};
+
+/**
+ * UFC fight nights: one UpcomingGame per event (card), headliner = last bout.
+ */
+export function normalizeEspnMmaEvent(event: EspnMmaEvent): UpcomingGame | null {
+  const competitions = event.competitions ?? [];
+  if (competitions.length === 0) return null;
+
+  const mainEvent = competitions[competitions.length - 1];
+  const competitors = mainEvent.competitors ?? [];
+  if (competitors.length < 2) return null;
+
+  const awayRaw = competitors[0];
+  const homeRaw = competitors[1];
+  const startsAt = event.date ?? mainEvent.date;
+  if (!startsAt) return null;
+
+  const statusSource = event.status?.type ?? mainEvent.status?.type;
+  let status = mapEspnStatus(statusSource);
+  if (status === "closed" && new Date(startsAt) > new Date()) {
+    status = "scheduled";
+  }
+
+  const venueComp = competitions[0];
+
+  return {
+    id: crypto.randomUUID(),
+    externalId: `espn-${event.id}`,
+    sport: "UFC",
+    league: "UFC",
+    status,
+    startsAt,
+    tournamentName: event.name ?? "UFC Fight Night",
+    homeTeam: normalizeCompetitor(homeRaw, "UFC"),
+    awayTeam: normalizeCompetitor(awayRaw, "UFC"),
+    broadcast: extractBroadcast(venueComp),
+    venue: venueComp.venue
+      ? {
+          name: venueComp.venue.fullName ?? null,
+          city: venueComp.venue.address?.city ?? null,
+          state: venueComp.venue.address?.state ?? null,
+        }
+      : undefined,
+    lastSyncedAt: new Date().toISOString(),
+  };
+}
+
 export function normalizeEspnScoreboard(
   payload: { events?: unknown[] },
   sportKey: SportKey,
@@ -224,6 +293,12 @@ export function normalizeEspnScoreboard(
 
     if (sportKey === "GOLF") {
       games.push(normalizeEspnGolfEvent(event));
+      continue;
+    }
+
+    if (sportKey === "UFC") {
+      const normalized = normalizeEspnMmaEvent(event as EspnMmaEvent);
+      if (normalized) games.push(normalized);
       continue;
     }
 

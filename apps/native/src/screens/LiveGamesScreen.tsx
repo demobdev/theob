@@ -23,6 +23,8 @@ import { useUser } from "@clerk/clerk-expo";
 
 import BottomNavBar from "../components/BottomNavBar";
 import TeamDetailSheet from "./TeamDetailSheet";
+import FightNightHeroCard from "../components/FightNightHeroCard";
+import FightNightDetailSheet from "../components/FightNightDetailSheet";
 
 /**
  * Robust logo fallback system.
@@ -93,6 +95,7 @@ const LiveGamesScreen = ({ navigation }) => {
 
   // Helper: does this game feature a favorite team?
   const isFavoriteGame = (game: any): boolean => {
+    if (game.sport === "UFC") return false;
     const sport = game.sport;
     const favs = favoriteTeams[sport] ?? [];
     if (favs.length === 0) return false;
@@ -107,6 +110,7 @@ const LiveGamesScreen = ({ navigation }) => {
     team: any; sport: string; opponent?: any; gameStatus?: string; startsAt?: string;
   }>(null);
   const [showTVGuide, setShowTVGuide] = useState(false);
+  const [selectedFightNight, setSelectedFightNight] = useState<any>(null);
   const [listPage, setListPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
@@ -116,27 +120,43 @@ const LiveGamesScreen = ({ navigation }) => {
     sportFilter: selectedSport,
   });
   const allTeamsBySport = useQuery(api.sports_queries.getUniqueTeams);
+  const upcomingUfcEvents = useQuery(api.sports_queries.getUpcomingGames, {
+    sportFilter: "UFC",
+    limit: 10,
+  });
 
-  // Carousel: uses same data, filtered by sport already
+  const fightNightHero = useMemo(() => {
+    if (!upcomingUfcEvents?.length) return null;
+    const now = Date.now();
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
+    const inWindow = upcomingUfcEvents.filter((g: any) => {
+      const t = new Date(g.startsAt).getTime();
+      return t >= now - 12 * 60 * 60 * 1000 && t <= now + weekMs && g.status !== "closed";
+    });
+    return inWindow.sort((a: any, b: any) => a.startsAt.localeCompare(b.startsAt))[0] ?? null;
+  }, [upcomingUfcEvents]);
+
+  // Carousel: uses same data, filtered by sport already (UFC has its own hero card)
   const carouselGames = useMemo(() => {
     if (!allGamesForDate) return [];
     
+    const teamSports = allGamesForDate.filter((g: any) => g.sport !== "UFC");
     // Use a Map to ensure uniqueness by ID
     const uniqueGames = new Map();
     
     // Priority 1: Live games
-    const live = allGamesForDate.filter(g => g.status === 'inprogress');
+    const live = teamSports.filter(g => g.status === 'inprogress');
     live.forEach(g => uniqueGames.set(g._id, g));
     
     // Priority 2: Prime Time games
-    const prime = allGamesForDate.filter(g => g.isPrimeTime && g.status !== 'inprogress');
+    const prime = teamSports.filter(g => g.isPrimeTime && g.status !== 'inprogress');
     prime.forEach(g => {
         if (uniqueGames.size < 10) uniqueGames.set(g._id, g);
     });
     
     // Fallback: Fill with upcoming/closed games if carousel is too small
     if (uniqueGames.size < 5) {
-        const others = allGamesForDate.filter(g => !uniqueGames.has(g._id));
+        const others = teamSports.filter(g => !uniqueGames.has(g._id));
         others.slice(0, 5 - uniqueGames.size).forEach(g => uniqueGames.set(g._id, g));
     }
     
@@ -169,6 +189,7 @@ const LiveGamesScreen = ({ navigation }) => {
     }
 
     paginated.forEach(game => {
+      if (game.sport === "UFC") return;
       const sport = game.sport || "OTHER";
       if (!groups[sport]) groups[sport] = [];
       groups[sport].push(game);
@@ -604,6 +625,14 @@ const LiveGamesScreen = ({ navigation }) => {
                 </ScrollView>
             </View>
 
+            {/* UFC Fight Night hero — not in sport pills or team carousel */}
+            {fightNightHero && (
+              <FightNightHeroCard
+                event={fightNightHero}
+                onPress={() => setSelectedFightNight(fightNightHero)}
+              />
+            )}
+
             {/* Featured Games Carousel — always visible, all sports */}
             {carouselGames.length > 0 && (
                 <View style={styles.primeTimeSection}>
@@ -917,6 +946,11 @@ const LiveGamesScreen = ({ navigation }) => {
           onClose={() => setSelectedTeamDetail(null)}
         />
       )}
+
+      <FightNightDetailSheet
+        event={selectedFightNight}
+        onClose={() => setSelectedFightNight(null)}
+      />
 
       <BottomNavBar activeTab="GAMES" navigation={navigation} />
     </View>

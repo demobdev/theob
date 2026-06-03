@@ -140,7 +140,7 @@ export default function UpcomingGamesSection({
               ))}
             </div>
 
-            {/* Sport Filters */}
+            {/* Sport Filters — UFC fight-night hero is native-only for MVP; web parity deferred */}
             <div className="flex gap-1 bg-black p-1 rounded-xl border border-white/10 overflow-x-auto no-scrollbar w-full lg:w-auto">
               {(["ALL", "NFL", "NBA", "MLB", "NHL", "GOLF"] as const).map((s) => (
                 <button

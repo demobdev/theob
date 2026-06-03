@@ -32,6 +32,7 @@ GET .../scoreboard?dates=YYYYMMDD   # historical / specific day
 | MLB | `baseball` | `mlb` |
 | NHL | `hockey` | `nhl` |
 | GOLF | `golf` | `pga` |
+| UFC | `mma` | `ufc` |
 
 **Examples:**
 
@@ -42,7 +43,10 @@ curl "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
 curl "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20241215"
 curl "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard"
 curl "https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard"
+curl "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard"
 ```
+
+**UFC notes:** Each ESPN `event` is a fight night (card). Map one `UpcomingGame` per event — headliner from the **last** `competition` (main event). Fighters use `competitors[].athlete`, not team objects. API-Sports and TheSportsDB fallbacks are skipped for UFC.
 
 Response shape: `events[]` with `competitions[]`, `competitors[]`, `status`, scores — map into existing `UpcomingGame` in [`types.ts`](types.ts).
 

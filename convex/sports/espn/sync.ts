@@ -19,3 +19,25 @@ export function applyPrimeTimeFlags(games: UpcomingGame[]): UpcomingGame[] {
     return game;
   });
 }
+
+/**
+ * Marks the nearest upcoming UFC fight night as featured + prime time.
+ */
+export function applyUfcFeaturedFlags(games: UpcomingGame[]): UpcomingGame[] {
+  const eligible = games
+    .filter(
+      (g) =>
+        g.sport === "UFC" &&
+        (g.status === "scheduled" || g.status === "inprogress"),
+    )
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+
+  if (eligible.length === 0) return games;
+
+  const featuredExternalId = eligible[0].externalId;
+  return games.map((g) =>
+    g.externalId === featuredExternalId
+      ? { ...g, isFeatured: true, isPrimeTime: true }
+      : g,
+  );
+}

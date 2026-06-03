@@ -51,6 +51,13 @@ export const LEAGUES: Record<SportKey, LeagueConfig> = {
     sportradarLeagueKey: "pga",
     apiVersion: "v3",
   },
+  UFC: {
+    sport: "mma",
+    key: "UFC",
+    label: "UFC",
+    sportradarLeagueKey: "ufc",
+    apiVersion: "v1",
+  },
 } as const;
 
 /**
@@ -76,9 +83,10 @@ export function isSportInSeason(sport: SportKey, date: Date = new Date()): boole
       return month >= 1 && month <= 10;
       
     case "GOLF":
-      // PGA operates largely year round
+    case "UFC":
+      // PGA and UFC operate largely year round
       return true;
-      
+
     default:
       return true;
   }
