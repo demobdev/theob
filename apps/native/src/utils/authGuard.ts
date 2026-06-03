@@ -1,17 +1,13 @@
-import { Alert } from "react-native";
+import type { ShowObAlert } from "../hooks/useObAlert";
 
 /**
  * Ensures the user is authenticated before performing an action.
- * If not authenticated, shows an alert with a 'Sign In' button.
- * 
- * @param isSignedIn - Boolean from useAuth() or useUser()
- * @param navigation - Navigation object to perform redirection
- * @param action - Optional callback to perform if authenticated
- * @param message - Custom message to show in the alert
+ * If not authenticated, shows a leather OB alert with a 'Sign In' button.
  */
 export const ensureAuth = (
-  isSignedIn: boolean, 
-  navigation: any, 
+  isSignedIn: boolean,
+  navigation: { navigate: (screen: string) => void },
+  showAlert: ShowObAlert,
   action?: () => void,
   message: string = "Sign in to access this feature and start earning points!"
 ) => {
@@ -20,16 +16,17 @@ export const ensureAuth = (
     return true;
   }
 
-  Alert.alert(
-    "Join the Roster",
+  showAlert({
+    title: "Join the Roster",
     message,
-    [
+    buttons: [
       { text: "Cancel", style: "cancel" },
-      { 
-        text: "Sign In", 
-        onPress: () => navigation.navigate("LoginScreen") 
-      }
-    ]
-  );
+      {
+        text: "Sign In",
+        style: "primary",
+        onPress: () => navigation.navigate("LoginScreen"),
+      },
+    ],
+  });
   return false;
 };

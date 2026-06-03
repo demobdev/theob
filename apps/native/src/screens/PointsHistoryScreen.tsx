@@ -14,6 +14,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import { api } from "../../../../convex/_generated/api";
 import { RFValue } from "react-native-responsive-fontsize";
 import { ensureAuth } from "../utils/authGuard";
+import { useObAlert } from "../hooks/useObAlert";
 
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr);
@@ -30,15 +31,16 @@ const formatDate = (dateStr: string) => {
 const { width } = Dimensions.get("window");
 
 const PointsHistoryScreen = ({ navigation }) => {
+  const { showObAlert, alertModal } = useObAlert();
   const { isSignedIn, isLoaded } = useAuth();
   const [activeTab, setActiveTab] = React.useState("History"); // "History" | "Expiring Points"
   const history = useQuery(api.loyalty.getPointsHistory, { limit: 50 }) || [];
 
   React.useEffect(() => {
     if (isLoaded && !isSignedIn) {
-      ensureAuth(false, navigation);
+      ensureAuth(false, navigation, showObAlert);
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, showObAlert]);
 
   return (
     <View style={styles.container}>
@@ -118,6 +120,7 @@ const PointsHistoryScreen = ({ navigation }) => {
       >
           <Text style={styles.doneBtnText}>CLOSE</Text>
       </TouchableOpacity>
+      {alertModal}
     </View>
   );
 };

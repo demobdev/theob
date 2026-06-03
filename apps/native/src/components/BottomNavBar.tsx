@@ -1,11 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@clerk/clerk-expo";
-import { ensureAuth } from "../utils/authGuard";
-
 const BottomNavBar = ({ activeTab, navigation }) => {
-  const { isSignedIn } = useAuth();
 
   const tabs = [
     { name: "HOME", isLogo: true, route: "LandingScreen" },

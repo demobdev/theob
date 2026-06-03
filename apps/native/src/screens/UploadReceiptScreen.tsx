@@ -7,24 +7,24 @@ import {
   TextInput,
   ScrollView,
   StatusBar,
-  Image,
-  Alert,
   ActivityIndicator
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useObAlert } from "../hooks/useObAlert";
 
 const UploadReceiptScreen = ({ navigation }) => {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date().toLocaleDateString());
   const [isUploading, setIsUploading] = useState(false);
+  const { showObAlert, alertModal } = useObAlert();
   const submitReceipt = useMutation(api.loyalty.submitReceipt);
 
   const handleSubmit = async () => {
     if (!amount) {
-        Alert.alert("Error", "Please enter the receipt amount.");
+        showObAlert({ title: "Error", message: "Please enter the receipt amount." });
         return;
     }
 
@@ -36,13 +36,22 @@ const UploadReceiptScreen = ({ navigation }) => {
             receiptDate: date,
         });
         
-        Alert.alert(
-            "Submission Successful",
-            "Your receipt has been submitted for review. Points will be awarded once verified.",
-            [{ text: "OK", onPress: () => navigation.navigate("RewardsScreen") }]
-        );
+        showObAlert({
+            title: "Submission Successful",
+            message: "Your receipt has been submitted for review. Points will be awarded once verified.",
+            buttons: [
+              {
+                text: "OK",
+                style: "primary",
+                onPress: () => navigation.navigate("RewardsScreen"),
+              },
+            ],
+        });
     } catch (error) {
-        Alert.alert("Submission Failed", "Something went wrong. Please try again.");
+        showObAlert({
+          title: "Submission Failed",
+          message: "Something went wrong. Please try again.",
+        });
     } finally {
         setIsUploading(false);
     }
@@ -73,7 +82,12 @@ const UploadReceiptScreen = ({ navigation }) => {
         {/* CAMERA PREVIEW PLACEHOLDER */}
         <TouchableOpacity 
             style={styles.cameraPlaceholder}
-            onPress={() => Alert.alert("Photo Attached", "A mock photo has been attached to your receipt.")}
+            onPress={() =>
+              showObAlert({
+                title: "Photo Attached",
+                message: "A mock photo has been attached to your receipt.",
+              })
+            }
         >
             <Ionicons name="add-circle" size={40} color="#333" />
             <Text style={styles.cameraLabel}>Tap to take a photo</Text>
@@ -128,6 +142,7 @@ const UploadReceiptScreen = ({ navigation }) => {
             Submissions are reviewed within 24-48 hours. Please keep your physical receipt until points are awarded.
         </Text>
       </ScrollView>
+      {alertModal}
     </View>
   );
 };

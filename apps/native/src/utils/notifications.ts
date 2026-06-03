@@ -1,11 +1,11 @@
 import { Linking, Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { ObAlertConfig } from "../components/ObAlertModal";
+import type { ShowObAlert } from "../hooks/useObAlert";
+
+export type { ShowObAlert };
 
 const NOTIFICATIONS_PREF_KEY = "notificationsEnabled";
-
-export type ShowObAlert = (config: ObAlertConfig) => void;
 
 export async function requestOnboardingNotifications(
   showAlert: ShowObAlert

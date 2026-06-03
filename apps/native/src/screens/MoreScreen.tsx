@@ -14,8 +14,10 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { useUser, useAuth } from "@clerk/clerk-expo";
 import BottomNavBar from "../components/BottomNavBar";
 import { ensureAuth } from "../utils/authGuard";
+import { useObAlert } from "../hooks/useObAlert";
 
 const MoreScreen = ({ navigation }) => {
+  const { showObAlert, alertModal } = useObAlert();
   const { user } = useUser();
   const { isSignedIn } = useAuth();
 
@@ -27,7 +29,7 @@ const MoreScreen = ({ navigation }) => {
   );
 
   const handleNav = (screen: string) => {
-    ensureAuth(!!isSignedIn, navigation, () => navigation.navigate(screen));
+    ensureAuth(!!isSignedIn, navigation, showObAlert, () => navigation.navigate(screen));
   };
 
   return (
@@ -109,6 +111,7 @@ const MoreScreen = ({ navigation }) => {
       </View>
 
       <BottomNavBar activeTab="MORE" navigation={navigation} />
+      {alertModal}
     </SafeAreaView>
   );
 };

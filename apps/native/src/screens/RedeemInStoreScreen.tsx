@@ -11,7 +11,6 @@ import {
   ActivityIndicator,
   ScrollView,
   Linking,
-  Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery, useMutation } from "convex/react";
@@ -19,10 +18,12 @@ import { api } from "../../../../convex/_generated/api";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useUser } from "@clerk/clerk-expo";
 import QRCode from "react-native-qrcode-svg";
+import { useObAlert } from "../hooks/useObAlert";
 
 const { width } = Dimensions.get("window");
 
 const RedeemInStoreScreen = ({ route, navigation }) => {
+  const { showObAlert, alertModal } = useObAlert();
   const { rewardId } = route.params;
   const { user } = useUser();
   const [redeeming, setRedeeming] = useState(false);
@@ -50,7 +51,10 @@ const RedeemInStoreScreen = ({ route, navigation }) => {
 
   const handleRedeem = async () => {
     if (!user) {
-        Alert.alert("Sign In Required", "Please sign in to redeem rewards.");
+        showObAlert({
+          title: "Sign In Required",
+          message: "Please sign in to redeem rewards.",
+        });
         return;
     }
 
@@ -66,7 +70,7 @@ const RedeemInStoreScreen = ({ route, navigation }) => {
         const errorMessage = e?.message || "Something went wrong. Please try again.";
         // Clean up the Convex error prefix if it exists
         const cleanMessage = errorMessage.replace("[CONVEX M(loyalty:redeemReward)] Server Error\nUncaught Error: ", "");
-        Alert.alert("Redemption Failed", cleanMessage);
+        showObAlert({ title: "Redemption Failed", message: cleanMessage });
     } finally {
         setRedeeming(false);
     }
@@ -231,6 +235,7 @@ const RedeemInStoreScreen = ({ route, navigation }) => {
               </View>
           </View>
       </Modal>
+      {alertModal}
     </View>
   );
 };

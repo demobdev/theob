@@ -8,13 +8,13 @@ import {
   StatusBar,
   Image,
   Dimensions,
-  Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useCart } from "../context/CartContext";
+import { useObAlert } from "../hooks/useObAlert";
 
 const { width } = Dimensions.get("window");
 
@@ -25,6 +25,7 @@ const getRewardImageLarge = (key) => {
 const RedeemOnlineScreen = ({ route, navigation }) => {
   const { rewardId } = route.params;
   const { applyReward } = useCart();
+  const { showObAlert, alertModal } = useObAlert();
 
   const currentReward = (useQuery(api.loyalty.getRewardDefinitions) as any[])?.find(r => r._id === rewardId);
 
@@ -33,11 +34,17 @@ const RedeemOnlineScreen = ({ route, navigation }) => {
   const handleApply = () => {
     // In a real app, logic would verify eligibility here
     applyReward(currentReward);
-    Alert.alert(
-        "Successfully Applied!",
-        `${currentReward.title} has been added to your current order. You'll see the discount at checkout.`,
-        [{ text: "Go to Menu", onPress: () => navigation.navigate("HomeScreen") }]
-    );
+    showObAlert({
+        title: "Successfully Applied!",
+        message: `${currentReward.title} has been added to your current order. You'll see the discount at checkout.`,
+        buttons: [
+          {
+            text: "Go to Menu",
+            style: "primary",
+            onPress: () => navigation.navigate("HomeScreen"),
+          },
+        ],
+    });
   };
 
   return (
@@ -89,6 +96,7 @@ const RedeemOnlineScreen = ({ route, navigation }) => {
             <Text style={styles.termsText}>View terms and conditions</Text>
         </TouchableOpacity>
       </View>
+      {alertModal}
     </View>
   );
 };

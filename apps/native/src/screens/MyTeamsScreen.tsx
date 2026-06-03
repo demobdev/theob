@@ -9,13 +9,13 @@ import {
   StatusBar,
   Image,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useUser } from "@clerk/clerk-expo";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import { useObAlert } from "../hooks/useObAlert";
 
 // ─── Sub-components defined OUTSIDE to prevent re-mount on render ──────────────
 
@@ -52,6 +52,7 @@ const TeamTile = ({
 // ─── Main Screen ───────────────────────────────────────────────────────────────
 
 const MyTeamsScreen = ({ navigation }: any) => {
+  const { showObAlert, alertModal } = useObAlert();
   const { user, isLoaded } = useUser();
   const sportGroups = useQuery(api.sports_queries.getUniqueTeams) ?? [];
 
@@ -82,14 +83,18 @@ const MyTeamsScreen = ({ navigation }: any) => {
   const handleSave = async () => {
     if (!isLoaded) return;
     if (!user) {
-      Alert.alert(
-        "Join the Roster",
-        "You need to be logged in to save your favorite teams.",
-        [
+      showObAlert({
+        title: "Join the Roster",
+        message: "You need to be logged in to save your favorite teams.",
+        buttons: [
           { text: "Cancel", style: "cancel" },
-          { text: "Sign In", onPress: () => navigation.navigate("LoginScreen") }
-        ]
-      );
+          {
+            text: "Sign In",
+            style: "primary",
+            onPress: () => navigation.navigate("LoginScreen"),
+          },
+        ],
+      });
       return;
     }
     setSaving(true);
@@ -103,7 +108,10 @@ const MyTeamsScreen = ({ navigation }: any) => {
       setDirty(false);
       navigation.goBack();
     } catch (err) {
-      Alert.alert("Error", "Could not save your team preferences. Please try again.");
+      showObAlert({
+        title: "Error",
+        message: "Could not save your team preferences. Please try again.",
+      });
     } finally {
       setSaving(false);
     }
@@ -226,6 +234,7 @@ const MyTeamsScreen = ({ navigation }: any) => {
           </TouchableOpacity>
         </View>
       )}
+      {alertModal}
     </SafeAreaView>
   );
 };

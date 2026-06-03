@@ -119,7 +119,7 @@ const SavedCardsScreen = ({ navigation }) => {
 
         <TouchableOpacity 
           style={styles.addBtn} 
-          onPress={() => ensureAuth(!!isSignedIn, navigation, () => navigation.navigate("AddCardScreen"))}
+          onPress={() => ensureAuth(!!isSignedIn, navigation, showObAlert, () => navigation.navigate("AddCardScreen"))}
         >
           <Ionicons name="add-circle-outline" size={24} color="#FFF" style={{ marginRight: 10 }} />
           <Text style={styles.addBtnText}>ADD NEW CARD</Text>

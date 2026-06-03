@@ -13,7 +13,6 @@ import {
   ImageBackground,
   ScrollView,
   Animated,
-  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -31,6 +30,7 @@ import {
   destinationLabel,
 } from "../utils/orderValidation";
 import { reportError } from "../utils/reportError";
+import { useObAlert } from "../hooks/useObAlert";
 import {
   GREENVILLE,
   formatAsapWindow,
@@ -58,7 +58,7 @@ const minutesUntilOpen = (): number => {
   return (24 - h + 11) * 60 - now.getMinutes();
 };
 
-const RewardsCarousel = ({ navigation }) => {
+const RewardsCarousel = ({ navigation, showObAlert }) => {
   const { appliedReward, applyReward } = useCart();
   const availableRewards = useQuery(api.loyalty.getAvailableRewards) || [];
   const { isSignedIn } = useAuth();
@@ -67,6 +67,7 @@ const RewardsCarousel = ({ navigation }) => {
     ensureAuth(
       !!isSignedIn,
       navigation,
+      showObAlert,
       () => {
         if (appliedReward?._id === reward._id) {
           applyReward(null);
@@ -214,6 +215,7 @@ const getImageSource = (imgStr) => {
 };
 
 const CartScreen = ({ navigation }) => {
+  const { showObAlert, alertModal } = useObAlert();
   const { isSignedIn } = useAuth();
   const posthog = usePostHog();
   const {
@@ -301,7 +303,7 @@ const CartScreen = ({ navigation }) => {
       kitchenOpen,
     });
     if (!validation.ok) {
-      Alert.alert("Cannot place order", validation.message);
+      showObAlert({ title: "Cannot place order", message: validation.message });
       if (
         validation.message.includes("phone") ||
         validation.message.includes("vehicle") ||
@@ -346,16 +348,16 @@ const CartScreen = ({ navigation }) => {
         total,
       });
 
-      Alert.alert(
-        "Order placed",
-        `Kitchen estimate: ${pickupTime}. We'll notify you when it's ready for pickup.`,
-      );
+      showObAlert({
+        title: "Order placed",
+        message: `Kitchen estimate: ${pickupTime}. We'll notify you when it's ready for pickup.`,
+      });
       clearCart();
       navigation.navigate("HomeScreen");
     } catch (err: unknown) {
       reportError(err, { flow: "place_order" });
       const message = err instanceof Error ? err.message : String(err);
-      Alert.alert("Order failed", message);
+      showObAlert({ title: "Order failed", message });
     } finally {
       setPlacingOrder(false);
     }
@@ -387,7 +389,7 @@ const CartScreen = ({ navigation }) => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
-          <RewardsCarousel navigation={navigation} />
+          <RewardsCarousel navigation={navigation} showObAlert={showObAlert} />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
@@ -453,6 +455,7 @@ const CartScreen = ({ navigation }) => {
         onPlaceOrder={handleCheckout}
         placingOrder={placingOrder}
       />
+      {alertModal}
     </SafeAreaView>
   );
 };

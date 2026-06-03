@@ -10,7 +10,6 @@ import {
   SafeAreaView,
   StatusBar,
   ImageBackground,
-  Alert,
   Modal
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,6 +22,7 @@ import BottomNavBar from "../components/BottomNavBar";
 import { useCart } from "../context/CartContext";
 import QRCode from "react-native-qrcode-svg";
 import { ensureAuth } from "../utils/authGuard";
+import { useObAlert } from "../hooks/useObAlert";
 
 const { width } = Dimensions.get("window");
 
@@ -39,6 +39,7 @@ const getRewardImage = (title = "") => {
 };
 
 const RewardsScreen = ({ navigation }) => {
+  const { showObAlert, alertModal } = useObAlert();
   const { totalItems } = useCart();
   const { user } = useUser();
   const { isSignedIn } = useAuth();
@@ -64,15 +65,25 @@ const RewardsScreen = ({ navigation }) => {
 
   const handleClaimBirthday = async () => {
     if (!isSignedIn) {
-      ensureAuth(false, navigation);
+      ensureAuth(false, navigation, showObAlert);
       return;
     }
     try {
       const result = await claimBirthday();
       if (result.success) {
-        Alert.alert("🎉 HAPPY BIRTHDAY!", `150 PTS have been added to your Roster balance. Enjoy your day!`, [{ text: "AWESOME" }]);
+        showObAlert({
+          title: "🎉 HAPPY BIRTHDAY!",
+          message: "150 PTS have been added to your Roster balance. Enjoy your day!",
+          buttons: [{ text: "AWESOME", style: "primary" }],
+        });
       } else {
-        Alert.alert("Hold on", result.reason === "Already granted" ? "You've already claimed your gift for this year!" : "It's not your birthday yet!");
+        showObAlert({
+          title: "Hold on",
+          message:
+            result.reason === "Already granted"
+              ? "You've already claimed your gift for this year!"
+              : "It's not your birthday yet!",
+        });
       }
     } catch (error) {
       console.error(error);
@@ -106,7 +117,7 @@ const RewardsScreen = ({ navigation }) => {
                     <Text style={styles.pointsMain}>{points.toLocaleString()}</Text>
                     <Text style={styles.pointsSub}>TOTAL POINTS AVAILABLE</Text>
                 </View>
-                <TouchableOpacity style={styles.scanActionBtn} onPress={() => ensureAuth(!!isSignedIn, navigation, () => setMemberQrVisible(true))}>
+                <TouchableOpacity style={styles.scanActionBtn} onPress={() => ensureAuth(!!isSignedIn, navigation, showObAlert, () => setMemberQrVisible(true))}>
                     <Ionicons name="qr-code" size={18} color="#FFF" />
                     <Text style={styles.scanActionBtnText}>SCAN</Text>
                 </TouchableOpacity>
@@ -124,7 +135,7 @@ const RewardsScreen = ({ navigation }) => {
             <View style={styles.actionRow}>
                 <TouchableOpacity 
                     style={styles.pillBtn}
-                    onPress={() => ensureAuth(!!isSignedIn, navigation, () => navigation.navigate("PointsHistoryScreen"))}
+                    onPress={() => ensureAuth(!!isSignedIn, navigation, showObAlert, () => navigation.navigate("PointsHistoryScreen"))}
                 >
                     <Ionicons name="time-outline" size={16} color="#FFA500" />
                     <Text style={styles.pillBtnText}>HISTORY</Text>
@@ -146,7 +157,7 @@ const RewardsScreen = ({ navigation }) => {
             onPress={() => {
               const promoReward = rewards.find(r => r.title === "$5 Off The Owner's Wings");
               if (promoReward) {
-                ensureAuth(!!isSignedIn, navigation, () => navigation.navigate("RedeemInStoreScreen", { rewardId: promoReward._id }));
+                ensureAuth(!!isSignedIn, navigation, showObAlert, () => navigation.navigate("RedeemInStoreScreen", { rewardId: promoReward._id }));
               }
             }}
             activeOpacity={0.9}
@@ -239,7 +250,7 @@ const RewardsScreen = ({ navigation }) => {
                     <TouchableOpacity 
                         key={reward._id} 
                         style={styles.voucherContainer}
-                        onPress={() => ensureAuth(!!isSignedIn, navigation, () => navigation.navigate("RewardDetailScreen", { rewardId: reward._id }))}
+                        onPress={() => ensureAuth(!!isSignedIn, navigation, showObAlert, () => navigation.navigate("RewardDetailScreen", { rewardId: reward._id }))}
                     >
                         <ImageBackground 
                             source={require("../../assets/images/leather_black.jpg")} 
@@ -305,6 +316,7 @@ const RewardsScreen = ({ navigation }) => {
       </Modal>
 
       <BottomNavBar activeTab="REWARDS" navigation={navigation} />
+      {alertModal}
     </View>
   );
 };
