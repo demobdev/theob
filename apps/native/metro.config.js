@@ -26,7 +26,10 @@ config.resolver.extraNodeModules = {
 config.resolver.sourceExts = [...config.resolver.sourceExts, "mjs", "cjs"];
 
 // 5. Watch only convex/ (not whole monorepo — avoids ENOENT on .agents/skills, etc.)
-config.watchFolders = [path.resolve(workspaceRoot, "convex")];
+config.watchFolders = [
+  path.resolve(workspaceRoot, "convex"),
+  path.resolve(workspaceRoot, "packages/legal"),
+];
 
 // Ignore agent skills, local convex cache, and other non-app paths if they appear in the tree
 const blockList = [
