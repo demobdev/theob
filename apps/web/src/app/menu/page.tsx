@@ -6,12 +6,14 @@ import Footer from "@/components/home/Footer";
 import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
-import { Search, Download, ShoppingBag, Car, Info, ChevronRight, Menu as MenuIcon } from "lucide-react";
+import { Search, Download, ShoppingBag, ChevronRight, Menu as MenuIcon } from "lucide-react";
 import ProductCard from "@/components/menu/ProductCard";
 import ProductDetailModal from "@/components/menu/ProductDetailModal";
 import CartDrawer from "@/components/menu/CartDrawer";
+import LocationCard from "@/components/menu/LocationCard";
 import { useCart } from "@/hooks/useCart";
 import { Doc } from "../../../../../convex/_generated/dataModel";
+import { categoryHeroImage } from "@/lib/categoryHero";
 
 export default function MenuPage() {
   const categories = useQuery(api.products.getCategories);
@@ -21,6 +23,7 @@ export default function MenuPage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Doc<"products"> | null>(null);
+  const [selectedCategoryName, setSelectedCategoryName] = useState<string | undefined>();
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   
@@ -93,18 +96,13 @@ export default function MenuPage() {
         </div>
 
         {/* Curbside Indicator - Top Left */}
-        <div 
+        <button
+          type="button"
           onClick={() => setFulfillmentModalOpen(true)}
-          className="absolute top-8 left-8 z-20 hidden md:flex items-center gap-4 px-6 py-3 bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl cursor-pointer hover:bg-black/80 transition-all"
+          className="absolute top-8 left-8 z-20 hidden md:block max-w-sm cursor-pointer text-left"
         >
-           <div className="h-10 w-10 rounded-xl bg-[#D4AF37] flex items-center justify-center text-black">
-              <Car size={20} />
-           </div>
-           <div>
-              <p className="text-white font-black uppercase tracking-tight text-[10px]">{fulfillment ? fulfillment.replace("-", " ") : "Select Pickup"}</p>
-              <p className="text-[#D4AF37] font-black uppercase tracking-widest text-[8px]">Active at Greenville</p>
-           </div>
-        </div>
+          <LocationCard />
+        </button>
 
         {/* Download Menu Button - Top Right */}
         <div className="absolute top-8 right-8 z-20">
@@ -153,7 +151,7 @@ export default function MenuPage() {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
                   <input 
                     type="text" 
-                    placeholder="Search favorites..." 
+                    placeholder="Search menu..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-[#121212] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-xs font-bold uppercase tracking-widest focus:border-[#D4AF37]/50 focus:outline-none transition-all placeholder:text-gray-600"
@@ -184,11 +182,23 @@ export default function MenuPage() {
                   ref={el => { categoryRefs.current[category._id] = el; }}
                   className="scroll-mt-40"
                 >
-                   <div className="flex items-center gap-6 mb-12">
-                      <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">
-                        {category.name}
-                      </h2>
-                      <div className="flex-1 h-px bg-gradient-to-r from-white/10 to-transparent" />
+                   <div className="relative rounded-2xl overflow-hidden mb-12 min-h-[100px] flex items-end">
+                      <Image
+                        src={categoryHeroImage(category.name)}
+                        fill
+                        className="object-cover opacity-50"
+                        alt=""
+                        sizes="100vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+                      <div className="relative z-10 p-6 md:p-8 flex items-end gap-6 w-full">
+                        <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">
+                          {category.name}
+                        </h2>
+                        <span className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.3em] mb-2 hidden sm:block">
+                          The Lineup
+                        </span>
+                      </div>
                    </div>
 
                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
@@ -198,6 +208,7 @@ export default function MenuPage() {
                           product={product} 
                           onSelect={(p) => {
                             setSelectedProduct(p);
+                            setSelectedCategoryName(category.name);
                             setIsDetailModalOpen(true);
                           }}
                         />
@@ -264,6 +275,7 @@ export default function MenuPage() {
       {/* Modals & Overlays */}
       <ProductDetailModal 
         product={selectedProduct} 
+        categoryName={selectedCategoryName}
         isOpen={isDetailModalOpen} 
         onClose={() => setIsDetailModalOpen(false)} 
       />

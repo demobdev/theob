@@ -2,8 +2,9 @@
 
 import React, { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Store, Car, Truck, X, MapPin, Clock, ChevronDown } from "lucide-react";
+import { Store, Car, Truck, X, Clock, ChevronDown } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
+import LocationCard from "./LocationCard";
 
 export default function LocationFulfillmentModal() {
   const { setFulfillment, fulfillment, isFulfillmentModalOpen, setFulfillmentModalOpen } = useCart();
@@ -111,22 +112,8 @@ export default function LocationFulfillmentModal() {
                          </div>
                       </div>
                    ) : (
-                      <div className="bg-gray-50 rounded-[24px] p-6 mb-8 relative overflow-hidden group">
-                         <div className="flex items-start gap-4 relative z-10">
-                            <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-[#D4AF37] shadow-sm">
-                               <MapPin size={20} />
-                            </div>
-                            <div>
-                               <p className="font-black uppercase tracking-tight text-sm">The Owner's Box</p>
-                               <p className="text-gray-500 text-xs font-medium leading-relaxed">
-                                  1757 Woodruff Rd,<br />
-                                  Greenville, SC 29607
-                               </p>
-                            </div>
-                            <button className="ml-auto bg-black text-[#D4AF37] px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#1A1A1A] transition-all">
-                               Change
-                            </button>
-                         </div>
+                      <div className="mb-8">
+                         <LocationCard onChange={() => setFulfillmentModalOpen(false)} />
                       </div>
                    )}
 

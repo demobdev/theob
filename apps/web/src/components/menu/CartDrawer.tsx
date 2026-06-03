@@ -6,6 +6,7 @@ import { X, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import Image from "next/image";
 import Link from "next/link";
+import { resolveProductImageSrc } from "@/lib/productImage";
 
 interface Props {
   isOpen: boolean;
@@ -81,9 +82,9 @@ export default function CartDrawer({ isOpen, onClose }: Props) {
                           {items.map((item) => (
                             <div key={item.id} className="flex gap-6 group">
                               <div className="h-20 w-20 relative rounded-xl overflow-hidden shrink-0 border border-white/5">
-                                 {item.image && (
+                                 {resolveProductImageSrc(item.image) && (
                                    <Image 
-                                      src={item.image.startsWith("http") || item.image.startsWith("/") ? item.image : `/images/food/${item.image}.png`}
+                                      src={resolveProductImageSrc(item.image)!}
                                       fill
                                       className="object-cover"
                                       alt={item.name}

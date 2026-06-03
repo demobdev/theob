@@ -11,6 +11,8 @@ export const GREENVILLE_LOCATION = {
   state: "SC",
   zip: "29607",
   fullAddress: "1757 Woodruff Rd. STE A, Greenville, SC 29607",
+  latitude: 34.8289,
+  longitude: -82.3235,
   phone: "", // store line — fill when ops provides
   timezone: "America/New_York",
   /** Kitchen service window (local hour, 24h) */
