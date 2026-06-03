@@ -124,26 +124,36 @@ export default function MenuPage() {
           {/* Sidebar Navigation */}
           <aside className="w-full lg:w-72 shrink-0">
              <div className="sticky top-28 space-y-6">
-                <div className="premium-card p-6 border-white/10 bg-black/80 backdrop-blur-xl">
-                   <h3 className="text-white font-black uppercase tracking-widest text-xs mb-6 flex items-center gap-2">
-                     <MenuIcon size={14} className="text-[#D4AF37]" />
+                <div className="premium-card p-3 sm:p-4 lg:p-6 border-white/10 bg-black/80 backdrop-blur-xl">
+                   <h3 className="text-white font-black uppercase tracking-widest text-[10px] lg:text-xs mb-2 lg:mb-6 flex items-center gap-2 px-1">
+                     <MenuIcon size={12} className="text-[#D4AF37] lg:w-3.5 lg:h-3.5" />
                      Categories
                    </h3>
-                   <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar gap-2 lg:gap-1">
-                      {categories?.map((cat) => (
-                        <button
-                          key={cat._id}
-                          onClick={() => scrollToCategory(cat._id)}
-                          className={`flex items-center justify-between px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left ${
-                            activeCategory === cat._id 
-                              ? "bg-[#D4AF37] text-black" 
-                              : "text-gray-400 hover:text-white hover:bg-white/5"
-                          }`}
-                        >
-                          {cat.name}
-                          <ChevronRight size={12} className={`hidden lg:block ${activeCategory === cat._id ? "opacity-100" : "opacity-0"}`} />
-                        </button>
-                      ))}
+                   <div className="relative lg:static -mx-1 lg:mx-0">
+                     <div
+                       aria-hidden
+                       className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-gradient-to-r from-[#121212] to-transparent lg:hidden"
+                     />
+                     <div
+                       aria-hidden
+                       className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-[#121212] to-transparent lg:hidden"
+                     />
+                     <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar gap-1.5 lg:gap-1 px-1 lg:px-0 pb-0.5 lg:pb-0">
+                        {categories?.map((cat) => (
+                          <button
+                            key={cat._id}
+                            onClick={() => scrollToCategory(cat._id)}
+                            className={`shrink-0 flex items-center justify-between px-3 py-2 lg:px-4 lg:py-3 rounded-lg lg:rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left ${
+                              activeCategory === cat._id 
+                                ? "bg-[#D4AF37] text-black" 
+                                : "text-gray-400 hover:text-white hover:bg-white/5"
+                            }`}
+                          >
+                            {cat.name}
+                            <ChevronRight size={12} className={`hidden lg:block ${activeCategory === cat._id ? "opacity-100" : "opacity-0"}`} />
+                          </button>
+                        ))}
+                     </div>
                    </div>
                 </div>
 
