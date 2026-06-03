@@ -29,6 +29,7 @@ export type FightNightGame = {
 type Props = {
   event: FightNightGame;
   onPress: () => void;
+  layout?: "stacked" | "carousel";
 };
 
 const FighterCol = ({
@@ -50,11 +51,19 @@ const FighterCol = ({
   </View>
 );
 
-export default function FightNightHeroCard({ event, onPress }: Props) {
+export default function FightNightHeroCard({
+  event,
+  onPress,
+  layout = "stacked",
+}: Props) {
   const isLive = event.status === "inprogress";
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+    <TouchableOpacity
+      style={[styles.card, layout === "carousel" && styles.cardCarousel]}
+      onPress={onPress}
+      activeOpacity={0.9}
+    >
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.sportBadge}>
@@ -127,6 +136,11 @@ const styles = StyleSheet.create({
     borderColor: UFC_RED,
     borderRadius: 4,
     overflow: "hidden",
+  },
+  cardCarousel: {
+    width: "100%",
+    marginHorizontal: 0,
+    marginBottom: 0,
   },
   header: {
     flexDirection: "row",

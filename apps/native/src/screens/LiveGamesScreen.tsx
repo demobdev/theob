@@ -1,11 +1,10 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   StyleSheet,
   View,
   Text,
   TouchableOpacity,
   Image,
-  FlatList,
   ScrollView,
   Dimensions,
   SafeAreaView,
@@ -22,10 +21,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useUser } from "@clerk/clerk-expo";
 
 import BottomNavBar from "../components/BottomNavBar";
+import DynamicGamesCarousel, { CarouselSlot } from "../components/DynamicGamesCarousel";
 import TeamDetailSheet from "./TeamDetailSheet";
-import FightNightHeroCard from "../components/FightNightHeroCard";
 import FightNightDetailSheet from "../components/FightNightDetailSheet";
-import RacingEventCard from "../components/RacingEventCard";
 import RacingDetailSheet from "../components/RacingDetailSheet";
 import {
   formatVenueDateShort,
@@ -84,6 +82,8 @@ const nearestUpcomingEvent = (
     inWindow.sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null
   );
 };
+
+const MAX_CAROUSEL_SLOTS = 7;
 
 const LiveGamesScreen = ({ navigation }) => {
   const daysString = useMemo(() => getVenueNext7Days(), []);
@@ -192,37 +192,88 @@ const LiveGamesScreen = ({ navigation }) => {
     }
   }, [upcomingUfcEvents]);
 
-  // Carousel: uses same data, filtered by sport already (UFC has its own hero card)
-  const carouselGames = useMemo(() => {
+  // Unified carousel: live → UFC/NASCAR/F1 heroes → primetime → upcoming (no finals)
+  const carouselSlots = useMemo((): CarouselSlot[] => {
     if (!allGamesForDate) return [];
-    
+
+    const slots: CarouselSlot[] = [];
+    const seen = new Set<string>();
+
+    const addTeam = (game: any) => {
+      const id = game._id ?? game.id;
+      if (!id || seen.has(id) || game.status === "closed") return;
+      seen.add(id);
+      slots.push({ kind: "team", id, game });
+    };
+
+    const addUfc = (event: any) => {
+      const id = event._id ?? event.id ?? "ufc-hero";
+      if (seen.has(id)) return;
+      seen.add(id);
+      slots.push({ kind: "ufc", id, event });
+    };
+
+    const addRacing = (event: any) => {
+      const id = event._id ?? event.id ?? `${event.sport}-hero`;
+      if (seen.has(id)) return;
+      seen.add(id);
+      slots.push({ kind: "racing", id, event });
+    };
+
     const teamSports = allGamesForDate.filter(
       (g: any) => !INDIVIDUAL_SPORTS.has(g.sport),
     );
-    // Use a Map to ensure uniqueness by ID
-    const uniqueGames = new Map();
-    
-    // Priority 1: Live games
-    const live = teamSports.filter(g => g.status === 'inprogress');
-    live.forEach(g => uniqueGames.set(g._id, g));
-    
-    // Priority 2: Prime Time games
-    const prime = teamSports.filter(g => g.isPrimeTime && g.status !== 'inprogress');
-    prime.forEach(g => {
-        if (uniqueGames.size < 10) uniqueGames.set(g._id, g);
-    });
-    
-    // Fallback: Fill with upcoming/closed games if carousel is too small
-    if (uniqueGames.size < 5) {
-        const others = teamSports.filter(g => !uniqueGames.has(g._id));
-        others.slice(0, 5 - uniqueGames.size).forEach(g => uniqueGames.set(g._id, g));
-    }
-    
-    return Array.from(uniqueGames.values());
-  }, [allGamesForDate]);
 
-  const [carouselIndex, setCarouselIndex] = useState(0);
-  const carouselRef = useRef<FlatList>(null);
+    teamSports
+      .filter((g: any) => g.status === "inprogress")
+      .forEach(addTeam);
+
+    allGamesForDate
+      .filter(
+        (g: any) =>
+          INDIVIDUAL_SPORTS.has(g.sport) && g.status === "inprogress",
+      )
+      .forEach((g: any) => {
+        if (g.sport === "UFC") addUfc(g);
+        else if (g.sport === "NASCAR" || g.sport === "F1") addRacing(g);
+      });
+
+    if (selectedSport === "All" || selectedSport === "UFC") {
+      if (fightNightHero) addUfc(fightNightHero);
+    }
+    if (selectedSport === "All" || selectedSport === "NASCAR") {
+      if (nascarHero) addRacing(nascarHero);
+    }
+    if (selectedSport === "All" || selectedSport === "F1") {
+      if (f1Hero) addRacing(f1Hero);
+    }
+
+    teamSports
+      .filter(
+        (g: any) =>
+          g.isPrimeTime &&
+          g.status !== "inprogress" &&
+          g.status !== "closed",
+      )
+      .forEach((g: any) => {
+        if (slots.length < MAX_CAROUSEL_SLOTS) addTeam(g);
+      });
+
+    if (slots.length < MAX_CAROUSEL_SLOTS) {
+      teamSports
+        .filter((g: any) => !seen.has(g._id) && g.status !== "closed")
+        .slice(0, MAX_CAROUSEL_SLOTS - slots.length)
+        .forEach(addTeam);
+    }
+
+    return slots.slice(0, MAX_CAROUSEL_SLOTS);
+  }, [
+    allGamesForDate,
+    fightNightHero,
+    nascarHero,
+    f1Hero,
+    selectedSport,
+  ]);
 
   const majorLeagues = ["NFL", "NBA", "MLB", "NHL"];
 
@@ -767,104 +818,19 @@ const LiveGamesScreen = ({ navigation }) => {
                 </ScrollView>
             </View>
 
-            {/* UFC Fight Night hero — not in sport pills or team carousel */}
-            {fightNightHero &&
-              (selectedSport === "All" || selectedSport === "UFC") && (
-              <FightNightHeroCard
-                event={fightNightHero}
-                onPress={() => {
-                  setSelectedFightNight(fightNightHero);
-                  if (selectedSport !== "UFC") setSelectedSport("UFC");
-                }}
-              />
-            )}
-
-            {nascarHero &&
-              (selectedSport === "All" || selectedSport === "NASCAR") && (
-              <RacingEventCard
-                event={nascarHero}
-                onPress={() => {
-                  setSelectedRacingEvent(nascarHero);
-                  if (selectedSport !== "NASCAR") setSelectedSport("NASCAR");
-                }}
-              />
-            )}
-
-            {f1Hero &&
-              (selectedSport === "All" || selectedSport === "F1") && (
-              <RacingEventCard
-                event={f1Hero}
-                onPress={() => {
-                  setSelectedRacingEvent(f1Hero);
-                  if (selectedSport !== "F1") setSelectedSport("F1");
-                }}
-              />
-            )}
-
-            {/* Featured Games Carousel — always visible, all sports */}
-            {carouselGames.length > 0 && (
-                <View style={styles.primeTimeSection}>
-                    <FlatList
-                        ref={carouselRef}
-                        data={carouselGames}
-                        renderItem={renderGameCard}
-                        keyExtractor={(item) => item._id}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.carouselContent}
-                        snapToInterval={width * 0.88 + 16}
-                        decelerationRate="fast"
-                        pagingEnabled={false}
-                        onMomentumScrollEnd={(e) => {
-                            const idx = Math.round(e.nativeEvent.contentOffset.x / (width * 0.88 + 16));
-                            setCarouselIndex(idx);
-                        }}
-                        getItemLayout={(data, index) => ({
-                            length: width * 0.88 + 16,
-                            offset: (width * 0.88 + 16) * index,
-                            index,
-                        })}
-                    />
-                    {/* Carousel dots + arrows */}
-                    {carouselGames.length > 1 && (
-                      <View style={styles.carouselNav}>
-                        <TouchableOpacity
-                          style={[styles.carouselArrow, carouselIndex === 0 && styles.carouselArrowDisabled]}
-                          onPress={() => {
-                            const next = Math.max(0, carouselIndex - 1);
-                            setCarouselIndex(next);
-                            carouselRef.current?.scrollToIndex({ index: next, animated: true });
-                          }}
-                          disabled={carouselIndex === 0}
-                        >
-                          <Ionicons name="chevron-back" size={18} color="#FFA500" />
-                        </TouchableOpacity>
-                        <View style={styles.carouselDots}>
-                          {carouselGames.map((_, i) => (
-                            <View
-                              key={i}
-                              style={[
-                                styles.carouselDot,
-                                i === carouselIndex && styles.carouselDotActive,
-                              ]}
-                            />
-                          ))}
-                        </View>
-                        <TouchableOpacity
-                          style={[styles.carouselArrow, carouselIndex === carouselGames.length - 1 && styles.carouselArrowDisabled]}
-                          onPress={() => {
-                            const next = Math.min(carouselGames.length - 1, carouselIndex + 1);
-                            setCarouselIndex(next);
-                            carouselRef.current?.scrollToIndex({ index: next, animated: true });
-                          }}
-                          disabled={carouselIndex === carouselGames.length - 1}
-                        >
-                          <Ionicons name="chevron-forward" size={18} color="#FFA500" />
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                </View>
-            )}
+            {/* Featured highlights — one carousel for live, primetime, UFC, NASCAR, F1 */}
+            <DynamicGamesCarousel
+              slots={carouselSlots}
+              renderTeamCard={(game) => renderGameCard({ item: game })}
+              onUfcPress={(event) => {
+                setSelectedFightNight(event);
+                if (selectedSport !== "UFC") setSelectedSport("UFC");
+              }}
+              onRacingPress={(event) => {
+                setSelectedRacingEvent(event);
+                if (selectedSport !== event.sport) setSelectedSport(event.sport);
+              }}
+            />
 
             {/* Team Filter Row */}
             {allTeamsBySport && allTeamsBySport.length > 0 && !INDIVIDUAL_SPORTS.has(selectedSport) && (() => {

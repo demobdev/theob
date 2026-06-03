@@ -35,6 +35,7 @@ export type RacingEventGame = {
 type Props = {
   event: RacingEventGame;
   onPress: () => void;
+  layout?: "stacked" | "carousel";
 };
 
 const DriverCol = ({
@@ -58,14 +59,22 @@ const DriverCol = ({
   </View>
 );
 
-export default function RacingEventCard({ event, onPress }: Props) {
+export default function RacingEventCard({
+  event,
+  onPress,
+  layout = "stacked",
+}: Props) {
   const series = SERIES_STYLE[event.sport] ?? SERIES_STYLE.NASCAR;
   const isLive = event.status === "inprogress";
   const hasDrivers = event.awayTeam?.name || event.homeTeam?.name;
 
   return (
     <TouchableOpacity
-      style={[styles.card, { borderColor: series.color }]}
+      style={[
+        styles.card,
+        { borderColor: series.color },
+        layout === "carousel" && styles.cardCarousel,
+      ]}
       onPress={onPress}
       activeOpacity={0.9}
     >
@@ -143,6 +152,11 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderRadius: 4,
     overflow: "hidden",
+  },
+  cardCarousel: {
+    width: "100%",
+    marginHorizontal: 0,
+    marginBottom: 0,
   },
   header: {
     flexDirection: "row",
