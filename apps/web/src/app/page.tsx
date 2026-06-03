@@ -13,11 +13,11 @@ export default function Home() {
     <main className="bg-[#0A0A0A] min-h-screen">
       <Header />
       <Hero />
+      <Menu />
       <AppPromoBanner />
       <div className="relative z-10">
         <SportsTicker />
       </div>
-      <Menu />
       <FooterHero />
       <Footer />
     </main>
