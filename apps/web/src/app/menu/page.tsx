@@ -56,9 +56,9 @@ export default function MenuPage() {
       <Header />
       
       {/* Dynamic Fulfillment Banner (Sonny's Style) */}
-      <div className="bg-[#CC2027] py-3 text-center">
-         <p className="text-white text-[10px] md:text-xs font-black uppercase tracking-[0.2em]">
-            You are ordering <span className="underline decoration-white/30 underline-offset-4">{fulfillment === "delivery" ? "Delivery" : fulfillment === "curbside" ? "Curbside Pickup" : "In-Store Pickup"}</span> at <span className="font-bold underline decoration-white/30 underline-offset-4">{location}</span>
+      <div className="bg-[#D4AF37] py-3 text-center">
+         <p className="text-black text-[10px] md:text-xs font-black uppercase tracking-[0.2em]">
+            You are ordering <span className="underline decoration-black/30 underline-offset-4">{fulfillment === "delivery" ? "Delivery" : fulfillment === "curbside" ? "Curbside Pickup" : "In-Store Pickup"}</span> at <span className="font-bold underline decoration-black/30 underline-offset-4">{location}</span>
          </p>
       </div>
 

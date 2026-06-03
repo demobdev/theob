@@ -49,7 +49,7 @@ export default function Header() {
               <ChevronDownIcon className="h-3 w-3 stroke-[3]" />
             </div>
             <div className="text-[9px] opacity-70">
-              at <span className="font-bold underline underline-offset-2">{location}</span> <span className="text-[#CC2027] font-black ml-1">Change</span>
+              at <span className="font-bold underline underline-offset-2">{location}</span> <span className="text-black/80 font-black ml-1 underline underline-offset-2">Change</span>
             </div>
           </button>
 

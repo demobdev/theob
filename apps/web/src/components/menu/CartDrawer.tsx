@@ -97,7 +97,7 @@ export default function CartDrawer({ isOpen, onClose }: Props) {
                                   </h4>
                                   <button 
                                     onClick={() => removeItem(item.id)}
-                                    className="text-gray-600 hover:text-red-500 transition-colors"
+                                    className="text-gray-600 hover:text-[#D4AF37] transition-colors"
                                   >
                                     <Trash2 size={16} />
                                   </button>

@@ -114,7 +114,14 @@ const Footer = () => {
           
           <div className="flex items-center gap-2">
              <span className="text-gray-700 text-[8px] font-black uppercase tracking-[0.3em]">Crafted by</span>
-             <span className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest">Peters Design Co.</span>
+             <Link
+               href="https://wvfmlabs.com"
+               target="_blank"
+               rel="noopener noreferrer"
+               className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors"
+             >
+               WVFM Labs
+             </Link>
           </div>
         </div>
       </div>

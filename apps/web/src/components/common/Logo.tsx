@@ -10,23 +10,18 @@ const Logo = ({ isMobile }: Props) => {
   return (
     <Link href={"/"}>
       <div className="flex gap-3 items-center group">
-        <div className="relative h-10 w-10 sm:h-12 sm:w-12">
-          <Image 
-            src={"/images/theob-letter-tp.png"} 
+        <div className="relative h-8 w-8 sm:h-9 sm:w-9 shrink-0">
+          <Image
+            src="/images/ob-icon.png"
             fill
-            alt="The Owner's Box Logo" 
-            className="object-contain group-hover:scale-110 transition-transform duration-300" 
+            alt="The Owner's Box"
+            className="object-contain group-hover:scale-110 transition-transform duration-300"
           />
         </div>
         {!isMobile ? (
-          <div className="flex flex-col">
-            <span className="font-montserrat text-white text-xl sm:text-2xl font-black uppercase tracking-tighter leading-none">
-              The Owner's
-            </span>
-            <span className="font-montserrat text-[#D4AF37] text-lg sm:text-xl font-bold uppercase tracking-widest leading-none mt-0.5">
-              Box
-            </span>
-          </div>
+          <span className="font-montserrat text-white text-sm sm:text-base font-black uppercase tracking-tight whitespace-nowrap leading-none">
+            The Owner&apos;s Box
+          </span>
         ) : null}
       </div>
     </Link>

@@ -76,7 +76,7 @@ export default function LocationFulfillmentModal() {
                           onClick={() => setTempFulfillment(opt.id)}
                           className={`flex-1 flex flex-col items-center justify-center py-4 gap-2 transition-all ${
                             tempFulfillment === opt.id 
-                              ? "bg-[#CC2027] text-white" 
+                              ? "bg-[#D4AF37] text-black" 
                               : "bg-white text-gray-500 hover:bg-gray-50"
                           }`}
                         >
@@ -113,7 +113,7 @@ export default function LocationFulfillmentModal() {
                    ) : (
                       <div className="bg-gray-50 rounded-[24px] p-6 mb-8 relative overflow-hidden group">
                          <div className="flex items-start gap-4 relative z-10">
-                            <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-[#CC2027] shadow-sm">
+                            <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-[#D4AF37] shadow-sm">
                                <MapPin size={20} />
                             </div>
                             <div>
@@ -123,7 +123,7 @@ export default function LocationFulfillmentModal() {
                                   Greenville, SC 29607
                                </p>
                             </div>
-                            <button className="ml-auto bg-[#CC2027] text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all">
+                            <button className="ml-auto bg-black text-[#D4AF37] px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#1A1A1A] transition-all">
                                Change
                             </button>
                          </div>
@@ -168,7 +168,7 @@ export default function LocationFulfillmentModal() {
                          <button 
                           onClick={() => setTimeType("today")}
                           className={`flex-1 py-4 rounded-xl text-xs font-black uppercase tracking-widest border transition-all ${
-                            timeType === "today" ? "bg-[#CC2027] border-[#CC2027] text-white" : "border-gray-200 text-gray-500 hover:border-gray-300"
+                            timeType === "today" ? "bg-[#D4AF37] border-[#D4AF37] text-black" : "border-gray-200 text-gray-500 hover:border-gray-300"
                           }`}
                          >
                            Today
@@ -176,7 +176,7 @@ export default function LocationFulfillmentModal() {
                          <button 
                           onClick={() => setTimeType("schedule")}
                           className={`flex-1 py-4 rounded-xl text-xs font-black uppercase tracking-widest border transition-all ${
-                            timeType === "schedule" ? "bg-[#CC2027] border-[#CC2027] text-white" : "border-gray-200 text-gray-500 hover:border-gray-300"
+                            timeType === "schedule" ? "bg-[#D4AF37] border-[#D4AF37] text-black" : "border-gray-200 text-gray-500 hover:border-gray-300"
                           }`}
                          >
                            Schedule
@@ -204,7 +204,7 @@ export default function LocationFulfillmentModal() {
                 <div className="p-8 bg-gray-50 border-t border-gray-100">
                    <button 
                     onClick={handleUpdate}
-                    className="w-full py-5 bg-[#CC2027] text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl hover:brightness-110 active:scale-[0.98] transition-all"
+                    className="w-full py-5 bg-[#D4AF37] text-black font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl hover:brightness-110 active:scale-[0.98] transition-all"
                    >
                      Update Order
                    </button>
