@@ -244,5 +244,15 @@ export default defineSchema({
     nickname: v.optional(v.string()), // e.g. "My Visa"
     createdAt: v.string(),
   }).index("by_userId", ["userId"]),
+
+  /** Expo push tokens for mobile order alerts and optional marketing. */
+  push_tokens: defineTable({
+    userId: v.string(), // Clerk subject ID
+    token: v.string(),
+    platform: v.union(v.literal("ios"), v.literal("android")),
+    updatedAt: v.string(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_token", ["token"]),
 });
 

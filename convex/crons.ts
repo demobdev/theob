@@ -9,4 +9,7 @@ crons.interval(
   api.sports_actions.scheduledSyncWithFallback,
 );
 
+// Game-day promo pushes (future): cron here → internal.pushNotifications.sendPushToUser
+// with requireMarketingOptIn: true for users with push_tokens + marketingOptIn.
+
 export default crons;

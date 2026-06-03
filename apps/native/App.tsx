@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
+import * as Notifications from "expo-notifications";
 import {
   NavigationContainer,
   type NavigationContainerRef,
@@ -12,6 +13,8 @@ import { PostHogProvider } from "posthog-react-native";
 import { posthog } from "./src/config/posthog";
 import { Sentry } from "./src/config/sentry";
 import PostHogUserSync from "./src/components/PostHogUserSync";
+import AuthPushRegistrar from "./src/components/AuthPushRegistrar";
+import PushNotificationHandler from "./src/components/PushNotificationHandler";
 
 // Import Screens
 import LandingScreen from "./src/screens/LandingScreen";
@@ -52,6 +55,16 @@ import { OrderProvider } from "./src/context/OrderContext";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 const Stack = createNativeStackNavigator();
 
@@ -130,6 +143,7 @@ function App() {
         }}
       >
         <PostHogUserSync />
+        <AuthPushRegistrar />
         <CartProvider>
           <OrderProvider>
             <SafeAreaProvider>
@@ -151,6 +165,7 @@ function App() {
                   routeNameRef.current = current;
                 }}
               >
+                <PushNotificationHandler navigationRef={navigationRef} />
                 <TextureOverlay>
                   <AppNavigation />
                 </TextureOverlay>

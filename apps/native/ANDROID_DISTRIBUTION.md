@@ -86,3 +86,25 @@ Same Expo project: `eas build -p ios --profile production` + TestFlight via App 
 | App can’t reach backend | Check EAS secrets for `EXPO_PUBLIC_CONVEX_URL` |
 | Auth fails on build | Clerk publishable key + `CLERK_ISSUER_URL` on **Convex** deployment |
 | Package name mismatch | Play app id must be `com.theownersbox.app` |
+| Push not received on device | Use a **preview/production EAS build** (not Expo Go). Configure FCM via `eas credentials` for Android. Test delivery at [expo.dev/notifications](https://expo.dev/notifications) with your Expo push token. |
+| Push works in dev but not prod | Optional: set `EXPO_ACCESS_TOKEN` on the **Convex** deployment for higher Expo push rate limits |
+
+## Push notifications (Android FCM)
+
+Push requires a **development or production build** — Expo Go cannot receive remote notifications.
+
+1. **FCM credentials** — from `apps/native`:
+   ```powershell
+   eas credentials -p android
+   ```
+   Follow prompts to upload or generate a Firebase Cloud Messaging key. EAS attaches FCM to your Android app automatically on the next build.
+
+2. **Build & install** — preview APK or production AAB (see options above).
+
+3. **Register token** — sign in on device; the app registers its Expo push token with Convex (`push_tokens` table).
+
+4. **Test send** — copy the Expo push token from device logs or Convex dashboard, then send a test at [expo.dev/notifications](https://expo.dev/notifications).
+
+5. **Order-ready flow** — when an admin marks an order `ready` in the dashboard, Convex sends a push via `https://exp.host/--/api/v2/push/send`.
+
+Optional Convex env: `EXPO_ACCESS_TOKEN` (Expo account access token) — improves rate limits; not required for local/dev testing.
