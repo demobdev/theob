@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -7,7 +7,6 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-  Alert,
   Image,
   TextInput,
   ActivityIndicator
@@ -22,6 +21,7 @@ import {
   formatUSPhoneInput,
   normalizePhoneDigits,
 } from "../utils/phoneFormat";
+import ObAlertModal, { type ObAlertConfig } from "../components/ObAlertModal";
 
 // Moving these OUTSIDE the component to prevent re-mounting and losing focus
 const InfoField = ({ label, value, onChangeText, showChange = false, editable = true, isEditing = false, keyboardType, maxLength }) => (
@@ -73,6 +73,15 @@ const AccountScreen = ({ navigation }) => {
   const [birthDay, setBirthDay] = useState("13");
   const [smsConsent, setSmsConsent] = useState(false);
   const [marketingOptIn, setMarketingOptIn] = useState(false);
+  const [obAlert, setObAlert] = useState<ObAlertConfig | null>(null);
+
+  const showObAlert = useCallback((config: ObAlertConfig) => {
+    setObAlert(config);
+  }, []);
+
+  const dismissObAlert = useCallback(() => {
+    setObAlert(null);
+  }, []);
 
   // Sync state with user data ONLY when loaded and not editing
   useEffect(() => {
@@ -96,18 +105,17 @@ const AccountScreen = ({ navigation }) => {
   }, [isLoaded, user, profile, isEditing]);
 
   const handleSignOut = () => {
-    Alert.alert(
-      "Sign Out",
-      "Are you sure you want to sign out?",
-      [
+    showObAlert({
+      title: "Sign Out",
+      message: "Are you sure you want to sign out?",
+      buttons: [
         { text: "Cancel", style: "cancel" },
-        { 
-          text: "Sign Out", 
-          style: "destructive",
+        {
+          text: "Sign Out",
+          style: "primary",
           onPress: async () => {
             try {
               await signOut();
-              // Force navigation back to the Landing screen to prevent being trapped in Account
               navigation.reset({
                 index: 0,
                 routes: [{ name: "LandingScreen" }],
@@ -115,15 +123,18 @@ const AccountScreen = ({ navigation }) => {
             } catch (error) {
               console.error("Sign out error:", error);
             }
-          } 
+          },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const handleSave = async () => {
     if (!isLoaded || !user) {
-      Alert.alert("Error", "We're still syncing your profile. Please try again in a few seconds.");
+      showObAlert({
+        title: "Error",
+        message: "We're still syncing your profile. Please try again in a few seconds.",
+      });
       return;
     }
 
@@ -151,42 +162,47 @@ const AccountScreen = ({ navigation }) => {
       });
       
       if (result?.error === "NOT_AUTHENTICATED") {
-        Alert.alert(
-          "Sync Issue", 
-          "We couldn't sync your changes to our secure server. Please try logging out and back in."
-        );
+        showObAlert({
+          title: "Sync Issue",
+          message:
+            "We couldn't sync your changes to our secure server. Please try logging out and back in.",
+        });
         return;
       }
-      
+
       setIsEditing(false);
-      Alert.alert("Success", "Profile updated successfully!");
+      showObAlert({
+        title: "Success",
+        message: "Profile updated successfully!",
+      });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to update profile. Please try again.";
-      Alert.alert("Error", message);
+      showObAlert({ title: "Error", message });
       console.error(err);
     }
   };
 
   const handleAccountRemoval = () => {
-    Alert.alert(
-      "Request Account Removal",
-      "Are you sure you want to request account removal? This action is permanent and cannot be undone.",
-      [
+    showObAlert({
+      title: "Request Account Removal",
+      message:
+        "Are you sure you want to request account removal? This action is permanent and cannot be undone.",
+      buttons: [
         { text: "Cancel", style: "cancel" },
-        { 
-          text: "Confirm", 
-          style: "destructive",
+        {
+          text: "Confirm",
+          style: "primary",
           onPress: () => {
-            // Logic to send request could go here
-            Alert.alert(
-              "Request Sent", 
-              "Your request has been received. Our team will contact you at your registered email to complete the process."
-            );
-          } 
+            showObAlert({
+              title: "Request Sent",
+              message:
+                "Your request has been received. Our team will contact you at your registered email to complete the process.",
+            });
+          },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const handleCancel = () => {
@@ -218,6 +234,8 @@ const AccountScreen = ({ navigation }) => {
   }
 
   return (
+    <>
+    <ObAlertModal visible={obAlert !== null} config={obAlert} onClose={dismissObAlert} />
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       
@@ -360,6 +378,7 @@ const AccountScreen = ({ navigation }) => {
         </View>
       </ScrollView>
     </SafeAreaView>
+    </>
   );
 };
 
