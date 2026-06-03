@@ -20,7 +20,7 @@ const navigation = [
 ];
 
 const moreLinks = [
-  { name: "Private Events", href: "/events" },
+  { name: "Private Events", href: "/private-events" },
   { name: "About the Box", href: "/about" },
   { name: "Contact", href: "/contact" },
   { name: "FAQ", href: "/faq" },

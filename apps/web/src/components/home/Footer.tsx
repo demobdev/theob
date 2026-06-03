@@ -2,7 +2,8 @@ import React from "react";
 import Logo from "../common/Logo";
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, Facebook, Twitter, Mail, MapPin, Phone } from "lucide-react";
+import { Instagram, Facebook, Twitter, MapPin, Phone } from "lucide-react";
+import AppStoreBadges from "@/components/common/AppStoreBadges";
 
 const footerNav = {
   explore: [
@@ -14,10 +15,10 @@ const footerNav = {
   ],
   visit: [
     { name: "Greenville, SC", href: "/locations" },
-    { name: "Private Events", href: "/events" },
+    { name: "Private Events", href: "/private-events" },
     { name: "About the Box", href: "/about" },
-    { name: "Contact Us", href: "/contact" },
-    { name: "Careers", href: "/careers" },
+    { name: "FAQ", href: "/faq" },
+    { name: "Contact Us", href: "/locations#contact" },
   ]
 };
 
@@ -78,14 +79,7 @@ const Footer = () => {
           <div className="space-y-10">
             <div>
               <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-6">Download the App</h4>
-              <div className="flex flex-col gap-3">
-                <Link href="#" className="hover:scale-[1.02] transition-transform">
-                  <Image src="/apple-app-store.svg" alt="Download on the App Store" width={140} height={42} />
-                </Link>
-                <Link href="#" className="hover:scale-[1.02] transition-transform">
-                  <Image src="/google-play.svg" alt="Get it on Google Play" width={140} height={42} />
-                </Link>
-              </div>
+              <AppStoreBadges />
             </div>
             <div className="pt-6 border-t border-white/5 space-y-4">
                <div className="flex items-center gap-3 text-gray-500">
