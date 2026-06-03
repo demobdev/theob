@@ -14,6 +14,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
+import { clerkAppearance } from "@/lib/clerkAppearance";
 
 const navItems = [
   { name: "Overview", href: "/admin", icon: LayoutDashboard },
@@ -71,7 +72,10 @@ export default function Sidebar() {
       <div className="p-4 border-t border-[#1a1a1a] bg-[#050505]">
         <div className="flex items-center justify-between px-2">
           <div className="flex items-center gap-3">
-            <UserButton afterSignOutUrl="/" />
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={clerkAppearance}
+            />
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-gray-500 uppercase leading-none">Identity</span>
               <span className="text-xs font-bold text-white truncate max-w-[100px]">ADMIN</span>
