@@ -23,6 +23,31 @@ export function applyPrimeTimeFlags(games: UpcomingGame[]): UpcomingGame[] {
 /**
  * Marks the nearest upcoming UFC fight night as featured + prime time.
  */
+/**
+ * Marks the nearest upcoming NASCAR or F1 race as featured + prime time.
+ */
+export function applyRacingFeaturedFlags(
+  games: UpcomingGame[],
+  sport: "NASCAR" | "F1",
+): UpcomingGame[] {
+  const eligible = games
+    .filter(
+      (g) =>
+        g.sport === sport &&
+        (g.status === "scheduled" || g.status === "inprogress"),
+    )
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+
+  if (eligible.length === 0) return games;
+
+  const featuredExternalId = eligible[0].externalId;
+  return games.map((g) =>
+    g.externalId === featuredExternalId
+      ? { ...g, isFeatured: true, isPrimeTime: true }
+      : g,
+  );
+}
+
 export function applyUfcFeaturedFlags(games: UpcomingGame[]): UpcomingGame[] {
   const eligible = games
     .filter(

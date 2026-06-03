@@ -117,7 +117,9 @@ function extractBroadcast(competition: {
   return [...new Set(names)].join(", ");
 }
 
-type EspnCompetitor = Parameters<typeof normalizeCompetitor>[0];
+type EspnCompetitor = Parameters<typeof normalizeCompetitor>[0] & {
+  order?: number | string;
+};
 
 type EspnTeamEvent = {
   id: string;
@@ -274,6 +276,90 @@ export function normalizeEspnMmaEvent(event: EspnMmaEvent): UpcomingGame | null 
   };
 }
 
+/**
+ * NASCAR / F1: one UpcomingGame per race weekend (main race session only).
+ */
+export function normalizeEspnRacingEvent(
+  event: EspnMmaEvent,
+  sportKey: "NASCAR" | "F1",
+): UpcomingGame | null {
+  const competitions = event.competitions ?? [];
+  if (competitions.length === 0) return null;
+
+  const raceComp =
+    competitions.find((c) => {
+      const abbr = (c as { type?: { abbreviation?: string } }).type?.abbreviation?.toLowerCase();
+      const name = (c as { type?: { name?: string } }).type?.name?.toLowerCase() ?? "";
+      return abbr === "race" || name.includes("race");
+    }) ?? competitions[competitions.length - 1];
+
+  const startsAt = raceComp.date ?? event.date;
+  if (!startsAt) return null;
+
+  const statusSource =
+    (raceComp as { status?: { type?: { state?: string; name?: string } } }).status?.type ??
+    event.status?.type;
+  let status = mapEspnStatus(statusSource);
+  if (status === "closed" && new Date(startsAt) > new Date()) {
+    status = "scheduled";
+  }
+
+  const competitors = [...((raceComp as { competitors?: EspnCompetitor[] }).competitors ?? [])].sort(
+    (a, b) => (Number(a.order) || 999) - (Number(b.order) || 999),
+  );
+
+  const config = ESPN_PATHS[sportKey];
+  const featured = competitors.slice(0, 2);
+  const awayRaw = featured[0];
+  const homeRaw = featured[1];
+
+  const extraDrivers = competitors
+    .slice(2, 5)
+    .map((c) => c.athlete?.displayName ?? c.athlete?.fullName)
+    .filter(Boolean);
+
+  const trackFromName = event.name?.includes(" at ")
+    ? event.name.split(" at ").slice(1).join(" at ")
+    : null;
+
+  return {
+    id: crypto.randomUUID(),
+    externalId: `espn-${event.id}`,
+    sport: sportKey,
+    league: config.label,
+    status,
+    startsAt,
+    tournamentName: event.name ?? config.label,
+    homeTeam: homeRaw ? normalizeCompetitor(homeRaw, sportKey) : undefined,
+    awayTeam: awayRaw ? normalizeCompetitor(awayRaw, sportKey) : undefined,
+    editorialNote:
+      extraDrivers.length > 0 ? `Also racing: ${extraDrivers.join(", ")}` : null,
+    broadcast: extractBroadcast(raceComp as { broadcasts?: Array<{ names?: string[]; shortName?: string }> }),
+    venue: (() => {
+      const venue = (
+        raceComp as {
+          venue?: {
+            fullName?: string;
+            address?: { city?: string; state?: string };
+          };
+        }
+      ).venue;
+      if (venue?.fullName || venue?.address?.city) {
+        return {
+          name: venue.fullName ?? trackFromName,
+          city: venue.address?.city ?? null,
+          state: venue.address?.state ?? null,
+        };
+      }
+      if (trackFromName) {
+        return { name: trackFromName, city: null, state: null };
+      }
+      return undefined;
+    })(),
+    lastSyncedAt: new Date().toISOString(),
+  };
+}
+
 export function normalizeEspnScoreboard(
   payload: { events?: unknown[] },
   sportKey: SportKey,
@@ -298,6 +384,12 @@ export function normalizeEspnScoreboard(
 
     if (sportKey === "UFC") {
       const normalized = normalizeEspnMmaEvent(event as EspnMmaEvent);
+      if (normalized) games.push(normalized);
+      continue;
+    }
+
+    if (sportKey === "NASCAR" || sportKey === "F1") {
+      const normalized = normalizeEspnRacingEvent(event as EspnMmaEvent, sportKey);
       if (normalized) games.push(normalized);
       continue;
     }

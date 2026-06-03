@@ -1,4 +1,13 @@
-export type SportKey = "NFL" | "NCAAF" | "NBA" | "MLB" | "NHL" | "GOLF" | "UFC";
+export type SportKey =
+  | "NFL"
+  | "NCAAF"
+  | "NBA"
+  | "MLB"
+  | "NHL"
+  | "GOLF"
+  | "UFC"
+  | "NASCAR"
+  | "F1";
 
 export type GameStatus = "scheduled" | "inprogress" | "closed" | "cancelled" | "postponed";
 

@@ -25,11 +25,15 @@ import BottomNavBar from "../components/BottomNavBar";
 import TeamDetailSheet from "./TeamDetailSheet";
 import FightNightHeroCard from "../components/FightNightHeroCard";
 import FightNightDetailSheet from "../components/FightNightDetailSheet";
+import RacingEventCard from "../components/RacingEventCard";
+import RacingDetailSheet from "../components/RacingDetailSheet";
 import {
   formatVenueDateShort,
   formatVenueTime,
   getVenueNext7Days,
+  isEventInUpcomingWindow,
   isUfcInUpcomingWindow,
+  EVENT_HERO_WINDOW_DAYS,
   UFC_HERO_WINDOW_DAYS,
 } from "../lib/venueTimezone";
 
@@ -66,6 +70,20 @@ const getTeamLogo = (sport: string, abbr: string, fallbackUrl?: string) => {
 const { width } = Dimensions.get("window");
 
 const BASE_SPORTS = ["All", "NFL", "NBA", "MLB", "NHL", "GOLF"];
+const INDIVIDUAL_SPORTS = new Set(["UFC", "NASCAR", "F1", "GOLF"]);
+
+const nearestUpcomingEvent = (
+  events: Array<{ startsAt: string; status?: string }> | undefined,
+  windowDays: number = EVENT_HERO_WINDOW_DAYS,
+) => {
+  if (!events?.length) return null;
+  const inWindow = events.filter((g) =>
+    isEventInUpcomingWindow(g.startsAt, g.status, windowDays),
+  );
+  return (
+    inWindow.sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null
+  );
+};
 
 const LiveGamesScreen = ({ navigation }) => {
   const daysString = useMemo(() => getVenueNext7Days(), []);
@@ -80,7 +98,7 @@ const LiveGamesScreen = ({ navigation }) => {
 
   // Helper: does this game feature a favorite team?
   const isFavoriteGame = (game: any): boolean => {
-    if (game.sport === "UFC") return false;
+    if (INDIVIDUAL_SPORTS.has(game.sport)) return false;
     const sport = game.sport;
     const favs = favoriteTeams[sport] ?? [];
     if (favs.length === 0) return false;
@@ -96,6 +114,7 @@ const LiveGamesScreen = ({ navigation }) => {
   }>(null);
   const [showTVGuide, setShowTVGuide] = useState(false);
   const [selectedFightNight, setSelectedFightNight] = useState<any>(null);
+  const [selectedRacingEvent, setSelectedRacingEvent] = useState<any>(null);
   const [listPage, setListPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
@@ -109,6 +128,14 @@ const LiveGamesScreen = ({ navigation }) => {
     sportFilter: "UFC",
     limit: 20,
   });
+  const upcomingNascarEvents = useQuery(api.sports_queries.getUpcomingGames, {
+    sportFilter: "NASCAR",
+    limit: 20,
+  });
+  const upcomingF1Events = useQuery(api.sports_queries.getUpcomingGames, {
+    sportFilter: "F1",
+    limit: 20,
+  });
 
   const showUfcPill = useMemo(
     () =>
@@ -118,20 +145,44 @@ const LiveGamesScreen = ({ navigation }) => {
     [upcomingUfcEvents],
   );
 
-  const sportPills = useMemo(
-    () => (showUfcPill ? ["All", "UFC", ...BASE_SPORTS.slice(1)] : BASE_SPORTS),
-    [showUfcPill],
+  const showNascarPill = useMemo(
+    () =>
+      upcomingNascarEvents?.some((g: { startsAt: string; status?: string }) =>
+        isEventInUpcomingWindow(g.startsAt, g.status),
+      ) ?? false,
+    [upcomingNascarEvents],
   );
 
-  const fightNightHero = useMemo(() => {
-    if (!upcomingUfcEvents?.length) return null;
-    const inWindow = upcomingUfcEvents.filter((g: { startsAt: string; status?: string }) =>
-      isUfcInUpcomingWindow(g.startsAt, g.status, UFC_HERO_WINDOW_DAYS),
-    );
-    return inWindow.sort((a: { startsAt: string }, b: { startsAt: string }) =>
-      a.startsAt.localeCompare(b.startsAt),
-    )[0] ?? null;
-  }, [upcomingUfcEvents]);
+  const showF1Pill = useMemo(
+    () =>
+      upcomingF1Events?.some((g: { startsAt: string; status?: string }) =>
+        isEventInUpcomingWindow(g.startsAt, g.status),
+      ) ?? false,
+    [upcomingF1Events],
+  );
+
+  const sportPills = useMemo(() => {
+    const pills = ["All"];
+    if (showUfcPill) pills.push("UFC");
+    if (showNascarPill) pills.push("NASCAR");
+    if (showF1Pill) pills.push("F1");
+    return [...pills, ...BASE_SPORTS.slice(1)];
+  }, [showUfcPill, showNascarPill, showF1Pill]);
+
+  const fightNightHero = useMemo(
+    () => nearestUpcomingEvent(upcomingUfcEvents, UFC_HERO_WINDOW_DAYS),
+    [upcomingUfcEvents],
+  );
+
+  const nascarHero = useMemo(
+    () => nearestUpcomingEvent(upcomingNascarEvents),
+    [upcomingNascarEvents],
+  );
+
+  const f1Hero = useMemo(
+    () => nearestUpcomingEvent(upcomingF1Events),
+    [upcomingF1Events],
+  );
 
   useEffect(() => {
     if (__DEV__ && upcomingUfcEvents !== undefined && upcomingUfcEvents.length === 0) {
@@ -145,7 +196,9 @@ const LiveGamesScreen = ({ navigation }) => {
   const carouselGames = useMemo(() => {
     if (!allGamesForDate) return [];
     
-    const teamSports = allGamesForDate.filter((g: any) => g.sport !== "UFC");
+    const teamSports = allGamesForDate.filter(
+      (g: any) => !INDIVIDUAL_SPORTS.has(g.sport),
+    );
     // Use a Map to ensure uniqueness by ID
     const uniqueGames = new Map();
     
@@ -186,8 +239,10 @@ const LiveGamesScreen = ({ navigation }) => {
 
     const groups: Record<string, typeof paginated> = {};
 
-    if (selectedSport === "UFC") {
-      groups.UFC = paginated.filter((g: { sport?: string }) => g.sport === "UFC");
+    if (selectedSport === "UFC" || selectedSport === "NASCAR" || selectedSport === "F1") {
+      groups[selectedSport] = paginated.filter(
+        (g: { sport?: string }) => g.sport === selectedSport,
+      );
       return groups;
     }
 
@@ -198,7 +253,7 @@ const LiveGamesScreen = ({ navigation }) => {
     }
 
     paginated.forEach(game => {
-      if (game.sport === "UFC") return;
+      if (INDIVIDUAL_SPORTS.has(game.sport)) return;
       const sport = game.sport || "OTHER";
       if (!groups[sport]) groups[sport] = [];
       groups[sport].push(game);
@@ -224,6 +279,8 @@ const LiveGamesScreen = ({ navigation }) => {
           case 'NHL': return '#A2AAAD';
           case 'GOLF': return '#2d6a4f';
           case 'UFC': return '#D20A0A';
+          case 'NASCAR': return '#FFD700';
+          case 'F1': return '#E10600';
           default: return '#FFA500';
       }
   };
@@ -236,6 +293,8 @@ const LiveGamesScreen = ({ navigation }) => {
           case 'NHL': return 'snow';
           case 'GOLF': return 'golf';
           case 'UFC': return 'fitness';
+          case 'NASCAR': return 'car-sport';
+          case 'F1': return 'speedometer';
           default: return 'trophy';
       }
   };
@@ -251,7 +310,10 @@ const LiveGamesScreen = ({ navigation }) => {
       case "MLB":
         return month >= 1 && month <= 10; // Feb - Nov
       case "GOLF":
+      case "F1":
         return true;
+      case "NASCAR":
+        return month >= 1 && month <= 10;
       default:
         return true;
     }
@@ -283,7 +345,9 @@ const LiveGamesScreen = ({ navigation }) => {
                         size={14} 
                         color={hasGames ? accentColor : '#666'} 
                     />
-                    <Text style={[styles.leagueHeaderTitle, !hasGames && { color: '#666' }]}>{sport} {sport === 'GOLF' ? 'TOUR' : 'LEAGUE'}</Text>
+                    <Text style={[styles.leagueHeaderTitle, !hasGames && { color: '#666' }]}>
+                      {sport} {sport === 'GOLF' ? 'TOUR' : INDIVIDUAL_SPORTS.has(sport) && sport !== 'GOLF' ? 'SERIES' : 'LEAGUE'}
+                    </Text>
                 </View>
                 <View style={styles.leagueRightSide}>
                     <Text style={styles.leagueGameCount}>{hasGames ? `${games.length} GAMES` : inSeason ? 'NO GAMES TODAY' : 'OFF SEASON'}</Text>
@@ -313,7 +377,10 @@ const LiveGamesScreen = ({ navigation }) => {
   const renderGameCard = ({ item }) => {
     const isLive = item.status === "inprogress";
     const isFinal = item.status === "closed";
-    const isTournament = item.sport === "GOLF" || !!item.tournamentName || (!item.awayTeam && !item.homeTeam);
+    const isTournament =
+      INDIVIDUAL_SPORTS.has(item.sport) ||
+      !!item.tournamentName ||
+      (!item.awayTeam && !item.homeTeam);
     const sportColor = getSportColor(item.sport);
     
     return (
@@ -343,10 +410,20 @@ const LiveGamesScreen = ({ navigation }) => {
 
         {isTournament ? (
             <View style={styles.tournamentBody}>
-                <Ionicons name="trophy-outline" size={44} color="#FFA500" style={{ marginBottom: 10 }} />
+                <Ionicons
+                  name={item.sport === "NASCAR" ? "car-sport" : item.sport === "F1" ? "speedometer" : "trophy-outline"}
+                  size={44}
+                  color={sportColor}
+                  style={{ marginBottom: 10 }}
+                />
                 <Text style={styles.tournamentTitle} numberOfLines={2}>
-                    {item.tournamentName || "Upcoming Tournament"}
+                    {item.tournamentName || "Upcoming Event"}
                 </Text>
+                {(item.sport === "NASCAR" || item.sport === "F1") && item.awayTeam?.name && item.homeTeam?.name ? (
+                  <Text style={styles.heroDateSub}>
+                    {item.awayTeam.name} · {item.homeTeam.name}
+                  </Text>
+                ) : null}
             </View>
         ) : (
             <View style={styles.heroTeamsRow}>
@@ -451,7 +528,61 @@ const LiveGamesScreen = ({ navigation }) => {
 
   const renderListGame = ({ item }) => {
       const isLive = item.status === "inprogress";
-      
+      const isIndividual =
+        INDIVIDUAL_SPORTS.has(item.sport) || !!item.tournamentName;
+
+      if (isIndividual) {
+        const featured = [item.awayTeam?.name, item.homeTeam?.name].filter(Boolean);
+        return (
+          <TouchableOpacity
+            style={styles.listCard}
+            onPress={() => {
+              if (item.sport === "UFC") setSelectedFightNight(item);
+              else if (item.sport === "NASCAR" || item.sport === "F1") setSelectedRacingEvent(item);
+              else setSelectedGame(item);
+            }}
+          >
+            <View style={styles.cardContainer}>
+              <View style={styles.listLeftCol}>
+                <Text style={styles.listTimeMain}>{formatVenueTime(item.startsAt)}</Text>
+                <View style={styles.listSubInfoRow}>
+                  <Ionicons name="tv-outline" size={10} color="#FFA500" />
+                  <Text style={styles.listSubInfoText}>{item.broadcast || "SPEC"}</Text>
+                </View>
+                <View style={styles.listSubInfoRow}>
+                  <Ionicons name="location-outline" size={10} color="#888" />
+                  <Text style={styles.listSubInfoText} numberOfLines={1}>
+                    {item.venue?.name || item.venue?.city || "THE OB"}
+                  </Text>
+                </View>
+              </View>
+              <View style={[styles.listCenterCol, { flexDirection: "column", gap: 6 }]}>
+                <Text style={styles.listTeamAbbrMain} numberOfLines={2}>
+                  {item.tournamentName || item.sport}
+                </Text>
+                {featured.length > 0 ? (
+                  <Text style={styles.listSubInfoText} numberOfLines={2}>
+                    {featured.join(" · ")}
+                  </Text>
+                ) : null}
+              </View>
+              <View style={styles.listRightCol}>
+                {isLive ? (
+                  <View style={styles.liveBadgeSmall}>
+                    <View style={styles.liveDotSmall} />
+                    <Text style={styles.liveBadgeSmallText}>LIVE</Text>
+                  </View>
+                ) : item.status === "closed" ? (
+                  <View style={styles.finalBadgeSmall}>
+                    <Text style={styles.finalBadgeText}>FINAL</Text>
+                  </View>
+                ) : null}
+              </View>
+            </View>
+          </TouchableOpacity>
+        );
+      }
+
       return (
           <TouchableOpacity style={styles.listCard} onPress={() => setSelectedGame(item)}>
               <View style={styles.cardContainer}>
@@ -648,6 +779,28 @@ const LiveGamesScreen = ({ navigation }) => {
               />
             )}
 
+            {nascarHero &&
+              (selectedSport === "All" || selectedSport === "NASCAR") && (
+              <RacingEventCard
+                event={nascarHero}
+                onPress={() => {
+                  setSelectedRacingEvent(nascarHero);
+                  if (selectedSport !== "NASCAR") setSelectedSport("NASCAR");
+                }}
+              />
+            )}
+
+            {f1Hero &&
+              (selectedSport === "All" || selectedSport === "F1") && (
+              <RacingEventCard
+                event={f1Hero}
+                onPress={() => {
+                  setSelectedRacingEvent(f1Hero);
+                  if (selectedSport !== "F1") setSelectedSport("F1");
+                }}
+              />
+            )}
+
             {/* Featured Games Carousel — always visible, all sports */}
             {carouselGames.length > 0 && (
                 <View style={styles.primeTimeSection}>
@@ -714,7 +867,7 @@ const LiveGamesScreen = ({ navigation }) => {
             )}
 
             {/* Team Filter Row */}
-            {allTeamsBySport && allTeamsBySport.length > 0 && (() => {
+            {allTeamsBySport && allTeamsBySport.length > 0 && !INDIVIDUAL_SPORTS.has(selectedSport) && (() => {
               const sportTeams = selectedSport === "All"
                 ? allTeamsBySport
                 : allTeamsBySport.filter(s => s.sport === selectedSport);
@@ -965,6 +1118,11 @@ const LiveGamesScreen = ({ navigation }) => {
       <FightNightDetailSheet
         event={selectedFightNight}
         onClose={() => setSelectedFightNight(null)}
+      />
+
+      <RacingDetailSheet
+        event={selectedRacingEvent}
+        onClose={() => setSelectedRacingEvent(null)}
       />
 
       <BottomNavBar activeTab="GAMES" navigation={navigation} />

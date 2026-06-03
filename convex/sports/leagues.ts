@@ -58,6 +58,20 @@ export const LEAGUES: Record<SportKey, LeagueConfig> = {
     sportradarLeagueKey: "ufc",
     apiVersion: "v1",
   },
+  NASCAR: {
+    sport: "racing",
+    key: "NASCAR",
+    label: "NASCAR Cup",
+    sportradarLeagueKey: "nascar",
+    apiVersion: "v1",
+  },
+  F1: {
+    sport: "racing",
+    key: "F1",
+    label: "Formula 1",
+    sportradarLeagueKey: "f1",
+    apiVersion: "v1",
+  },
 } as const;
 
 /**
@@ -84,8 +98,13 @@ export function isSportInSeason(sport: SportKey, date: Date = new Date()): boole
       
     case "GOLF":
     case "UFC":
-      // PGA and UFC operate largely year round
+    case "F1":
+      // PGA, UFC, and F1 operate largely year round
       return true;
+
+    case "NASCAR":
+      // Cup Series: February through November
+      return month >= 1 && month <= 10;
 
     default:
       return true;

@@ -14,6 +14,8 @@ export const ESPN_PATHS: Record<
   NHL: { sport: "hockey", league: "nhl", label: "NHL" },
   GOLF: { sport: "golf", league: "pga", label: "PGA Tour" },
   UFC: { sport: "mma", league: "ufc", label: "UFC" },
+  NASCAR: { sport: "racing", league: "nascar-premier", label: "NASCAR Cup" },
+  F1: { sport: "racing", league: "f1", label: "Formula 1" },
 };
 
 export type EspnScoreboardResponse = {

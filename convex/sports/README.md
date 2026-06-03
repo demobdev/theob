@@ -25,6 +25,12 @@ Sportradar remains in `sportradar/` for legacy/manual use only; scheduled sync d
 
 **UFC:** Synced via ESPN MMA scoreboard only (`mma/ufc`). One row per fight night; no API-Sports/TSDB fallback.
 
+**NASCAR / F1:** Synced via ESPN racing scoreboards only:
+- NASCAR Cup: `racing/nascar-premier/scoreboard`
+- Formula 1: `racing/f1/scoreboard`
+
+One row per race weekend (main **Race** session). Top-two drivers map to `awayTeam`/`homeTeam`; additional names go in `editorialNote`. Practice/qualifying sessions are not separate rows (deferred).
+
 ## Env vars (minimal)
 
 | Key | Required? |

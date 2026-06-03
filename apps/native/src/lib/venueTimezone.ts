@@ -105,8 +105,11 @@ export function getVenueNext7Days(
   return days;
 }
 
-const UFC_PILL_WINDOW_DAYS = 14;
-const UFC_HERO_WINDOW_DAYS = 14;
+const EVENT_PILL_WINDOW_DAYS = 14;
+const EVENT_HERO_WINDOW_DAYS = 14;
+
+const UFC_PILL_WINDOW_DAYS = EVENT_PILL_WINDOW_DAYS;
+const UFC_HERO_WINDOW_DAYS = EVENT_HERO_WINDOW_DAYS;
 
 export function isUfcInUpcomingWindow(
   startsAt: string,
@@ -120,4 +123,17 @@ export function isUfcInUpcomingWindow(
   return t >= now - 12 * 60 * 60 * 1000 && t <= now + windowMs;
 }
 
-export { UFC_PILL_WINDOW_DAYS, UFC_HERO_WINDOW_DAYS };
+export function isEventInUpcomingWindow(
+  startsAt: string,
+  status: string | undefined,
+  windowDays: number = EVENT_PILL_WINDOW_DAYS,
+): boolean {
+  return isUfcInUpcomingWindow(startsAt, status, windowDays);
+}
+
+export { EVENT_PILL_WINDOW_DAYS, EVENT_HERO_WINDOW_DAYS };
+export {
+  isUfcInUpcomingWindow,
+  UFC_PILL_WINDOW_DAYS,
+  UFC_HERO_WINDOW_DAYS,
+};
