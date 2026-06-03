@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -8,7 +8,6 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
-  Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -16,12 +15,22 @@ import { useQuery, useMutation } from "convex/react";
 import { useAuth } from "@clerk/clerk-expo";
 import { api } from "../../../../convex/_generated/api";
 import { ensureAuth } from "../utils/authGuard";
+import ObAlertModal, { type ObAlertConfig } from "../components/ObAlertModal";
 
 const SavedCardsScreen = ({ navigation }) => {
   const { isSignedIn } = useAuth();
+  const [obAlert, setObAlert] = useState<ObAlertConfig | null>(null);
   const savedCards = useQuery(api.payments.getPaymentMethods) as any[];
   const removeMutation = useMutation(api.payments.removePaymentMethod);
   const setDefaultMutation = useMutation(api.payments.setDefaultPaymentMethod);
+
+  const showObAlert = useCallback((config: ObAlertConfig) => {
+    setObAlert(config);
+  }, []);
+
+  const dismissObAlert = useCallback(() => {
+    setObAlert(null);
+  }, []);
 
   const getCardIcon = (brand) => {
     const b = brand?.toLowerCase();
@@ -31,35 +40,36 @@ const SavedCardsScreen = ({ navigation }) => {
   };
 
   const handleRemove = (cardId) => {
-    Alert.alert(
-      "Remove Card",
-      "Are you sure you want to remove this payment method?",
-      [
+    showObAlert({
+      title: "Remove Card",
+      message: "Are you sure you want to remove this payment method?",
+      buttons: [
         { text: "Cancel", style: "cancel" },
-        { 
-          text: "Remove", 
-          style: "destructive",
+        {
+          text: "Remove",
+          style: "primary",
           onPress: async () => {
             try {
               await removeMutation({ cardId });
             } catch (error) {
-              Alert.alert("Error", "Failed to remove card");
+              showObAlert({ title: "Error", message: "Failed to remove card" });
             }
-          }
-        }
-      ]
-    );
+          },
+        },
+      ],
+    });
   };
 
   const handleSetDefault = async (cardId) => {
     try {
       await setDefaultMutation({ cardId });
     } catch (error) {
-      Alert.alert("Error", "Failed to update default card");
+      showObAlert({ title: "Error", message: "Failed to update default card" });
     }
   };
 
   return (
+    <>
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       
@@ -124,6 +134,8 @@ const SavedCardsScreen = ({ navigation }) => {
         </View>
       </ScrollView>
     </SafeAreaView>
+    <ObAlertModal visible={obAlert !== null} config={obAlert} onClose={dismissObAlert} />
+    </>
   );
 };
 

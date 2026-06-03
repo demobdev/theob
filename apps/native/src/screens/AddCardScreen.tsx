@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -7,7 +7,6 @@ import {
   SafeAreaView,
   TextInput,
   ScrollView,
-  Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -16,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import ObAlertModal, { type ObAlertConfig } from "../components/ObAlertModal";
 
 const AddCardScreen = ({ navigation }) => {
   const [cardNumber, setCardNumber] = useState("");
@@ -25,6 +25,15 @@ const AddCardScreen = ({ navigation }) => {
   const [zip, setZip] = useState("");
   const [isDefault, setIsDefault] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [obAlert, setObAlert] = useState<ObAlertConfig | null>(null);
+
+  const showObAlert = useCallback((config: ObAlertConfig) => {
+    setObAlert(config);
+  }, []);
+
+  const dismissObAlert = useCallback(() => {
+    setObAlert(null);
+  }, []);
 
   const convexUser = useQuery(api.loyalty.getUserProfile);
   console.log("DEBUG: Convex User Profile:", convexUser);
@@ -52,12 +61,12 @@ const AddCardScreen = ({ navigation }) => {
 
   const handleSaveCard = async () => {
     if (!cardNumber || !expiry || !cvv || !zip) {
-      Alert.alert("Error", "Please fill in all fields");
+      showObAlert({ title: "Error", message: "Please fill in all fields" });
       return;
     }
 
     if (cardNumber.length < 16) {
-      Alert.alert("Error", "Invalid card number");
+      showObAlert({ title: "Error", message: "Invalid card number" });
       return;
     }
 
@@ -77,20 +86,23 @@ const AddCardScreen = ({ navigation }) => {
       });
 
       if (result?.success) {
-        Alert.alert("Success", "Card saved securely", [
-          { text: "OK", onPress: () => navigation.goBack() }
-        ]);
+        showObAlert({
+          title: "Success",
+          message: "Card saved securely",
+          buttons: [{ text: "OK", style: "primary", onPress: () => navigation.goBack() }],
+        });
       } else if (result?.error === "NOT_AUTHENTICATED") {
-        Alert.alert(
-          "Authentication Required", 
-          "Your session hasn't synced with our secure vault yet. Please wait a moment or try logging out and back in."
-        );
+        showObAlert({
+          title: "Authentication Required",
+          message:
+            "Your session hasn't synced with our secure vault yet. Please wait a moment or try logging out and back in.",
+        });
       } else {
         throw new Error(result?.error || "Unknown error");
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", "Failed to save card. Please try again.");
+      showObAlert({ title: "Error", message: "Failed to save card. Please try again." });
     } finally {
       setLoading(false);
     }
@@ -117,6 +129,7 @@ const AddCardScreen = ({ navigation }) => {
   };
 
   return (
+    <>
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -250,6 +263,8 @@ const AddCardScreen = ({ navigation }) => {
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    <ObAlertModal visible={obAlert !== null} config={obAlert} onClose={dismissObAlert} />
+    </>
   );
 };
 
