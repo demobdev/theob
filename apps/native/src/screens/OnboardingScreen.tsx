@@ -18,6 +18,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Video, ResizeMode } from "expo-av";
 import { requestOnboardingNotifications } from "../utils/notifications";
+import ObAlertModal, { type ObAlertConfig } from "../components/ObAlertModal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,7 +27,16 @@ const SLIDE_COUNT = 3;
 const OnboardingScreen = ({ navigation }) => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [obAlert, setObAlert] = useState<ObAlertConfig | null>(null);
   const scrollRef = useRef<ScrollView>(null);
+
+  const showObAlert = useCallback((config: ObAlertConfig) => {
+    setObAlert(config);
+  }, []);
+
+  const dismissObAlert = useCallback(() => {
+    setObAlert(null);
+  }, []);
 
   const canGoBack = activeSlide > 0;
   const canGoForward = activeSlide < SLIDE_COUNT - 1;
@@ -117,11 +127,12 @@ const OnboardingScreen = ({ navigation }) => {
   };
 
   const handleEnableNotifications = async () => {
-    await requestOnboardingNotifications();
+    await requestOnboardingNotifications(showObAlert);
   };
 
   return (
     <View style={styles.container}>
+      <ObAlertModal visible={obAlert !== null} config={obAlert} onClose={dismissObAlert} />
       <StatusBar barStyle="light-content" />
 
       <ScrollView
