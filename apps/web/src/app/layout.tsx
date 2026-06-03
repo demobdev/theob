@@ -3,6 +3,7 @@ import { Inter, Montserrat, Lato } from "next/font/google";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 import ConvexClientProvider from "./ConvexClientProvider";
+import AppDownloadPromoModal from "@/components/common/AppDownloadPromoModal";
 import LocationFulfillmentModal from "@/components/menu/LocationFulfillmentModal";
 import PostHogAuthSync from "@/components/PostHogAuthSync";
 import ConvexProfileSync from "@/components/ConvexProfileSync";
@@ -28,6 +29,7 @@ export default function RootLayout({
           <PostHogAuthSync />
           <ConvexProfileSync />
           {children}
+          <AppDownloadPromoModal />
           <LocationFulfillmentModal />
         </ConvexClientProvider>
       </body>
