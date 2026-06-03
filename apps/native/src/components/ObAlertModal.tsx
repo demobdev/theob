@@ -8,11 +8,12 @@ import {
   Image,
   Pressable,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 export const OB_GOLD = "#D4AF37";
 export const OB_CREAM = "#F5F0E8";
-/** Subtle leather grain over cream — matches app texture system (~15%) */
-export const OB_LEATHER_TEXTURE_OPACITY = 0.12;
+/** Leather grain over cream — visible pebble grain without muddying the base */
+export const OB_LEATHER_TEXTURE_OPACITY = 0.25;
 
 const CREAM_LEATHER = require("../../assets/images/cream_leather.png");
 
@@ -53,10 +54,22 @@ export default function ObAlertModal({ visible, config, onClose }: Props) {
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityRole="button" />
         <View style={styles.card} accessibilityViewIsModal>
           <View style={styles.creamBase} />
+          <View style={styles.warmTint} pointerEvents="none" />
           <Image
             source={CREAM_LEATHER}
             style={[styles.leatherTexture, { opacity: OB_LEATHER_TEXTURE_OPACITY }]}
             resizeMode="cover"
+          />
+          <LinearGradient
+            colors={[
+              "rgba(28, 24, 16, 0.07)",
+              "transparent",
+              "transparent",
+              "rgba(28, 24, 16, 0.07)",
+            ]}
+            locations={[0, 0.14, 0.86, 1]}
+            style={styles.edgeVignette}
+            pointerEvents="none"
           />
           <View style={styles.content}>
             <Text style={styles.title}>{config.title}</Text>
@@ -121,7 +134,14 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: OB_CREAM,
   },
+  warmTint: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(212, 175, 55, 0.04)",
+  },
   leatherTexture: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  edgeVignette: {
     ...StyleSheet.absoluteFillObject,
   },
   content: {
