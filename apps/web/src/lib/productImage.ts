@@ -31,6 +31,17 @@ const MENU_IMAGE_KEYS = new Set([
   "egg_breakfast",
   "pancakes",
   "breakfast_skillet",
+  "beer",
+  "soda",
+  "cocktail",
+  "bud_light",
+  "coca_cola",
+  "diet_coke",
+  "coke_zero",
+  "sprite",
+  "bottled_coke",
+  "bottled_diet_coke",
+  "bottled_sprite",
 ]);
 
 const DRINK_LIKE = new Set([
@@ -71,12 +82,13 @@ export function resolveProductImageSrc(
   const key = image.replace(/\.(png|jpe?g|webp)$/i, "");
   const aliases: Record<string, string> = {
     crab_cake: "crabcake_sandwich",
+    "bud-light": "bud_light",
   };
   const resolved = aliases[key] ?? key;
   if (MENU_IMAGE_KEYS.has(resolved) || aliases[key]) {
     return `/images/food/${resolved}.png`;
   }
-  if (isDrinkImageKey(resolved) || resolved === "logo_b") {
+  if (resolved === "logo_b") {
     return "/loading-icon.png";
   }
   return `/images/food/${resolved}.png`;

@@ -199,17 +199,17 @@ const getImageSource = (imgStr) => {
     case "chicken_waffles": return require("../../assets/images/menu/chicken_waffles.png");
 
     // DRINKS
-    case "beer": return require("../../assets/images/menu/cheese_pizza.png"); // Placeholder
-    case "soda": return require("../../assets/images/menu/crab_dip.png"); // Placeholder
-    case "cocktail": return require("../../assets/images/menu/philly.png"); // Placeholder
-    case "coca_cola":
-    case "diet_coke":
-    case "coke_zero":
-    case "sprite":
-    case "bottled_coke":
-    case "bottled_diet_coke":
-    case "bottled_sprite":
-      return require("../../assets/images/menu/crab_dip.png"); // Placeholder
+    case "beer": return require("../../assets/images/menu/beer.png");
+    case "soda": return require("../../assets/images/menu/soda.png");
+    case "cocktail": return require("../../assets/images/menu/cocktail.png");
+    case "bud_light": return require("../../assets/images/menu/bud_light.png");
+    case "coca_cola": return require("../../assets/images/menu/coca_cola.png");
+    case "diet_coke": return require("../../assets/images/menu/diet_coke.png");
+    case "coke_zero": return require("../../assets/images/menu/coke_zero.png");
+    case "sprite": return require("../../assets/images/menu/sprite.png");
+    case "bottled_coke": return require("../../assets/images/menu/bottled_coke.png");
+    case "bottled_diet_coke": return require("../../assets/images/menu/bottled_diet_coke.png");
+    case "bottled_sprite": return require("../../assets/images/menu/bottled_sprite.png");
     
     case "supreme_pizza": return require("../../assets/images/menu/supreme_pizza.png");
     case "ham_pineapple": return require("../../assets/images/menu/ham_pineapple.png");
