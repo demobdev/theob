@@ -66,16 +66,20 @@ export default function LocationFulfillmentModal() {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="relative isolate w-full max-w-lg transform overflow-hidden rounded-[32px] bg-white text-black p-0 shadow-2xl transition-all">
-                
-                {/* Close Button */}
-                <button 
-                  onClick={() => setFulfillmentModalOpen(false)} 
-                  className="absolute top-6 right-6 z-10 text-gray-400 hover:text-black transition-colors"
-                >
-                  <X size={24} />
-                </button>
 
-                <div className="p-8">
+                {/* Header strip: close in corner, tabs below */}
+                <div className="relative shrink-0 h-10">
+                  <button
+                    type="button"
+                    onClick={() => setFulfillmentModalOpen(false)}
+                    aria-label="Close"
+                    className="absolute top-3 right-3 z-10 text-neutral-400 hover:text-black transition-colors"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+
+                <div className="px-8 pb-8 pt-2">
                    {/* Fulfillment Tabs */}
                    <div className="flex border border-gray-200 rounded-2xl overflow-hidden mb-8">
                       {options.map((opt) => (
