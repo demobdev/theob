@@ -81,6 +81,7 @@ From the **repo root** (`c:\dev\theob` or your clone path):
 ```bash
 npm run dev:backend          # watcher + deploy on save
 npx convex run seedMenu:populate
+npx convex run seedMenuExtras:addCokeDrinks   # incremental Coke drinks (no full re-seed)
 npx convex run seedRewards:seedRewards
 ```
 

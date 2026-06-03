@@ -418,5 +418,120 @@ export const addExtras = mutation({
     });
 
     return "Extra menu items added successfully.";
-  }
+  },
+});
+
+/**
+ * Adds Coca-Cola fountain & bottled drinks to an existing menu.
+ * Safe to re-run — skips products that already exist by name.
+ * Run AFTER seedMenu:populate (or on any menu that lacks Coke lineup).
+ */
+export const addCokeDrinks = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const cats = await ctx.db.query("categories").collect();
+    const drinksCat = cats.find((c) => c.name === "Drinks");
+    if (!drinksCat) {
+      throw new Error('Drinks category not found. Run seedMenu:populate first.');
+    }
+
+    const existing = await ctx.db.query("products").collect();
+    const names = new Set(existing.map((p) => p.name));
+
+    const icePreference = {
+      name: "Ice Preference",
+      type: "single_select",
+      required: true,
+      options: [
+        { name: "Regular Ice", priceExtra: 0, defaultSelected: true },
+        { name: "Light Ice", priceExtra: 0 },
+        { name: "No Ice", priceExtra: 0 },
+      ],
+    };
+
+    const fountainSize = {
+      name: "Size",
+      type: "single_select",
+      required: true,
+      options: [
+        { name: "Regular", priceExtra: 0, defaultSelected: true },
+        { name: "Large", priceExtra: 0.75 },
+      ],
+    };
+
+    const cokeDrinks = [
+      {
+        name: "Coca-Cola Fountain",
+        description: "Classic Coca-Cola from the fountain. Free refills.",
+        price: 3.5,
+        pointsWorth: 3,
+        image: "coca_cola",
+        isFeatured: true,
+        modifiers: [fountainSize, icePreference],
+      },
+      {
+        name: "Diet Coke Fountain",
+        description: "Diet Coke from the fountain. Free refills.",
+        price: 3.5,
+        pointsWorth: 3,
+        image: "diet_coke",
+        isFeatured: false,
+        modifiers: [fountainSize, icePreference],
+      },
+      {
+        name: "Coke Zero Fountain",
+        description: "Coke Zero Sugar from the fountain. Free refills.",
+        price: 3.5,
+        pointsWorth: 3,
+        image: "coke_zero",
+        isFeatured: false,
+        modifiers: [fountainSize, icePreference],
+      },
+      {
+        name: "Sprite Fountain",
+        description: "Crisp lemon-lime Sprite from the fountain. Free refills.",
+        price: 3.5,
+        pointsWorth: 3,
+        image: "sprite",
+        isFeatured: false,
+        modifiers: [fountainSize, icePreference],
+      },
+      {
+        name: "Coca-Cola Bottle (20oz)",
+        description: "Chilled 20oz bottled Coca-Cola. To-go friendly.",
+        price: 4.5,
+        pointsWorth: 4,
+        image: "bottled_coke",
+        isFeatured: false,
+      },
+      {
+        name: "Diet Coke Bottle (20oz)",
+        description: "Chilled 20oz bottled Diet Coke. To-go friendly.",
+        price: 4.5,
+        pointsWorth: 4,
+        image: "bottled_diet_coke",
+        isFeatured: false,
+      },
+      {
+        name: "Sprite Bottle (20oz)",
+        description: "Chilled 20oz bottled Sprite. To-go friendly.",
+        price: 4.5,
+        pointsWorth: 4,
+        image: "bottled_sprite",
+        isFeatured: false,
+      },
+    ];
+
+    let added = 0;
+    for (const drink of cokeDrinks) {
+      if (names.has(drink.name)) continue;
+      await ctx.db.insert("products", {
+        ...drink,
+        categoryId: drinksCat._id,
+      });
+      added++;
+    }
+
+    return `Added ${added} Coca-Cola drink product(s).`;
+  },
 });

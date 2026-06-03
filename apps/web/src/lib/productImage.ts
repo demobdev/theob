@@ -33,12 +33,32 @@ const MENU_IMAGE_KEYS = new Set([
   "breakfast_skillet",
 ]);
 
-const DRINK_LIKE = new Set(["beer", "soda", "cocktail", "bud_light", "bud-light"]);
+const DRINK_LIKE = new Set([
+  "beer",
+  "soda",
+  "cocktail",
+  "bud_light",
+  "bud-light",
+  "coca_cola",
+  "diet_coke",
+  "coke_zero",
+  "sprite",
+  "bottled_coke",
+  "bottled_diet_coke",
+  "bottled_sprite",
+]);
 
 export function isDrinkImageKey(key: string | undefined): boolean {
   if (!key) return false;
   const k = key.toLowerCase();
-  return DRINK_LIKE.has(k) || k.includes("beer") || k.includes("drink");
+  return (
+    DRINK_LIKE.has(k) ||
+    k.includes("beer") ||
+    k.includes("drink") ||
+    k.includes("coke") ||
+    k.includes("sprite") ||
+    k.includes("soda")
+  );
 }
 
 /** Resolve Convex product.image slug or URL to a public path */

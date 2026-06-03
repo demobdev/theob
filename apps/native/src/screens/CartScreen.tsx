@@ -202,6 +202,14 @@ const getImageSource = (imgStr) => {
     case "beer": return require("../../assets/images/menu/cheese_pizza.png"); // Placeholder
     case "soda": return require("../../assets/images/menu/crab_dip.png"); // Placeholder
     case "cocktail": return require("../../assets/images/menu/philly.png"); // Placeholder
+    case "coca_cola":
+    case "diet_coke":
+    case "coke_zero":
+    case "sprite":
+    case "bottled_coke":
+    case "bottled_diet_coke":
+    case "bottled_sprite":
+      return require("../../assets/images/menu/crab_dip.png"); // Placeholder
     
     case "supreme_pizza": return require("../../assets/images/menu/supreme_pizza.png");
     case "ham_pineapple": return require("../../assets/images/menu/ham_pineapple.png");

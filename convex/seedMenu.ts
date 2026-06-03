@@ -82,6 +82,27 @@ export const populate = mutation({
       ]
     };
 
+    const icePreference = {
+      name: "Ice Preference",
+      type: "single_select",
+      required: true,
+      options: [
+        { name: "Regular Ice", priceExtra: 0, defaultSelected: true },
+        { name: "Light Ice", priceExtra: 0 },
+        { name: "No Ice", priceExtra: 0 },
+      ],
+    };
+
+    const fountainSize = {
+      name: "Size",
+      type: "single_select",
+      required: true,
+      options: [
+        { name: "Regular", priceExtra: 0, defaultSelected: true },
+        { name: "Large", priceExtra: 0.75 },
+      ],
+    };
+
     // ==========================================
     // 1. APPETIZERS
     // ==========================================
@@ -448,8 +469,75 @@ export const populate = mutation({
       ]
     });
     await ctx.db.insert("products", {
+      name: "Coca-Cola Fountain",
+      description: "Classic Coca-Cola from the fountain. Free refills.",
+      price: 3.50,
+      pointsWorth: 3,
+      categoryId: catMap["Drinks"],
+      image: "coca_cola",
+      isFeatured: true,
+      modifiers: [fountainSize, icePreference],
+    });
+    await ctx.db.insert("products", {
+      name: "Diet Coke Fountain",
+      description: "Diet Coke from the fountain. Free refills.",
+      price: 3.50,
+      pointsWorth: 3,
+      categoryId: catMap["Drinks"],
+      image: "diet_coke",
+      isFeatured: false,
+      modifiers: [fountainSize, icePreference],
+    });
+    await ctx.db.insert("products", {
+      name: "Coke Zero Fountain",
+      description: "Coke Zero Sugar from the fountain. Free refills.",
+      price: 3.50,
+      pointsWorth: 3,
+      categoryId: catMap["Drinks"],
+      image: "coke_zero",
+      isFeatured: false,
+      modifiers: [fountainSize, icePreference],
+    });
+    await ctx.db.insert("products", {
+      name: "Sprite Fountain",
+      description: "Crisp lemon-lime Sprite from the fountain. Free refills.",
+      price: 3.50,
+      pointsWorth: 3,
+      categoryId: catMap["Drinks"],
+      image: "sprite",
+      isFeatured: false,
+      modifiers: [fountainSize, icePreference],
+    });
+    await ctx.db.insert("products", {
+      name: "Coca-Cola Bottle (20oz)",
+      description: "Chilled 20oz bottled Coca-Cola. To-go friendly.",
+      price: 4.50,
+      pointsWorth: 4,
+      categoryId: catMap["Drinks"],
+      image: "bottled_coke",
+      isFeatured: false,
+    });
+    await ctx.db.insert("products", {
+      name: "Diet Coke Bottle (20oz)",
+      description: "Chilled 20oz bottled Diet Coke. To-go friendly.",
+      price: 4.50,
+      pointsWorth: 4,
+      categoryId: catMap["Drinks"],
+      image: "bottled_diet_coke",
+      isFeatured: false,
+    });
+    await ctx.db.insert("products", {
+      name: "Sprite Bottle (20oz)",
+      description: "Chilled 20oz bottled Sprite. To-go friendly.",
+      price: 4.50,
+      pointsWorth: 4,
+      categoryId: catMap["Drinks"],
+      image: "bottled_sprite",
+      isFeatured: false,
+    });
+    await ctx.db.insert("products", {
       name: "Fountain Soda",
-      description: "Coke products. Free refills.",
+      description: "Other fountain flavors — Dr Pepper, Fanta & more. Free refills.",
       price: 3.50,
       pointsWorth: 3,
       categoryId: catMap["Drinks"],
@@ -461,20 +549,15 @@ export const populate = mutation({
           type: "single_select",
           required: true,
           options: [
-            { name: "Coke", priceExtra: 0 },
-            { name: "Diet Coke", priceExtra: 0 },
-            { name: "Sprite", priceExtra: 0 },
-            { name: "Dr Pepper", priceExtra: 0 },
-            { name: "Fanta Orange", priceExtra: 0 }
-          ]
+            { name: "Dr Pepper", priceExtra: 0, defaultSelected: true },
+            { name: "Fanta Orange", priceExtra: 0 },
+            { name: "Barq's Root Beer", priceExtra: 0 },
+            { name: "Mello Yello", priceExtra: 0 },
+          ],
         },
-        {
-          name: "Ice Preference",
-          type: "single_select",
-          required: true,
-          options: [{ name: "Regular Ice", priceExtra: 0, defaultSelected: true }, { name: "Light Ice", priceExtra: 0 }, { name: "No Ice", priceExtra: 0 }]
-        }
-      ]
+        fountainSize,
+        icePreference,
+      ],
     });
 
     return "Seeded Robust Menu with Pre-Selected Ingredients successfully.";

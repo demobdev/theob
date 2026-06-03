@@ -43,6 +43,19 @@ const getImageSource = (imgStr) => {
     case "steak_and_eggs": return require("../../assets/images/menu/steak_and_eggs.png");
     case "chicken_waffles": return require("../../assets/images/menu/chicken_waffles.png");
 
+    // DRINKS
+    case "beer":
+    case "soda":
+    case "cocktail":
+    case "coca_cola":
+    case "diet_coke":
+    case "coke_zero":
+    case "sprite":
+    case "bottled_coke":
+    case "bottled_diet_coke":
+    case "bottled_sprite":
+      return require("../../assets/images/menu/crab_dip.png"); // Placeholder
+
     // NEW MAPPINGS
     case "supreme_pizza": return require("../../assets/images/menu/supreme_pizza.png");
     case "ham_pineapple": return require("../../assets/images/menu/ham_pineapple.png");
