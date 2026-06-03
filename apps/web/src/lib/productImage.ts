@@ -49,10 +49,17 @@ export function resolveProductImageSrc(
   if (image.startsWith("http") || image.startsWith("/")) return image;
 
   const key = image.replace(/\.(png|jpe?g|webp)$/i, "");
-  if (MENU_IMAGE_KEYS.has(key)) {
-    return `/images/food/${key}.png`;
+  const aliases: Record<string, string> = {
+    crab_cake: "crabcake_sandwich",
+  };
+  const resolved = aliases[key] ?? key;
+  if (MENU_IMAGE_KEYS.has(resolved) || aliases[key]) {
+    return `/images/food/${resolved}.png`;
   }
-  return `/images/food/${key}.png`;
+  if (isDrinkImageKey(resolved) || resolved === "logo_b") {
+    return "/loading-icon.png";
+  }
+  return `/images/food/${resolved}.png`;
 }
 
 export function productImageAspect(
