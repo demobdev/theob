@@ -49,9 +49,10 @@ const OnboardingScreen = ({ navigation }) => {
       subtitle: "JOIN THE ROSTER",
       description:
         "Earn points on every order. Stack them to earn rewards, starting with a FREE order of our signature OWNER'S WINGS after your first purchase.",
-      image: require("../../assets/images/menu/jumbo_wings.png"),
+      image: require("../../assets/images/hero-bg.png"),
       color: "#D4AF37",
-      isMacro: true,
+      isHeroBar: true,
+      overlayOpacity: 0.55,
     },
     {
       id: 2,
@@ -67,9 +68,9 @@ const OnboardingScreen = ({ navigation }) => {
       cta: "Enable Notifications",
       footerText:
         "BE THE FIRST TO KNOW\nGet game-day deals, secret menu items and special surprises.",
-      image: require("../../assets/images/ob-collage.png"),
+      image: require("../../assets/images/hero-bg.png"),
       color: "#D4AF37",
-      overlayOpacity: 0.95,
+      overlayOpacity: 0.65,
     },
     {
       id: 3,
@@ -173,11 +174,8 @@ const OnboardingScreen = ({ navigation }) => {
               <ImageBackground
                 source={slide.image}
                 style={styles.background}
-                imageStyle={
-                  slide.isMacro
-                    ? { transform: [{ scale: 1.2 }], opacity: 0.9 }
-                    : { opacity: 0.9 }
-                }
+                resizeMode="cover"
+                imageStyle={slide.isHeroBar ? undefined : { opacity: 0.9 }}
               >
                 <View
                   style={[

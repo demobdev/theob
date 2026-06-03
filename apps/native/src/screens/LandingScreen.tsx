@@ -120,7 +120,7 @@ const LandingScreen = ({ navigation }) => {
   const carouselItems = [
     { type: "food", label: "LOCAL FAVORITE", image: require("../../assets/images/menu/jumbo_wings.png") },
     { type: "cinematic", label: "", image: require("../../assets/images/menu/meat_lover_pizza.png") },
-    { type: "brand", label: "", image: require("../../assets/images/hero.png") },
+    { type: "brand", label: "", image: require("../../assets/images/hero-bg.png") },
   ];
 
   useEffect(() => {
