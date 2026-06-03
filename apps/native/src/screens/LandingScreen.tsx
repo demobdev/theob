@@ -388,20 +388,6 @@ const LandingScreen = ({ navigation }) => {
           </ScrollView>
         </View>
 
-        {/* CATERING BANNER */}
-        <View style={styles.section}>
-            <View style={styles.cateringCard}>
-                <View style={styles.cateringOverlay}>
-                    <View style={styles.cateringContent}>
-                        <Text style={styles.cateringTitle}>CATERING</Text>
-                        <Text style={styles.cateringSubtitle}>CRAFTED FOR YOUR TEAM</Text>
-                        <TouchableOpacity style={styles.cateringBtn}><Text style={styles.cateringBtnText}>LEARN MORE</Text></TouchableOpacity>
-                    </View>
-                    <Image source={require("../../assets/images/menu/philly.png")} style={styles.cateringInsetImg} />
-                </View>
-            </View>
-        </View>
-
         {/* BOTTOM CATEGORIES */}
         <View style={styles.sectionBottom}>
           <Text style={styles.sectionTitle}>CATEGORIES</Text>
@@ -942,59 +928,6 @@ const styles = StyleSheet.create({
     fontFamily: "MRegular",
     fontSize: 9,
     marginTop: 10,
-  },
-  cateringImage: {
-    width: "100%",
-    height: 180,
-  },
-  cateringCard: {
-    height: 160,
-    marginHorizontal: 20,
-    borderRadius: 15,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
-  },
-  cateringOverlay: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    padding: 20,
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  cateringContent: {
-    flex: 1,
-  },
-  cateringInsetImg: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: "#FFA500",
-  },
-  cateringTitle: {
-    color: "#FFA500",
-    fontSize: RFValue(24),
-    fontFamily: "MBold",
-    letterSpacing: 2,
-  },
-  cateringSubtitle: {
-    color: "#FFA500",
-    fontSize: RFValue(12),
-    fontFamily: "MBold",
-  },
-  cateringBtn: {
-    backgroundColor: "#FFA500", // NOW GOLD
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 25,
-    marginTop: 15,
-  },
-  cateringBtnText: {
-    color: "#000", // BLACK ON GOLD
-    fontFamily: "MBold",
-    fontSize: 9,
   },
   sectionBottom: {
     paddingHorizontal: 20,
