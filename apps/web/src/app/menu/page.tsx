@@ -67,8 +67,8 @@ export default function MenuPage() {
       </div>
 
       {/* Compact hero — atmosphere + food mosaic */}
-      <section className="relative border-b border-[#D4AF37]/15 overflow-hidden">
-        <div className="grid grid-cols-12 h-[180px] sm:h-[220px] md:h-[260px]">
+      <section className="relative border-b border-[#D4AF37]/15 overflow-hidden mb-6 md:mb-8">
+        <div className="grid grid-cols-12 h-[160px] sm:h-[200px] md:h-[240px]">
           <div className="col-span-4 md:col-span-3 relative">
             <Image
               src="/hero.png"
@@ -103,8 +103,8 @@ export default function MenuPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/50 to-transparent pointer-events-none" />
 
         <div className="absolute inset-x-0 bottom-0 z-10">
-          <div className="container mx-auto px-4 pb-4 md:pb-5 pt-16 md:pt-20">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div className="container mx-auto px-4 pb-5 md:pb-6 pt-12 md:pt-16">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-5">
               <div className="min-w-0">
                 <div className="h-px w-12 bg-[#D4AF37] mb-2.5" />
                 <h1 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight leading-none">
@@ -120,7 +120,7 @@ export default function MenuPage() {
               </div>
 
               {categories && categories.length > 0 && (
-                <div className="flex gap-2 overflow-x-auto no-scrollbar md:max-w-[55%] pb-0.5">
+                <div className="flex gap-2 overflow-x-auto no-scrollbar md:max-w-[55%] pb-1 mb-1 md:mb-0">
                   {categories.map((cat) => (
                     <button
                       key={cat._id}
@@ -162,7 +162,7 @@ export default function MenuPage() {
 
       {/* Main Layout */}
       <section className="noise-overlay pb-20">
-        <div className="container mx-auto px-4 flex flex-col lg:flex-row gap-12 relative z-30">
+        <div className="container mx-auto px-4 pt-4 md:pt-6 flex flex-col lg:flex-row gap-6 lg:gap-8 relative z-30">
           
           {/* Sidebar Navigation */}
           <aside className="w-full lg:w-72 shrink-0">
