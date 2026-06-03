@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import ObAlertModal, { type ObAlertConfig } from "../components/ObAlertModal";
 
 export type ShowObAlert = (config: ObAlertConfig) => void;
