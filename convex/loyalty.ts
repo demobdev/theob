@@ -134,6 +134,14 @@ export const submitReceipt = mutation({
   },
 });
 
+function normalizePhoneDigits(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 11 && digits.startsWith("1")) {
+    return digits.slice(1);
+  }
+  return digits;
+}
+
 // Sync full user profile details (called from Account or Login)
 export const syncUserProfile = mutation({
   args: {
@@ -147,20 +155,42 @@ export const syncUserProfile = mutation({
     const userId = await getUserId(ctx);
     if (!userId) return { success: false, error: "NOT_AUTHENTICATED" };
 
-    const profile = await ctx.db
+    let profile = await ctx.db
       .query("user_profiles")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
 
-    if (!profile) throw new Error("Profile not found");
+    if (!profile) {
+      const profileId = await ctx.db.insert("user_profiles", {
+        userId,
+        points: 0,
+        lifetimePoints: 0,
+        lastPointsUpdate: new Date().toISOString(),
+      });
+      profile = await ctx.db.get(profileId);
+      if (!profile) throw new Error("Failed to create profile");
+    }
 
-    await ctx.db.patch(profile._id, {
-      phone: args.phone,
-      birthMonth: args.birthMonth,
-      birthDay: args.birthDay,
-      smsConsent: args.smsConsent,
-      marketingOptIn: args.marketingOptIn,
-    });
+    const patch: {
+      phone?: string;
+      birthMonth?: string;
+      birthDay?: string;
+      smsConsent?: boolean;
+      marketingOptIn?: boolean;
+    } = {};
+
+    if (args.phone !== undefined) {
+      const digits = normalizePhoneDigits(args.phone);
+      patch.phone = digits.length > 0 ? digits : undefined;
+    }
+    if (args.birthMonth !== undefined) patch.birthMonth = args.birthMonth;
+    if (args.birthDay !== undefined) patch.birthDay = args.birthDay;
+    if (args.smsConsent !== undefined) patch.smsConsent = args.smsConsent;
+    if (args.marketingOptIn !== undefined) patch.marketingOptIn = args.marketingOptIn;
+
+    if (Object.keys(patch).length > 0) {
+      await ctx.db.patch(profile._id, patch);
+    }
 
     return { success: true };
   },

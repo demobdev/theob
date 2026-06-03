@@ -17,9 +17,14 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { useUser, useAuth } from "@clerk/clerk-expo";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import {
+  formatUSPhoneDisplay,
+  formatUSPhoneInput,
+  normalizePhoneDigits,
+} from "../utils/phoneFormat";
 
 // Moving these OUTSIDE the component to prevent re-mounting and losing focus
-const InfoField = ({ label, value, onChangeText, showChange = false, editable = true, isEditing = false }) => (
+const InfoField = ({ label, value, onChangeText, showChange = false, editable = true, isEditing = false, keyboardType, maxLength }) => (
   <View style={styles.infoField}>
     <Text style={styles.fieldLabel}>{label.toUpperCase()}</Text>
     {isEditing && editable ? (
@@ -29,6 +34,8 @@ const InfoField = ({ label, value, onChangeText, showChange = false, editable = 
         onChangeText={onChangeText}
         placeholder={`Enter ${label}`}
         placeholderTextColor="#444"
+        keyboardType={keyboardType}
+        maxLength={maxLength}
       />
     ) : (
       <Text style={styles.fieldValue}>{value || "Not set"}</Text>
@@ -73,18 +80,20 @@ const AccountScreen = ({ navigation }) => {
       setFirstName(user.firstName || "");
       setLastName(user.lastName || "");
       const metadata = user.unsafeMetadata as any;
-      setPhone(metadata?.phone || user.primaryPhoneNumber?.phoneNumber || "");
-      setBirthMonth(metadata?.birthMonth || "February");
-      setBirthDay(metadata?.birthDay || "13");
+      const rawPhone =
+        profile?.phone ||
+        metadata?.phone ||
+        user.primaryPhoneNumber?.phoneNumber ||
+        "";
+      setPhone(formatUSPhoneDisplay(rawPhone));
+      setBirthMonth(profile?.birthMonth || metadata?.birthMonth || "February");
+      setBirthDay(profile?.birthDay || metadata?.birthDay || "13");
+      if (profile) {
+        setSmsConsent(profile.smsConsent || false);
+        setMarketingOptIn(profile.marketingOptIn || false);
+      }
     }
-  }, [isLoaded, user, isEditing]);
-
-  useEffect(() => {
-    if (profile && !isEditing) {
-      setSmsConsent(profile.smsConsent || false);
-      setMarketingOptIn(profile.marketingOptIn || false);
-    }
-  }, [profile, isEditing]);
+  }, [isLoaded, user, profile, isEditing]);
 
   const handleSignOut = () => {
     Alert.alert(
@@ -119,7 +128,7 @@ const AccountScreen = ({ navigation }) => {
     }
 
     try {
-      const safePhone = phone ? phone.trim() : "";
+      const phoneDigits = phone ? normalizePhoneDigits(phone) : "";
       
       await user.update({
         firstName: firstName.trim(),
@@ -128,13 +137,13 @@ const AccountScreen = ({ navigation }) => {
           ...(user.unsafeMetadata as any),
           birthMonth,
           birthDay,
-          phone: safePhone,
+          phone: phoneDigits,
         }
       });
       
       // Sync to Convex
       const result = await syncProfile({
-        phone: safePhone,
+        phone: phoneDigits,
         birthMonth,
         birthDay,
         smsConsent,
@@ -152,7 +161,9 @@ const AccountScreen = ({ navigation }) => {
       setIsEditing(false);
       Alert.alert("Success", "Profile updated successfully!");
     } catch (err) {
-      Alert.alert("Error", "Failed to update profile. Please try again.");
+      const message =
+        err instanceof Error ? err.message : "Failed to update profile. Please try again.";
+      Alert.alert("Error", message);
       console.error(err);
     }
   };
@@ -183,9 +194,14 @@ const AccountScreen = ({ navigation }) => {
       setFirstName(user.firstName || "");
       setLastName(user.lastName || "");
       const metadata = user.unsafeMetadata as any;
-      setPhone(metadata?.phone || user.primaryPhoneNumber?.phoneNumber || "");
-      setBirthMonth(metadata?.birthMonth || "February");
-      setBirthDay(metadata?.birthDay || "13");
+      const rawPhone =
+        profile?.phone ||
+        metadata?.phone ||
+        user.primaryPhoneNumber?.phoneNumber ||
+        "";
+      setPhone(formatUSPhoneDisplay(rawPhone));
+      setBirthMonth(profile?.birthMonth || metadata?.birthMonth || "February");
+      setBirthDay(profile?.birthDay || metadata?.birthDay || "13");
       setSmsConsent(profile?.smsConsent || false);
       setMarketingOptIn(profile?.marketingOptIn || false);
     }
@@ -242,9 +258,11 @@ const AccountScreen = ({ navigation }) => {
            <InfoField 
              label="Phone" 
              value={phone} 
-             onChangeText={setPhone}
+             onChangeText={(text) => setPhone(formatUSPhoneInput(text))}
              editable={true}
              isEditing={isEditing}
+             keyboardType="phone-pad"
+             maxLength={14}
            />
            
            <View style={{ flexDirection: "row", gap: 20 }}>
