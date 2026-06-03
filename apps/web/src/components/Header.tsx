@@ -32,6 +32,7 @@ export default function Header() {
   const { signOut } = useClerk();
   const pathname = usePathname();
   const { items, fulfillment, location, setFulfillmentModalOpen } = useCart();
+  const isMenuPage = pathname === "/menu";
 
   return (
     <>
@@ -57,8 +58,12 @@ export default function Header() {
 
           <div className="hidden sm:flex gap-4 items-center">
             <Link href="/rewards" className="hover:opacity-70 transition-opacity">Get $5 Off Your First Order</Link>
-            <span className="opacity-30">|</span>
-            <Link href="/menu" className="hover:opacity-70 transition-opacity italic">Order Online</Link>
+            {!isMenuPage && (
+              <>
+                <span className="opacity-30">|</span>
+                <Link href="/menu" className="hover:opacity-70 transition-opacity italic">Order Online</Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -139,11 +144,13 @@ export default function Header() {
                   
                   {user ? (
                     <div className="flex items-center gap-6">
-                      <Link href="/menu">
-                        <button className="gold-gradient text-black font-black uppercase tracking-widest text-[10px] px-6 py-3 rounded-xl hover:scale-105 transition-all gold-glow">
-                          Order Now
-                        </button>
-                      </Link>
+                      {!isMenuPage && (
+                        <Link href="/menu">
+                          <button className="gold-gradient text-black font-black uppercase tracking-widest text-[10px] px-6 py-3 rounded-xl hover:scale-105 transition-all gold-glow">
+                            Order Now
+                          </button>
+                        </Link>
+                      )}
                       <UserNav
                         image={user?.imageUrl}
                         name={user?.fullName!}
@@ -155,11 +162,13 @@ export default function Header() {
                       <Link href="/sign-in" className="text-white/70 text-[10px] font-black uppercase tracking-[0.2em] hover:text-[#D4AF37] transition-all">
                         Sign In
                       </Link>
-                      <Link href="/menu">
-                        <button className="gold-gradient text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-xl hover:brightness-110 transition-all gold-glow">
-                          Order Now
-                        </button>
-                      </Link>
+                      {!isMenuPage && (
+                        <Link href="/menu">
+                          <button className="gold-gradient text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-xl hover:brightness-110 transition-all gold-glow">
+                            Order Now
+                          </button>
+                        </Link>
+                      )}
                     </>
                   )}
                 </div>
@@ -253,11 +262,13 @@ export default function Header() {
                       Sign Out
                     </DisclosureButton>
                   )}
-                  <Link href="/menu">
-                    <DisclosureButton className="w-full py-5 text-center text-black gold-gradient font-black uppercase tracking-widest rounded-2xl gold-glow shadow-xl">
-                      Order Now
-                    </DisclosureButton>
-                  </Link>
+                  {!isMenuPage && (
+                    <Link href="/menu">
+                      <DisclosureButton className="w-full py-5 text-center text-black gold-gradient font-black uppercase tracking-widest rounded-2xl gold-glow shadow-xl">
+                        Order Now
+                      </DisclosureButton>
+                    </Link>
+                  )}
                 </div>
               </div>
             </DisclosurePanel>

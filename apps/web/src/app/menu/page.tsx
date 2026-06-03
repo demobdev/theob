@@ -11,7 +11,6 @@ import { Search, Download, ShoppingBag, ChevronRight, Menu as MenuIcon } from "l
 import ProductCard from "@/components/menu/ProductCard";
 import ProductDetailModal from "@/components/menu/ProductDetailModal";
 import CartDrawer from "@/components/menu/CartDrawer";
-import LocationCard from "@/components/menu/LocationCard";
 import { useCart } from "@/hooks/useCart";
 import { Doc } from "../../../../../convex/_generated/dataModel";
 import { categoryHeroImage } from "@/lib/categoryHero";
@@ -19,7 +18,7 @@ import { categoryHeroImage } from "@/lib/categoryHero";
 export default function MenuPage() {
   const categories = useQuery(api.products.getCategories);
   const products = useQuery(api.products.getAllProducts);
-  const { items, fulfillment, location, setFulfillmentModalOpen } = useCart();
+  const { items, fulfillment, setFulfillmentModalOpen } = useCart();
   
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,13 +57,6 @@ export default function MenuPage() {
   return (
     <main className="bg-[#0A0A0A] min-h-screen">
       <Header />
-      
-      {/* Dynamic Fulfillment Banner (Sonny's Style) */}
-      <div className="bg-[#D4AF37] py-3 text-center">
-         <p className="text-black text-[10px] md:text-xs font-black uppercase tracking-[0.2em]">
-            You are ordering <span className="underline decoration-black/30 underline-offset-4">{fulfillment === "delivery" ? "Delivery" : fulfillment === "curbside" ? "Curbside Pickup" : "In-Store Pickup"}</span> at <span className="font-bold underline decoration-black/30 underline-offset-4">{location}</span>
-         </p>
-      </div>
 
       {/* Compact hero — atmosphere + food mosaic */}
       <section className="relative border-b border-[#D4AF37]/15 overflow-hidden mb-6 md:mb-8">
@@ -104,23 +96,17 @@ export default function MenuPage() {
 
         <div className="absolute inset-x-0 bottom-0 z-10">
           <div className="container mx-auto px-4 pb-5 md:pb-6 pt-12 md:pt-16">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-5">
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-5">
               <div className="min-w-0">
                 <div className="h-px w-12 bg-[#D4AF37] mb-2.5" />
                 <h1 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight leading-none">
                   Menu
                 </h1>
-                <button
-                  type="button"
-                  onClick={() => setFulfillmentModalOpen(true)}
-                  className="mt-2 text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.2em] hover:underline underline-offset-4 text-left"
-                >
-                  Order for {fulfillment === "delivery" ? "delivery" : fulfillment === "curbside" ? "curbside pickup" : "pickup"} · {location}
-                </button>
               </div>
 
+              {/* Category pills — mobile/tablet only; desktop uses sidebar */}
               {categories && categories.length > 0 && (
-                <div className="flex gap-2 overflow-x-auto no-scrollbar md:max-w-[55%] pb-1 mb-1 md:mb-0">
+                <div className="lg:hidden flex gap-2 overflow-x-auto no-scrollbar max-w-full pb-1">
                   {categories.map((cat) => (
                     <button
                       key={cat._id}
@@ -142,13 +128,6 @@ export default function MenuPage() {
         </div>
 
         <div className="absolute top-3 right-3 md:top-4 md:right-4 z-20 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setFulfillmentModalOpen(true)}
-            className="hidden md:block max-w-xs cursor-pointer text-left"
-          >
-            <LocationCard />
-          </button>
           <a
             href="/menu.pdf"
             download
@@ -164,39 +143,31 @@ export default function MenuPage() {
       <section className="noise-overlay pb-20">
         <div className="container mx-auto px-4 pt-4 md:pt-6 flex flex-col lg:flex-row gap-6 lg:gap-8 relative z-30">
           
-          {/* Sidebar Navigation */}
+          {/* Sidebar — search (+ categories on desktop only) */}
           <aside className="w-full lg:w-72 shrink-0">
              <div className="sticky top-28 space-y-6">
-                <div className="premium-card p-3 sm:p-4 lg:p-6 border-white/10 bg-black/80 backdrop-blur-xl">
-                   <h3 className="text-white font-black uppercase tracking-widest text-[10px] lg:text-xs mb-2 lg:mb-6 flex items-center gap-2 px-1">
-                     <MenuIcon size={12} className="text-[#D4AF37] lg:w-3.5 lg:h-3.5" />
+                {/* Category nav — desktop sidebar only */}
+                <div className="hidden lg:block premium-card p-6 border-white/10 bg-black/80 backdrop-blur-xl">
+                   <h3 className="text-white font-black uppercase tracking-widest text-xs mb-6 flex items-center gap-2 px-1">
+                     <MenuIcon size={14} className="text-[#D4AF37]" />
                      Categories
                    </h3>
-                   <div className="relative lg:static -mx-1 lg:mx-0">
-                     <div
-                       aria-hidden
-                       className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-gradient-to-r from-[#121212] to-transparent lg:hidden"
-                     />
-                     <div
-                       aria-hidden
-                       className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-[#121212] to-transparent lg:hidden"
-                     />
-                     <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar gap-1.5 lg:gap-1 px-1 lg:px-0 pb-0.5 lg:pb-0">
+                   <div className="flex flex-col gap-1">
                         {categories?.map((cat) => (
                           <button
                             key={cat._id}
+                            type="button"
                             onClick={() => scrollToCategory(cat._id)}
-                            className={`shrink-0 flex items-center justify-between px-3 py-2 lg:px-4 lg:py-3 rounded-lg lg:rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap lg:whitespace-normal text-left ${
+                            className={`flex items-center justify-between px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-left ${
                               activeCategory === cat._id 
                                 ? "bg-[#D4AF37] text-black" 
                                 : "text-gray-400 hover:text-white hover:bg-white/5"
                             }`}
                           >
                             {cat.name}
-                            <ChevronRight size={12} className={`hidden lg:block ${activeCategory === cat._id ? "opacity-100" : "opacity-0"}`} />
+                            <ChevronRight size={12} className={activeCategory === cat._id ? "opacity-100" : "opacity-0"} />
                           </button>
                         ))}
-                     </div>
                    </div>
                 </div>
 
