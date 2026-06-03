@@ -101,9 +101,7 @@ export default function AppDownloadPromoModal() {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="relative isolate w-full max-w-md transform overflow-hidden rounded-[28px] border border-[#D4AF37]/20 bg-[#0A0A0A] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.9)] transition-all noise-overlay">
-                <div className="absolute inset-0 leather-bg opacity-60 pointer-events-none" />
-
+              <Dialog.Panel className="relative isolate w-full max-w-md transform overflow-hidden rounded-[28px] border border-[#D4AF37]/20 bg-[#1a1a1a] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.9)] transition-all">
                 <button
                   type="button"
                   onClick={handleDismiss}
