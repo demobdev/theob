@@ -36,24 +36,53 @@ function sortByStart(a: TonightGame, b: TonightGame) {
   return new Date(a.startsAt ?? 0).getTime() - new Date(b.startsAt ?? 0).getTime();
 }
 
+function sortByStartDesc(a: TonightGame, b: TonightGame) {
+  return sortByStart(b, a);
+}
+
+/** Matches Convex GameStatus "closed" plus legacy/raw aliases from feeds. */
+export function isTerminalGameStatus(status?: string): boolean {
+  const s = (status ?? "").toLowerCase();
+  return (
+    s === "closed" ||
+    s === "final" ||
+    s === "completed" ||
+    s === "complete"
+  );
+}
+
+function isActiveTonightGame(game: TonightGame): boolean {
+  const s = (game.status ?? "").toLowerCase();
+  if (isTerminalGameStatus(s)) return false;
+  if (s === "cancelled" || s === "postponed") return false;
+  return true;
+}
+
 export function pickTonightHighlight(games: TonightGame[]): TonightGame | null {
   if (!games.length) return null;
 
-  const live = games.filter((g) => g.status === "inprogress");
+  const active = games.filter(isActiveTonightGame);
+
+  const live = active.filter((g) => g.status === "inprogress");
   const liveUfc = live.filter((g) => g.sport === "UFC").sort(sortByStart)[0];
   if (liveUfc) return liveUfc;
   if (live.length) return [...live].sort(sortByStart)[0];
 
-  const scheduled = games.filter(
-    (g) => g.status !== "closed" && g.status !== "inprogress",
-  );
+  const scheduled = active.filter((g) => g.status !== "inprogress");
   const ufc = scheduled.filter((g) => g.sport === "UFC").sort(sortByStart)[0];
   if (ufc) return ufc;
 
   const prime = scheduled.filter((g) => g.isPrimeTime).sort(sortByStart)[0];
   if (prime) return prime;
 
-  return scheduled.sort(sortByStart)[0] ?? null;
+  const next = scheduled.sort(sortByStart)[0];
+  if (next) return next;
+
+  const finals = games.filter((g) => isTerminalGameStatus(g.status));
+  if (!finals.length) return null;
+
+  const primeFinal = finals.filter((g) => g.isPrimeTime).sort(sortByStartDesc)[0];
+  return primeFinal ?? finals.sort(sortByStartDesc)[0];
 }
 
 function matchupLabel(game: TonightGame): string {
@@ -80,12 +109,15 @@ export default function TonightAtTheOB({ games, onViewSchedule }: Props) {
   if (!highlight) return null;
 
   const isLive = highlight.status === "inprogress";
+  const isFinal = isTerminalGameStatus(highlight.status);
   const isUfc = highlight.sport === "UFC";
   const timeLabel = isLive
     ? "LIVE NOW"
-    : highlight.startsAt
-      ? formatVenueTime(highlight.startsAt)
-      : "TONIGHT";
+    : isFinal
+      ? "FINAL"
+      : highlight.startsAt
+        ? formatVenueTime(highlight.startsAt)
+        : "TONIGHT";
 
   return (
     <View style={styles.wrap}>
@@ -108,6 +140,11 @@ export default function TonightAtTheOB({ games, onViewSchedule }: Props) {
               <View style={styles.liveBadge}>
                 <View style={styles.liveDot} />
                 <Text style={styles.liveBadgeText}>LIVE</Text>
+              </View>
+            )}
+            {isFinal && !isLive && (
+              <View style={styles.finalBadge}>
+                <Text style={styles.finalBadgeText}>FINAL</Text>
               </View>
             )}
             <Text style={styles.sportPill}>{highlight.sport ?? "GAME"}</Text>
@@ -204,6 +241,18 @@ const styles = StyleSheet.create({
   },
   liveBadgeText: {
     color: "#4ade80",
+    fontFamily: "MBold",
+    fontSize: 8,
+    letterSpacing: 1,
+  },
+  finalBadge: {
+    backgroundColor: "rgba(136, 136, 136, 0.2)",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  finalBadgeText: {
+    color: "#888",
     fontFamily: "MBold",
     fontSize: 8,
     letterSpacing: 1,
