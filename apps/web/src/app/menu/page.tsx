@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/home/Footer";
 import Image from "next/image";
+import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { Search, Download, ShoppingBag, ChevronRight, Menu as MenuIcon } from "lucide-react";
@@ -65,61 +66,103 @@ export default function MenuPage() {
          </p>
       </div>
 
-      {/* Premium Hero Section */}
-      <section className="relative h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <Image 
-            src="/hero.png" 
-            fill 
-            className="object-cover opacity-60 scale-105" 
-            alt="The Owner's Box Menu Hero" 
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/40 to-transparent" />
+      {/* Compact hero — atmosphere + food mosaic */}
+      <section className="relative border-b border-[#D4AF37]/15 overflow-hidden">
+        <div className="grid grid-cols-12 h-[180px] sm:h-[220px] md:h-[260px]">
+          <div className="col-span-4 md:col-span-3 relative">
+            <Image
+              src="/hero.png"
+              fill
+              className="object-cover"
+              alt="The Owner's Box dining room"
+              priority
+              sizes="(max-width: 768px) 33vw, 25vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#0A0A0A]/80" />
+          </div>
+          <div className="col-span-8 md:col-span-9 grid grid-cols-3">
+            {[
+              { src: "/images/menu/jumbo_wings.png", alt: "Jumbo wings" },
+              { src: "/images/menu/rib_eye.png", alt: "Rib eye steak" },
+              { src: "/images/menu/meat_lover_pizza.png", alt: "Meat lover pizza" },
+            ].map((photo) => (
+              <div key={photo.src} className="relative overflow-hidden">
+                <Image
+                  src={photo.src}
+                  fill
+                  className="object-cover hover:scale-105 transition-transform duration-700"
+                  alt={photo.alt}
+                  sizes="(max-width: 768px) 22vw, 25vw"
+                />
+                <div className="absolute inset-0 bg-black/25" />
+              </div>
+            ))}
+          </div>
         </div>
-        
-        <div className="relative z-10 text-center px-4">
-           <div className="inline-block p-12 md:p-20 border border-white/20 backdrop-blur-xl rounded-[40px] relative overflow-hidden group">
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors" />
-              <div className="relative z-10">
-                <span className="text-[#D4AF37] font-black uppercase tracking-[0.4em] text-[10px] md:text-xs mb-4 block">
-                   Real Smoke • Real Craft
-                </span>
-                <h1 className="text-7xl md:text-9xl font-black text-white uppercase tracking-tighter leading-none mb-6">
+
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/50 to-transparent pointer-events-none" />
+
+        <div className="absolute inset-x-0 bottom-0 z-10">
+          <div className="container mx-auto px-4 pb-4 md:pb-5 pt-16 md:pt-20">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+              <div className="min-w-0">
+                <div className="h-px w-12 bg-[#D4AF37] mb-2.5" />
+                <h1 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight leading-none">
                   Menu
                 </h1>
-                <p className="text-gray-300 font-bold uppercase tracking-widest text-[10px] md:text-xs">
-                  The Lineup Built for Regulars
-                </p>
+                <button
+                  type="button"
+                  onClick={() => setFulfillmentModalOpen(true)}
+                  className="mt-2 text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.2em] hover:underline underline-offset-4 text-left"
+                >
+                  Order for {fulfillment === "delivery" ? "delivery" : fulfillment === "curbside" ? "curbside pickup" : "pickup"} · {location}
+                </button>
               </div>
-           </div>
+
+              {categories && categories.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto no-scrollbar md:max-w-[55%] pb-0.5">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat._id}
+                      type="button"
+                      onClick={() => scrollToCategory(cat._id)}
+                      className={`shrink-0 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all ${
+                        activeCategory === cat._id
+                          ? "bg-[#D4AF37] text-black border-[#D4AF37]"
+                          : "text-white/70 border-white/15 hover:border-[#D4AF37]/40 hover:text-white"
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Curbside Indicator - Top Left */}
-        <button
-          type="button"
-          onClick={() => setFulfillmentModalOpen(true)}
-          className="absolute top-8 left-8 z-20 hidden md:block max-w-sm cursor-pointer text-left"
-        >
-          <LocationCard />
-        </button>
-
-        {/* Download Menu Button - Top Right */}
-        <div className="absolute top-8 right-8 z-20">
-           <a 
-            href="/menu.pdf" 
-            download 
-            className="flex items-center gap-3 px-6 py-3 bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl text-white transition-all group"
-           >
-              <Download size={18} className="text-[#D4AF37] group-hover:scale-110 transition-transform" />
-              <span className="font-black uppercase tracking-widest text-[10px]">Download PDF</span>
-           </a>
+        <div className="absolute top-3 right-3 md:top-4 md:right-4 z-20 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setFulfillmentModalOpen(true)}
+            className="hidden md:block max-w-xs cursor-pointer text-left"
+          >
+            <LocationCard />
+          </button>
+          <a
+            href="/menu.pdf"
+            download
+            className="flex items-center gap-2 px-3 py-2 bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/10 rounded-xl text-white transition-all"
+          >
+            <Download size={14} className="text-[#D4AF37]" />
+            <span className="font-black uppercase tracking-widest text-[9px] hidden sm:inline">PDF</span>
+          </a>
         </div>
       </section>
 
       {/* Main Layout */}
       <section className="noise-overlay pb-20">
-        <div className="container mx-auto px-4 flex flex-col lg:flex-row gap-12 relative -mt-20 z-30">
+        <div className="container mx-auto px-4 flex flex-col lg:flex-row gap-12 relative z-30">
           
           {/* Sidebar Navigation */}
           <aside className="w-full lg:w-72 shrink-0">
@@ -168,24 +211,34 @@ export default function MenuPage() {
                   />
                 </div>
                 
-                {/* Promo Banner */}
-                <div className="premium-card p-6 border-[#D4AF37]/20 bg-[#D4AF37]/5">
-                   <div className="h-8 w-8 rounded-full bg-[#D4AF37] flex items-center justify-center text-black mb-4 shadow-[0_0_15px_rgba(212,175,55,0.3)]">
-                      <span className="font-black text-[10px]">$5</span>
-                   </div>
-                   <h4 className="text-white font-black uppercase tracking-tight text-xs mb-2">Join the Roster</h4>
-                   <p className="text-gray-500 text-[10px] font-medium uppercase tracking-widest leading-relaxed mb-4">
-                     Sign up now and get $5 off your next order over $25.
-                   </p>
-                   <button className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.2em] hover:underline">
-                     Learn More
-                   </button>
-                </div>
+                {/* Roster promo — desktop sidebar only, subtle */}
+                <Link
+                  href="/rewards"
+                  className="hidden lg:flex items-center gap-3 px-4 py-3 rounded-xl border border-[#D4AF37]/15 hover:border-[#D4AF37]/30 transition-colors group"
+                >
+                  <span className="shrink-0 h-7 w-7 rounded-full bg-[#D4AF37]/15 flex items-center justify-center text-[#D4AF37] font-black text-[9px]">
+                    $5
+                  </span>
+                  <span className="text-gray-500 text-[9px] font-black uppercase tracking-widest group-hover:text-[#D4AF37] transition-colors">
+                    Join the Roster
+                  </span>
+                  <ChevronRight size={12} className="ml-auto text-gray-600 group-hover:text-[#D4AF37] transition-colors" />
+                </Link>
              </div>
           </aside>
 
           {/* Product Feed */}
           <div className="flex-1 space-y-24">
+             <Link
+               href="/rewards"
+               className="lg:hidden flex items-center justify-between gap-3 px-4 py-3 mb-2 rounded-xl border border-[#D4AF37]/15 bg-[#D4AF37]/5 hover:border-[#D4AF37]/30 transition-colors"
+             >
+               <span className="text-[10px] font-black uppercase tracking-widest text-white/80">
+                 Join the Roster — $5 off orders $25+
+               </span>
+               <ChevronRight size={14} className="shrink-0 text-[#D4AF37]" />
+             </Link>
+
              {productsByCategory?.map((category) => (
                 <div 
                   key={category._id} 

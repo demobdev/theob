@@ -4,13 +4,14 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import Logo from "./common/Logo";
 import Link from "next/link";
-import { useUser } from "@clerk/clerk-react";
+import { useClerk, useUser } from "@clerk/clerk-react";
 import { UserNav } from "./common/UserNav";
 import { usePathname } from "next/navigation";
 import { Fragment } from "react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
 import { ShoppingBag } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "./common/avatar";
 
 const navigation = [
   { name: "Menu", href: "/menu" },
@@ -28,6 +29,7 @@ const moreLinks = [
 
 export default function Header() {
   const { user } = useUser();
+  const { signOut } = useClerk();
   const pathname = usePathname();
   const { items, fulfillment, location, setFulfillmentModalOpen } = useCart();
 
@@ -124,8 +126,8 @@ export default function Header() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="hidden sm:flex items-center gap-6">
+                {/* Action Buttons — desktop only (lg+) */}
+                <div className="hidden lg:flex items-center gap-6">
                   {items.length > 0 && (
                     <Link href="/menu" className="relative text-white hover:text-[#D4AF37] transition-colors">
                        <ShoppingBag size={20} />
@@ -176,9 +178,44 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Mobile Menu */}
+            {/* Mobile Menu — order, account, cart + nav links */}
             <DisclosurePanel className="lg:hidden bg-[#0A0A0A] border-b border-white/10">
               <div className="space-y-1 px-4 pb-10 pt-4">
+                {user && (
+                  <div className="flex items-center gap-4 pb-4 mb-2 border-b border-white/5">
+                    <Avatar className="h-11 w-11">
+                      <AvatarImage src={user.imageUrl} alt={user.fullName ?? "Account"} />
+                      <AvatarFallback>
+                        <img src="/images/profile.png" alt={user.fullName ?? "Account"} />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-white font-black uppercase tracking-tight text-sm truncate">
+                        {user.fullName}
+                      </p>
+                      <p className="text-gray-500 text-[10px] truncate">
+                        {user.primaryEmailAddress?.emailAddress}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {items.length > 0 && (
+                  <DisclosureButton
+                    as={Link}
+                    href="/menu"
+                    className="flex items-center justify-between py-4 px-1 text-white font-black uppercase tracking-tight border-b border-white/5 mb-2"
+                  >
+                    <span className="flex items-center gap-3">
+                      <ShoppingBag size={20} className="text-[#D4AF37]" />
+                      Cart
+                    </span>
+                    <span className="bg-[#D4AF37] text-black text-[10px] font-black h-6 min-w-6 px-1.5 rounded-full flex items-center justify-center">
+                      {items.length}
+                    </span>
+                  </DisclosureButton>
+                )}
+
                 {[...navigation, ...moreLinks].map((item) => (
                   <DisclosureButton
                     key={item.name}
@@ -192,13 +229,29 @@ export default function Header() {
                     {item.name}
                   </DisclosureButton>
                 ))}
+
+                <DisclosureButton
+                  as={Link}
+                  href="/rewards"
+                  className="block py-3 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-[#D4AF37] transition-all"
+                >
+                  Get $5 Off — Join the Roster
+                </DisclosureButton>
+
                 <div className="mt-8 pt-8 border-t border-white/5 flex flex-col gap-4">
-                  {!user && (
+                  {!user ? (
                     <Link href="/sign-in">
-                      <DisclosureButton className="w-full py-4 text-center text-white/50 font-black uppercase tracking-widest text-xs border border-white/10 rounded-2xl">
+                      <DisclosureButton className="w-full py-4 text-center text-white/70 font-black uppercase tracking-widest text-xs border border-white/10 rounded-2xl hover:border-[#D4AF37]/30 hover:text-[#D4AF37] transition-all">
                         Sign In
                       </DisclosureButton>
                     </Link>
+                  ) : (
+                    <DisclosureButton
+                      onClick={() => signOut()}
+                      className="w-full py-4 text-center text-white/50 font-black uppercase tracking-widest text-xs border border-white/10 rounded-2xl hover:border-white/20 transition-all"
+                    >
+                      Sign Out
+                    </DisclosureButton>
                   )}
                   <Link href="/menu">
                     <DisclosureButton className="w-full py-5 text-center text-black gold-gradient font-black uppercase tracking-widest rounded-2xl gold-glow shadow-xl">
