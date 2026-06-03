@@ -1,16 +1,15 @@
 /**
  * Fallback Sync Orchestrator
- * 
- * Waterfall: Sportradar → API-Sports → TheSportsDB
- * 
- * Each source is tried in order. If one fails (quota exceeded, missing key,
- * network error), we automatically fall back to the next.
+ *
+ * Waterfall: ESPN → API-Sports → TheSportsDB
+ *
+ * ESPN is free (no API key). Sportradar is no longer used in this path.
  */
 
 import { SportKey } from "./types";
 import { LEAGUES } from "./leagues";
-import { sportradarFetch, buildDailyScheduleUrl, buildGolfScheduleUrl } from "./sportradar/client";
-import { normalizeGame, normalizeGolfTournament } from "./sportradar/normalize";
+import { fetchEspnScoreboard } from "./espn/client";
+import { normalizeEspnScoreboard } from "./espn/normalize";
 import { fetchApiSportsGamesForDate } from "./apisports/client";
 import { normalizeApiSportsGame } from "./apisports/normalize";
 import { fetchTheSportsDBEvents } from "./thesportsdb/client";
@@ -20,78 +19,61 @@ import { UpcomingGame } from "./types";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Syncs a single sport for a single date using the 3-source waterfall.
- * Returns the normalized games, regardless of which source succeeded.
+ * Syncs a single sport for a single date using the redundant waterfall.
  */
 export async function syncSportForDate(
   sport: SportKey,
   year: number,
   month: number,
-  day: number
+  day: number,
 ): Promise<{ games: UpcomingGame[]; source: string }> {
   const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-  const config = LEAGUES[sport];
 
-  // ── SOURCE 1: Sportradar ──────────────────────────────────────────────────
+  // ── SOURCE 1: ESPN (free, no key) ─────────────────────────────────────────
   try {
-    let normalizedGames: UpcomingGame[] = [];
-
-    if (sport === "GOLF") {
-      const endpoint = buildGolfScheduleUrl(config.sportradarLeagueKey, config.apiVersion, year);
-      const payload = await sportradarFetch<any>(endpoint, sport);
-      const tournaments = payload.tournaments || [];
-      normalizedGames = tournaments.map(normalizeGolfTournament);
-    } else {
-      const endpoint = buildDailyScheduleUrl(
-        config.sportradarLeagueKey,
-        config.apiVersion,
-        year, month, day
-      );
-      const payload = await sportradarFetch<any>(endpoint, sport);
-      const rawGames = payload.games || [];
-      normalizedGames = rawGames.map((g: any) => normalizeGame(g, sport, config.label));
-    }
-
-    console.log(`[Sportradar ✓] ${sport} ${dateStr}: ${normalizedGames.length} games`);
-    return { games: normalizedGames, source: "sportradar" };
-
-  } catch (srErr: any) {
-    console.warn(`[Sportradar ✗] ${sport} ${dateStr}: ${srErr.message} → Trying API-Sports...`);
+    const payload = await fetchEspnScoreboard(sport, dateStr);
+    const normalizedGames = normalizeEspnScoreboard(payload, sport);
+    console.log(`[ESPN ✓] ${sport} ${dateStr}: ${normalizedGames.length} games`);
+    return { games: normalizedGames, source: "espn" };
+  } catch (espnErr: unknown) {
+    const message = espnErr instanceof Error ? espnErr.message : String(espnErr);
+    console.warn(`[ESPN ✗] ${sport} ${dateStr}: ${message} → Trying API-Sports...`);
   }
 
   // ── SOURCE 2: API-Sports ──────────────────────────────────────────────────
-  if (sport !== "GOLF") { // API-Sports doesn't have Golf
+  if (sport !== "GOLF") {
     try {
-      await sleep(300); // small buffer between sources
+      await sleep(300);
       const rawGames = await fetchApiSportsGamesForDate(sport, dateStr);
-      const normalizedGames = rawGames.map((g: any) => normalizeApiSportsGame(g, sport));
+      const normalizedGames = rawGames.map((g: unknown) =>
+        normalizeApiSportsGame(g, sport),
+      );
 
       console.log(`[API-Sports ✓] ${sport} ${dateStr}: ${normalizedGames.length} games`);
       return { games: normalizedGames, source: "apisports" };
-
-    } catch (asErr: any) {
-      console.warn(`[API-Sports ✗] ${sport} ${dateStr}: ${asErr.message} → Trying TheSportsDB...`);
+    } catch (asErr: unknown) {
+      const message = asErr instanceof Error ? asErr.message : String(asErr);
+      console.warn(`[API-Sports ✗] ${sport} ${dateStr}: ${message} → Trying TheSportsDB...`);
     }
   }
 
-  // ── SOURCE 3: TheSportsDB (Last Resort) ───────────────────────────────────
+  // ── SOURCE 3: TheSportsDB ─────────────────────────────────────────────────
   if (sport !== "GOLF") {
     try {
       await sleep(300);
       const rawEvents = await fetchTheSportsDBEvents(sport, dateStr);
       const normalizedGames = rawEvents
-        .map((e: any) => normalizeTheSportsDBEvent(e, sport))
+        .map((e: unknown) => normalizeTheSportsDBEvent(e, sport))
         .filter((g): g is UpcomingGame => g !== null);
 
       console.log(`[TheSportsDB ✓] ${sport} ${dateStr}: ${normalizedGames.length} games`);
       return { games: normalizedGames, source: "thesportsdb" };
-
-    } catch (tsdbErr: any) {
-      console.error(`[TheSportsDB ✗] ${sport} ${dateStr}: All sources failed. ${tsdbErr.message}`);
+    } catch (tsdbErr: unknown) {
+      const message = tsdbErr instanceof Error ? tsdbErr.message : String(tsdbErr);
+      console.error(`[TheSportsDB ✗] ${sport} ${dateStr}: All sources failed. ${message}`);
     }
   }
 
-  // All sources failed — return empty rather than crash the whole sync
   console.error(`[ALL SOURCES FAILED] ${sport} ${dateStr}`);
   return { games: [], source: "none" };
 }
@@ -102,11 +84,11 @@ export async function syncSportForDate(
 export async function syncUpcomingWeekWithFallback(
   ctx: any,
   api: any,
-  daysToSync: number = 8
+  daysToSync: number = 8,
 ): Promise<{ synced: number; errors: string[]; sourceReport: Record<string, string> }> {
   let totalSynced = 0;
   const errors: string[] = [];
-  const sourceReport: Record<string, string> = {}; // sport-date → source used
+  const sourceReport: Record<string, string> = {};
   const now = new Date();
 
   const sports = Object.keys(LEAGUES) as SportKey[];
@@ -136,11 +118,10 @@ export async function syncUpcomingWeekWithFallback(
           totalSynced += games.length;
         }
 
-        // Rate limit buffer between sports
         await sleep(1200);
-
-      } catch (err: any) {
-        const msg = `${sport} (${dateStr}): ${err.message}`;
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        const msg = `${sport} (${dateStr}): ${message}`;
         errors.push(msg);
         console.error(`[Sync Error] ${msg}`);
         await sleep(1200);

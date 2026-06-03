@@ -6,21 +6,12 @@
 
 | Layer | What runs today |
 |-------|------------------|
-| Sync | `sportradar/sync.ts` + `fallback_sync.ts` waterfall (Sportradar → API-Sports → TheSportsDB) |
-| Logos / UI | ESPN CDN (`a.espncdn.com`) + ESPN web links in `TeamDetailSheet` |
-| Env | `SPORTRADAR_*` optional; `API_SPORTS_KEY` optional; TheSportsDB needs nothing |
+| Cron | `scheduledSyncWithFallback` every 30 min |
+| Sync | `espn/` → API-Sports → TheSportsDB via [`fallback_sync.ts`](fallback_sync.ts) |
+| Logos / UI | ESPN CDN + `TeamDetailSheet` links |
+| Env | No ESPN keys; optional `API_SPORTS_KEY` for tier 2 |
 
-**No `convex/sports/espn/` module on `main` yet.**
-
-## Target waterfall (redundant & free)
-
-| Tier | Source | Cost |
-|------|--------|------|
-| 1 | **ESPN** `site.api.espn.com` | Free, no key |
-| 2 | API-Sports | Free tier with `API_SPORTS_KEY` |
-| 3 | TheSportsDB | Free (no key) |
-
-Retire Sportradar from the waterfall.
+Sportradar code is legacy; not used by the scheduled cron.
 
 ---
 
@@ -65,13 +56,13 @@ Response shape: `events[]` with `competitions[]`, `competitors[]`, `status`, sco
 
 ## Implementation checklist
 
-1. **Add** `convex/sports/espn/client.ts` — `fetchScoreboard(sportKey, ymd)` using table above + `dates` param.
-2. **Add** `convex/sports/espn/normalize.ts` — map ESPN `events` → `UpcomingGame`; reuse `getEspnLogoUrl` from [`sportradar/normalize.ts`](sportradar/normalize.ts) or extract to `espn/logos.ts`.
-3. **Update** [`fallback_sync.ts`](fallback_sync.ts) — ESPN first, then API-Sports, then TheSportsDB; delete or gate Sportradar.
-4. **Caching** — respect ESPN rate limits (doc recommends cache between cron runs; OB already sleeps between sports).
-5. **Update** [`sports_actions.ts`](../sports_actions.ts) — cron stays on `scheduledSyncWithFallback`.
-6. **Mirror** `apps/web/src/lib/sports/` if web still imports Sportradar.
-7. **Legal** — Public-ESPN-API disclaimer: unofficial API, may change; review before App Store scale.
+- [x] `convex/sports/espn/client.ts` — `fetchEspnScoreboard(sportKey, ymd)`
+- [x] `convex/sports/espn/normalize.ts` — ESPN `events` → `UpcomingGame`
+- [x] `convex/sports/espn/logos.ts` — ESPN CDN logo URLs
+- [x] [`fallback_sync.ts`](fallback_sync.ts) — ESPN-first waterfall
+- [x] [`crons.ts`](../crons.ts) — `scheduledSyncWithFallback`
+- [ ] **Mirror** `apps/web/src/lib/sports/` if web admin sync should match (optional)
+- [ ] **Legal** — unofficial API; review before App Store scale
 
 ---
 

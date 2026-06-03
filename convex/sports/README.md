@@ -11,25 +11,17 @@ War Room scores use a **waterfall**: try sources in order until one succeeds. Yo
 
 Both call [`fallback_sync.ts`](fallback_sync.ts) → `syncUpcomingWeekWithFallback`.
 
-## Waterfall (today in git)
+## Waterfall (production cron)
 
 ```
-1. Sportradar     → skips if no SPORTRADAR_* key (throws → next)
+1. ESPN           → free, `convex/sports/espn/` (site.api.espn.com)
 2. API-Sports     → free tier (~100 req/day) if API_SPORTS_KEY set
 3. TheSportsDB    → always free (public key "123", no env var)
 ```
 
-If step 1 fails and step 2 has no key, **step 3 still fills the War Room** for NBA/NHL/MLB/NFL/NCAAF.
+Sportradar remains in `sportradar/` for legacy/manual use only; scheduled sync does **not** call it.
 
-Golf: only Sportradar path today; may be empty without SR key until ESPN migration.
-
-## Planned: ESPN as source 1 (free)
-
-Replace Sportradar with ESPN public scoreboards (`site.api.espn.com`) — no API key.
-
-**Endpoint reference:** [pseudo-r/Public-ESPN-API](https://github.com/pseudo-r/Public-ESPN-API) (community docs for the same APIs ESPN’s apps use).
-
-Keep API-Sports + TheSportsDB as fallbacks. Implementation plan: [ESPN_MIGRATION.md](ESPN_MIGRATION.md).
+**Endpoint reference:** [pseudo-r/Public-ESPN-API](https://github.com/pseudo-r/Public-ESPN-API) · details: [ESPN_MIGRATION.md](ESPN_MIGRATION.md).
 
 ## Env vars (minimal)
 

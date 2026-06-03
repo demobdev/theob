@@ -4,9 +4,9 @@ import { api } from "./_generated/api";
 const crons = cronJobs();
 
 crons.interval(
-  "sync-sportradar-games-30min",
+  "sync-sports-espn-fallback-30min",
   { minutes: 30 },
-  api.sports_actions.scheduledSync,
+  api.sports_actions.scheduledSyncWithFallback,
 );
 
 export default crons;
