@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
+import { formatVenueDateShort, formatVenueTime } from "../lib/venueTimezone";
 
 const { width } = Dimensions.get("window");
 const UFC_RED = "#D20A0A";
@@ -51,7 +52,6 @@ const FighterCol = ({
 
 export default function FightNightHeroCard({ event, onPress }: Props) {
   const isLive = event.status === "inprogress";
-  const startDate = new Date(event.startsAt);
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
@@ -84,12 +84,10 @@ export default function FightNightHeroCard({ event, onPress }: Props) {
           {!isLive && (
             <>
               <Text style={styles.fightTime}>
-                {startDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                {formatVenueTime(event.startsAt)}
               </Text>
               <Text style={styles.fightDate}>
-                {startDate
-                  .toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })
-                  .toUpperCase()}
+                {formatVenueDateShort(event.startsAt)}
               </Text>
             </>
           )}

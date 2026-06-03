@@ -1,5 +1,9 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
+import {
+  addCalendarDays,
+  getVenueCalendarDate,
+} from "./lib/venueTimezone";
 
 /**
  * Returns truly live games, excluding stale "inprogress" records
@@ -92,10 +96,11 @@ export const getGamesForDate = query({
     sportFilter: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // Wide UTC window: capture games stored anywhere from day-before midnight to day+2 morning
-    // This handles ET games that appear as next-day UTC
-    const dayStart = args.targetDate + "T00:00:00Z"; // midnight UTC of the date
-    const dayEnd   = args.targetDate + "T28:00:00Z"; // 28 hours later catches all ET games
+    // Wide UTC fetch, then keep only games whose start falls on targetDate in venue TZ.
+    const prevDay = addCalendarDays(args.targetDate, -1);
+    const dayAfterNext = addCalendarDays(args.targetDate, 2);
+    const dayStart = `${prevDay}T00:00:00Z`;
+    const dayEnd = `${dayAfterNext}T00:00:00Z`;
 
     let games = await ctx.db.query("upcoming_games")
       .withIndex("by_startsAt", (q) =>
@@ -104,9 +109,13 @@ export const getGamesForDate = query({
       .order("asc")
       .collect();
 
-    // Post-filter by sport
+    games = games.filter(
+      (g: { startsAt: string }) =>
+        getVenueCalendarDate(g.startsAt) === args.targetDate,
+    );
+
     if (args.sportFilter && args.sportFilter !== "All") {
-      games = games.filter((g: any) => g.sport === args.sportFilter);
+      games = games.filter((g: { sport: string }) => g.sport === args.sportFilter);
     }
 
     return games;

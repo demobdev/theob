@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -25,6 +25,13 @@ import BottomNavBar from "../components/BottomNavBar";
 import TeamDetailSheet from "./TeamDetailSheet";
 import FightNightHeroCard from "../components/FightNightHeroCard";
 import FightNightDetailSheet from "../components/FightNightDetailSheet";
+import {
+  formatVenueDateShort,
+  formatVenueTime,
+  getVenueNext7Days,
+  isUfcInUpcomingWindow,
+  UFC_HERO_WINDOW_DAYS,
+} from "../lib/venueTimezone";
 
 /**
  * Robust logo fallback system.
@@ -58,32 +65,10 @@ const getTeamLogo = (sport: string, abbr: string, fallbackUrl?: string) => {
 
 const { width } = Dimensions.get("window");
 
-const SPORTS = ["All", "NFL", "NBA", "MLB", "NHL", "GOLF"];
-
-const getNext7Days = () => {
-  const days = [];
-  const today = new Date();
-  const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-  const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    const dateStr = d.toISOString().split("T")[0];
-    const isToday = i === 0;
-    
-    days.push({
-      id: dateStr,
-      label: isToday ? "TODAY" : dayNames[d.getDay()],
-      subLabel: `${monthNames[d.getMonth()]} ${d.getDate()}`,
-      fullDate: dateStr,
-    });
-  }
-  return days;
-};
+const BASE_SPORTS = ["All", "NFL", "NBA", "MLB", "NHL", "GOLF"];
 
 const LiveGamesScreen = ({ navigation }) => {
-  const daysString = useMemo(() => getNext7Days(), []);
+  const daysString = useMemo(() => getVenueNext7Days(), []);
   
   const { user } = useUser();
   const [selectedDate, setSelectedDate] = useState(daysString[0].fullDate);
@@ -122,18 +107,38 @@ const LiveGamesScreen = ({ navigation }) => {
   const allTeamsBySport = useQuery(api.sports_queries.getUniqueTeams);
   const upcomingUfcEvents = useQuery(api.sports_queries.getUpcomingGames, {
     sportFilter: "UFC",
-    limit: 10,
+    limit: 20,
   });
+
+  const showUfcPill = useMemo(
+    () =>
+      upcomingUfcEvents?.some((g: { startsAt: string; status?: string }) =>
+        isUfcInUpcomingWindow(g.startsAt, g.status),
+      ) ?? false,
+    [upcomingUfcEvents],
+  );
+
+  const sportPills = useMemo(
+    () => (showUfcPill ? ["All", "UFC", ...BASE_SPORTS.slice(1)] : BASE_SPORTS),
+    [showUfcPill],
+  );
 
   const fightNightHero = useMemo(() => {
     if (!upcomingUfcEvents?.length) return null;
-    const now = Date.now();
-    const weekMs = 7 * 24 * 60 * 60 * 1000;
-    const inWindow = upcomingUfcEvents.filter((g: any) => {
-      const t = new Date(g.startsAt).getTime();
-      return t >= now - 12 * 60 * 60 * 1000 && t <= now + weekMs && g.status !== "closed";
-    });
-    return inWindow.sort((a: any, b: any) => a.startsAt.localeCompare(b.startsAt))[0] ?? null;
+    const inWindow = upcomingUfcEvents.filter((g: { startsAt: string; status?: string }) =>
+      isUfcInUpcomingWindow(g.startsAt, g.status, UFC_HERO_WINDOW_DAYS),
+    );
+    return inWindow.sort((a: { startsAt: string }, b: { startsAt: string }) =>
+      a.startsAt.localeCompare(b.startsAt),
+    )[0] ?? null;
+  }, [upcomingUfcEvents]);
+
+  useEffect(() => {
+    if (__DEV__ && upcomingUfcEvents !== undefined && upcomingUfcEvents.length === 0) {
+      console.info(
+        "[LiveGames] No UFC events in DB — run Convex sports_actions.manualSync (ESPN UFC scoreboard).",
+      );
+    }
   }, [upcomingUfcEvents]);
 
   // Carousel: uses same data, filtered by sport already (UFC has its own hero card)
@@ -179,9 +184,13 @@ const LiveGamesScreen = ({ navigation }) => {
       : allGamesForDate;
     const paginated = teamFiltered.slice(0, listPage * ITEMS_PER_PAGE);
 
-    const groups = {};
-    
-    // Initialize groups for current sport or all major leagues if "All" is selected
+    const groups: Record<string, typeof paginated> = {};
+
+    if (selectedSport === "UFC") {
+      groups.UFC = paginated.filter((g: { sport?: string }) => g.sport === "UFC");
+      return groups;
+    }
+
     if (selectedSport !== "All") {
         groups[selectedSport] = [];
     } else {
@@ -214,6 +223,7 @@ const LiveGamesScreen = ({ navigation }) => {
           case 'NFL': return '#013369';
           case 'NHL': return '#A2AAAD';
           case 'GOLF': return '#2d6a4f';
+          case 'UFC': return '#D20A0A';
           default: return '#FFA500';
       }
   };
@@ -225,6 +235,7 @@ const LiveGamesScreen = ({ navigation }) => {
           case 'NFL': return 'american-football';
           case 'NHL': return 'snow';
           case 'GOLF': return 'golf';
+          case 'UFC': return 'fitness';
           default: return 'trophy';
       }
   };
@@ -379,10 +390,10 @@ const LiveGamesScreen = ({ navigation }) => {
                 ) : (
                    <>
                      <Text style={styles.heroTimeLarge}>
-                       {new Date(item.startsAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                       {formatVenueTime(item.startsAt)}
                      </Text>
                      <Text style={styles.heroDateSub}>
-                       {new Date(item.startsAt).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()}
+                       {formatVenueDateShort(item.startsAt)}
                      </Text>
                      {item.dayNight && (
                        <Text style={styles.heroDayNight}>
@@ -447,7 +458,7 @@ const LiveGamesScreen = ({ navigation }) => {
                   {/* LEFT: TIME & BROADCAST */}
                   <View style={styles.listLeftCol}>
                     <Text style={styles.listTimeMain}>
-                        {new Date(item.startsAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                        {formatVenueTime(item.startsAt)}
                     </Text>
                     <View style={styles.listSubInfoRow}>
                         <Ionicons name="tv-outline" size={10} color="#FFA500" />
@@ -609,7 +620,7 @@ const LiveGamesScreen = ({ navigation }) => {
             {/* Sports Filter Pill Selector */}
             <View style={styles.filterSection}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-                    {SPORTS.map(sport => (
+                    {sportPills.map(sport => (
                         <TouchableOpacity 
                             key={sport} 
                             style={[styles.filterPill, selectedSport === sport && styles.filterPillActive]}
@@ -626,10 +637,14 @@ const LiveGamesScreen = ({ navigation }) => {
             </View>
 
             {/* UFC Fight Night hero — not in sport pills or team carousel */}
-            {fightNightHero && (
+            {fightNightHero &&
+              (selectedSport === "All" || selectedSport === "UFC") && (
               <FightNightHeroCard
                 event={fightNightHero}
-                onPress={() => setSelectedFightNight(fightNightHero)}
+                onPress={() => {
+                  setSelectedFightNight(fightNightHero);
+                  if (selectedSport !== "UFC") setSelectedSport("UFC");
+                }}
               />
             )}
 
@@ -789,7 +804,7 @@ const LiveGamesScreen = ({ navigation }) => {
                                         <Text style={[styles.modalStatusText, { color: '#FFA500', marginRight: 20 }]}>LIVE NOW</Text>
                                     ) : (
                                         <Text style={[styles.modalStatusText, { marginRight: 20 }]}>
-                                            {new Date(selectedGame.startsAt).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()}
+                                            {formatVenueDateShort(selectedGame.startsAt)}
                                         </Text>
                                     )}
                                     <TouchableOpacity style={{ padding: 5 }} onPress={() => setSelectedGame(null)}>
@@ -818,7 +833,7 @@ const LiveGamesScreen = ({ navigation }) => {
                                     <Text style={styles.modalVsText}>VS</Text>
                                     {!isLive && !isFinal && (
                                         <Text style={styles.modalTimeText}>
-                                            {new Date(selectedGame.startsAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                                            {formatVenueTime(selectedGame.startsAt)}
                                         </Text>
                                     )}
                                 </View>
