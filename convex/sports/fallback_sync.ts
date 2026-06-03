@@ -10,6 +10,7 @@ import { SportKey } from "./types";
 import { LEAGUES } from "./leagues";
 import { fetchEspnScoreboard } from "./espn/client";
 import { normalizeEspnScoreboard } from "./espn/normalize";
+import { applyPrimeTimeFlags } from "./espn/sync";
 import { fetchApiSportsGamesForDate } from "./apisports/client";
 import { normalizeApiSportsGame } from "./apisports/normalize";
 import { fetchTheSportsDBEvents } from "./thesportsdb/client";
@@ -32,7 +33,7 @@ export async function syncSportForDate(
   // ── SOURCE 1: ESPN (free, no key) ─────────────────────────────────────────
   try {
     const payload = await fetchEspnScoreboard(sport, dateStr);
-    const normalizedGames = normalizeEspnScoreboard(payload, sport);
+    const normalizedGames = applyPrimeTimeFlags(normalizeEspnScoreboard(payload, sport));
     console.log(`[ESPN ✓] ${sport} ${dateStr}: ${normalizedGames.length} games`);
     return { games: normalizedGames, source: "espn" };
   } catch (espnErr: unknown) {

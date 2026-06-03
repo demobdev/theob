@@ -7,9 +7,11 @@ export interface TeamInfo {
   name: string;
   abbr?: string | null;
   logoUrl?: string | null;
+  logoUrlSmall?: string | null;
   // Season record (from daily-games.xsd teamType win/loss attributes)
   wins?: number | null;
   losses?: number | null;
+  draws?: number | null;
   // Live game stats
   runs?: number | null;   // MLB
   hits?: number | null;   // MLB
@@ -60,6 +62,7 @@ export interface UpcomingGame {
   doubleHeader?: boolean | null; // Is this a doubleheader?
   attendance?: number | null;    // Post-game announced attendance
   isFeatured?: boolean;
+  isPrimeTime?: boolean;
   featuredRank?: number | null;
   editorialNote?: string | null;
   lastSyncedAt?: string;

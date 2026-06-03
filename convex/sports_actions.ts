@@ -1,15 +1,14 @@
 import { action, internalMutation, internalQuery, ActionCtx } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { v } from "convex/values";
-import { syncUpcomingWeek } from "./sports/sportradar/sync";
 import { syncUpcomingWeekWithFallback } from "./sports/fallback_sync";
 import { requireAdmin } from "./lib/requireAdmin";
 
 export const scheduledSync = action({
   args: {},
-  handler: async (ctx) => {
-    console.log("Starting scheduled sports sync (Today + 7 Days)...");
-    const result = await syncUpcomingWeek(ctx, api);
+  handler: async (ctx: ActionCtx) => {
+    console.log("[Scheduled] Starting ESPN-first sports sync...");
+    const result = await syncUpcomingWeekWithFallback(ctx, api);
     console.log(`Sync completed. Synced ${result.synced} games. Errors: ${result.errors.length}`);
     return result;
   },
@@ -43,12 +42,12 @@ export const manualSync = action({
 });
 
 /**
- * Scheduled sync — uses the full 3-source waterfall for resilience.
+ * Scheduled sync — ESPN-first waterfall (ESPN → API-Sports → TheSportsDB).
  */
 export const scheduledSyncWithFallback = action({
   args: {},
   handler: async (ctx: ActionCtx) => {
-    console.log("[Scheduled] Starting 3-source redundant sync...");
+    console.log("[Scheduled] Starting ESPN-first redundant sync...");
     const result = await syncUpcomingWeekWithFallback(ctx, api);
     console.log(`[Scheduled] Done. Synced: ${result.synced} games. Errors: ${result.errors.length}`);
     if (result.errors.length > 0) {

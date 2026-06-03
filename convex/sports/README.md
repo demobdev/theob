@@ -14,7 +14,7 @@ Both call [`fallback_sync.ts`](fallback_sync.ts) → `syncUpcomingWeekWithFallba
 ## Waterfall (production cron)
 
 ```
-1. ESPN           → free, `convex/sports/espn/` (site.api.espn.com)
+1. ESPN           → free, `convex/sports/espn/` (API logos + prime-time flags)
 2. API-Sports     → free tier (~100 req/day) if API_SPORTS_KEY set
 3. TheSportsDB    → always free (public key "123", no env var)
 ```

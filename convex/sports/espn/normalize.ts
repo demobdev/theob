@@ -24,12 +24,29 @@ function mapEspnStatus(statusType: { state?: string; name?: string } | undefined
 
 function parseRecordSummary(competitor: {
   records?: Array<{ summary?: string }>;
-}): { wins?: number; losses?: number } {
+}): { wins?: number; losses?: number; draws?: number } {
   const summary = competitor.records?.[0]?.summary;
   if (!summary) return {};
-  const match = summary.match(/(\d+)-(\d+)/);
+  const match = summary.match(/(\d+)-(\d+)(?:-(\d+))?/);
   if (!match) return {};
-  return { wins: Number(match[1]), losses: Number(match[2]) };
+  return {
+    wins: Number(match[1]),
+    losses: Number(match[2]),
+    draws: match[3] != null ? Number(match[3]) : undefined,
+  };
+}
+
+function extractEspnLogoUrl(team?: {
+  logos?: Array<{ href?: string }>;
+  logo?: string;
+  flag?: { href?: string };
+}): string | null {
+  return team?.logos?.[0]?.href ?? team?.logo ?? team?.flag?.href ?? null;
+}
+
+function toSmallLogoUrl(logoUrl: string | null | undefined): string | null {
+  if (!logoUrl) return null;
+  return logoUrl.replace("/500/", "/100/");
 }
 
 function normalizeCompetitor(
@@ -42,22 +59,44 @@ function normalizeCompetitor(
       displayName?: string;
       abbreviation?: string;
       shortDisplayName?: string;
+      logos?: Array<{ href?: string }>;
+      logo?: string;
+      flag?: { href?: string };
+    };
+    athlete?: {
+      id?: string;
+      displayName?: string;
+      fullName?: string;
+      abbreviation?: string;
+      shortName?: string;
     };
     records?: Array<{ summary?: string }>;
   },
   sport: SportKey,
 ): TeamInfo {
-  const abbr = competitor.team?.abbreviation ?? competitor.team?.shortDisplayName ?? null;
+  const entity = competitor.team ?? competitor.athlete;
+  const abbr =
+    entity?.abbreviation ??
+    (entity as { shortDisplayName?: string })?.shortDisplayName ??
+    (entity as { shortName?: string })?.shortName ??
+    null;
   const score = competitor.score != null ? Number(competitor.score) : null;
   const record = parseRecordSummary(competitor);
+  const apiLogo = extractEspnLogoUrl(competitor.team);
+  const logoUrl = apiLogo ?? getEspnLogoUrl(sport, abbr);
 
   return {
-    id: competitor.team?.id ?? competitor.id ?? "",
-    name: competitor.team?.displayName ?? "TBD",
+    id: entity?.id ?? competitor.id ?? "",
+    name:
+      entity?.displayName ??
+      (entity as { fullName?: string })?.fullName ??
+      "TBD",
     abbr,
-    logoUrl: getEspnLogoUrl(sport, abbr),
+    logoUrl,
+    logoUrlSmall: toSmallLogoUrl(logoUrl),
     wins: record.wins ?? null,
     losses: record.losses ?? null,
+    draws: record.draws ?? null,
     score,
     runs: sport === "MLB" ? score : null,
   };
@@ -79,6 +118,7 @@ type EspnTeamEvent = {
   id: string;
   date: string;
   name?: string;
+  status?: { type?: { state?: string; name?: string } };
   competitions?: Array<{
     id?: string;
     date?: string;
@@ -103,13 +143,21 @@ export function normalizeEspnEvent(
   const competition = event.competitions?.[0];
   if (!competition?.competitors?.length) return null;
 
-  const homeRaw = competition.competitors.find((c) => c.homeAway === "home");
-  const awayRaw = competition.competitors.find((c) => c.homeAway === "away");
+  let homeRaw = competition.competitors.find((c) => c.homeAway === "home");
+  let awayRaw = competition.competitors.find((c) => c.homeAway === "away");
+
+  // Individual-style events may omit home/away (ported from admin-dashboard transform).
+  if ((!homeRaw || !awayRaw) && competition.competitors.length >= 2) {
+    homeRaw = homeRaw ?? competition.competitors[0];
+    awayRaw = awayRaw ?? competition.competitors[1];
+  }
+
   if (!homeRaw || !awayRaw) return null;
 
   const startsAt = competition.date ?? event.date;
   const config = ESPN_PATHS[sportKey];
-  let status = mapEspnStatus(competition.status?.type);
+  const statusSource = competition.status?.type ?? event.status?.type;
+  let status = mapEspnStatus(statusSource);
   if (status === "closed" && startsAt && new Date(startsAt) > new Date()) {
     status = "scheduled";
   }

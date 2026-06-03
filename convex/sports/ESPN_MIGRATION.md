@@ -7,7 +7,7 @@
 | Layer | What runs today |
 |-------|------------------|
 | Cron | `scheduledSyncWithFallback` every 30 min |
-| Sync | `espn/` → API-Sports → TheSportsDB via [`fallback_sync.ts`](fallback_sync.ts) |
+| Sync | ESPN (prime-time flags + API logos) → API-Sports → TheSportsDB via [`fallback_sync.ts`](fallback_sync.ts) |
 | Logos / UI | ESPN CDN + `TeamDetailSheet` links |
 | Env | No ESPN keys; optional `API_SPORTS_KEY` for tier 2 |
 
@@ -56,8 +56,9 @@ Response shape: `events[]` with `competitions[]`, `competitors[]`, `status`, sco
 
 ## Implementation checklist
 
+- [x] `convex/sports/espn/sync.ts` — prime-time carousel flags (first 2 live/upcoming per batch)
 - [x] `convex/sports/espn/client.ts` — `fetchEspnScoreboard(sportKey, ymd)`
-- [x] `convex/sports/espn/normalize.ts` — ESPN `events` → `UpcomingGame`
+- [x] `convex/sports/espn/normalize.ts` — ESPN `events` → `UpcomingGame` (API logos, `logoUrlSmall`, record draws)
 - [x] `convex/sports/espn/logos.ts` — ESPN CDN logo URLs
 - [x] [`fallback_sync.ts`](fallback_sync.ts) — ESPN-first waterfall
 - [x] [`crons.ts`](../crons.ts) — `scheduledSyncWithFallback`
