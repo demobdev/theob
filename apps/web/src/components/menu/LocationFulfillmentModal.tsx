@@ -34,7 +34,11 @@ export default function LocationFulfillmentModal() {
 
   return (
     <Transition show={isFulfillmentModalOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-[200]" onClose={() => setFulfillmentModalOpen(false)}>
+      <Dialog
+        as="div"
+        className="relative z-[1100]"
+        onClose={() => setFulfillmentModalOpen(false)}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -44,10 +48,13 @@ export default function LocationFulfillmentModal() {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" />
+          <div
+            className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm"
+            aria-hidden="true"
+          />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
+        <div className="fixed inset-0 z-[100] overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
             <Transition.Child
               as={Fragment}
@@ -58,12 +65,12 @@ export default function LocationFulfillmentModal() {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-[32px] bg-white text-black p-0 shadow-2xl transition-all">
+              <Dialog.Panel className="relative isolate w-full max-w-lg transform overflow-hidden rounded-[32px] bg-white text-black p-0 shadow-2xl transition-all">
                 
                 {/* Close Button */}
                 <button 
                   onClick={() => setFulfillmentModalOpen(false)} 
-                  className="absolute top-6 right-6 z-50 text-gray-400 hover:text-black transition-colors"
+                  className="absolute top-6 right-6 z-10 text-gray-400 hover:text-black transition-colors"
                 >
                   <X size={24} />
                 </button>
@@ -112,7 +119,7 @@ export default function LocationFulfillmentModal() {
                          </div>
                       </div>
                    ) : (
-                      <div className="mb-8">
+                      <div className="mb-8 overflow-hidden rounded-xl isolate">
                          <LocationCard onChange={() => setFulfillmentModalOpen(false)} />
                       </div>
                    )}

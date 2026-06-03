@@ -22,7 +22,7 @@ export default function LocationCard({ onChange, className = "" }: LocationCardP
         className="object-cover"
         sizes="(max-width: 768px) 100vw, 480px"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/50" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/50" />
       <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10">
         <div className="h-9 w-9 rounded-full bg-[#D4AF37] flex items-center justify-center shadow-lg border-2 border-black/30">
           <MapPin size={18} className="text-black" strokeWidth={2.5} />
