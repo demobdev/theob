@@ -1,16 +1,23 @@
 import React from "react";
 import Logo from "../common/Logo";
 import Link from "next/link";
-import Image from "next/image";
-import { Instagram, Facebook, Twitter, MapPin, Phone } from "lucide-react";
+import { MapPin, Phone } from "lucide-react";
 import AppStoreBadges from "@/components/common/AppStoreBadges";
+import SocialLinks from "@/components/common/SocialLinks";
+import { HEARTLAND_ORDER_URL } from "@/lib/heartlandLinks";
+import { WVFM_LABS_URL } from "@/lib/socialLinks";
 
-const footerNav = {
+type FooterLink = { name: string; href: string; external?: boolean };
+
+const footerNav: {
+  explore: FooterLink[];
+  visit: FooterLink[];
+} = {
   explore: [
     { name: "The Lineup", href: "/menu" },
     { name: "Live Games", href: "/games" },
     { name: "The Roster", href: "/rewards" },
-    { name: "Order Online", href: "/menu" },
+    { name: "Order Online", href: HEARTLAND_ORDER_URL, external: true },
     { name: "Gift Cards", href: "/gift-cards" },
   ],
   visit: [
@@ -38,13 +45,7 @@ const Footer = () => {
             <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-xs">
               Greenville’s premier sports bar experience. Where game-day energy meets modern hospitality and the best craft pizza in the Upstate.
             </p>
-            <div className="flex gap-4">
-              {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                <Link key={i} href="#" className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-all">
-                  <Icon size={18} />
-                </Link>
-              ))}
-            </div>
+            <SocialLinks />
           </div>
 
           {/* Explore */}
@@ -53,9 +54,20 @@ const Footer = () => {
             <ul className="space-y-4">
               {footerNav.explore.map((item) => (
                 <li key={item.name}>
-                  <Link href={item.href} className="text-gray-500 hover:text-[#D4AF37] transition-colors text-xs font-black uppercase tracking-widest">
-                    {item.name}
-                  </Link>
+                  {item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-500 hover:text-[#D4AF37] transition-colors text-xs font-black uppercase tracking-widest"
+                    >
+                      {item.name}
+                    </a>
+                  ) : (
+                    <Link href={item.href} className="text-gray-500 hover:text-[#D4AF37] transition-colors text-xs font-black uppercase tracking-widest">
+                      {item.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -106,17 +118,17 @@ const Footer = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-             <span className="text-gray-700 text-[8px] font-black uppercase tracking-[0.3em]">Crafted by</span>
-             <Link
-               href="https://wvfmlabs.com"
-               target="_blank"
-               rel="noopener noreferrer"
-               className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors"
-             >
-               WVFM Labs
-             </Link>
-          </div>
+          <p className="text-gray-500 text-[10px] font-medium tracking-wide">
+            Made with love ❤️{" "}
+            <a
+              href={WVFM_LABS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#D4AF37] font-black uppercase tracking-widest hover:text-white transition-colors"
+            >
+              WVFM Labs
+            </a>
+          </p>
         </div>
       </div>
     </footer>

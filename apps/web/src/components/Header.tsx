@@ -9,9 +9,9 @@ import { UserNav } from "./common/UserNav";
 import { usePathname } from "next/navigation";
 import { Fragment } from "react";
 import { cn } from "@/lib/utils";
-import { useCart } from "@/hooks/useCart";
-import { ShoppingBag } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./common/avatar";
+import HeartlandOrderLink from "@/components/common/HeartlandOrderLink";
+import { HEARTLAND_ORDER_URL } from "@/lib/heartlandLinks";
 
 const navigation = [
   { name: "Menu", href: "/menu" },
@@ -31,39 +31,22 @@ export default function Header() {
   const { user } = useUser();
   const { signOut } = useClerk();
   const pathname = usePathname();
-  const { items, fulfillment, location, setFulfillmentModalOpen } = useCart();
-  const isMenuPage = pathname === "/menu";
 
   return (
     <>
-      {/* Top Utility Bar */}
       <div className="bg-[#D4AF37] text-black py-2 px-4 text-[10px] sm:text-xs font-black uppercase tracking-widest">
-        <div className="container mx-auto flex justify-between items-center">
-          
-          {/* Fulfillment Toggle (Sonny's Style) */}
-          <button 
-            onClick={() => setFulfillmentModalOpen(true)}
-            className="flex flex-col items-start leading-tight hover:opacity-70 transition-opacity text-left"
-          >
-            <div className="flex items-center gap-1.5">
-              <span className="font-black tracking-tight">
-                {fulfillment === "delivery" ? "Delivery" : fulfillment === "curbside" ? "Curbside Pickup" : "In-Store Pickup"} ASAP
-              </span>
-              <ChevronDownIcon className="h-3 w-3 stroke-[3]" />
-            </div>
-            <div className="text-[9px] opacity-70">
-              at <span className="font-bold underline underline-offset-2">{location}</span> <span className="text-black/80 font-black ml-1 underline underline-offset-2">Change</span>
-            </div>
-          </button>
-
-          <div className="hidden sm:flex gap-4 items-center">
-            <Link href="/rewards" className="hover:opacity-70 transition-opacity">Get $5 Off Your First Order</Link>
-            {!isMenuPage && (
-              <>
-                <span className="opacity-30">|</span>
-                <Link href="/menu" className="hover:opacity-70 transition-opacity italic">Order Online</Link>
-              </>
-            )}
+        <div className="container mx-auto flex justify-between items-center gap-4">
+          <Link href="/locations" className="hover:opacity-70 transition-opacity truncate">
+            Greenville, SC · 1757 A Woodruff Rd
+          </Link>
+          <div className="hidden sm:flex gap-4 items-center shrink-0">
+            <Link href="/rewards" className="hover:opacity-70 transition-opacity">
+              Join the Roster
+            </Link>
+            <span className="opacity-30">|</span>
+            <a href={HEARTLAND_ORDER_URL} target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity italic">
+              Order Online →
+            </a>
           </div>
         </div>
       </div>
@@ -73,12 +56,10 @@ export default function Header() {
           <>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex h-20 items-center justify-between">
-                {/* Logo Section */}
                 <div className="flex shrink-0 items-center">
                   <Logo />
                 </div>
 
-                {/* Desktop Navigation */}
                 <div className="hidden lg:flex flex-1 justify-center px-8">
                   <div className="flex space-x-10">
                     {navigation.map((item) => (
@@ -87,14 +68,13 @@ export default function Header() {
                         href={item.href}
                         className={cn(
                           "text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:text-[#D4AF37]",
-                          pathname === item.href ? "text-[#D4AF37]" : "text-white/70"
+                          pathname === item.href ? "text-[#D4AF37]" : "text-white/70",
                         )}
                       >
                         {item.name}
                       </Link>
                     ))}
-                    
-                    {/* More Dropdown */}
+
                     <Menu as="div" className="relative">
                       <MenuButton className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/70 hover:text-[#D4AF37] transition-all outline-none">
                         More <ChevronDownIcon className="h-3 w-3" />
@@ -117,7 +97,7 @@ export default function Header() {
                                   href={link.href}
                                   className={cn(
                                     "block px-4 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
-                                    active ? "bg-[#D4AF37] text-black" : "text-gray-400 hover:text-white hover:bg-white/5"
+                                    active ? "bg-[#D4AF37] text-black" : "text-gray-400 hover:text-white hover:bg-white/5",
                                   )}
                                 >
                                   {link.name}
@@ -131,26 +111,14 @@ export default function Header() {
                   </div>
                 </div>
 
-                {/* Action Buttons — desktop only (lg+) */}
                 <div className="hidden lg:flex items-center gap-6">
-                  {items.length > 0 && (
-                    <Link href="/menu" className="relative text-white hover:text-[#D4AF37] transition-colors">
-                       <ShoppingBag size={20} />
-                       <span className="absolute -top-2 -right-2 bg-[#D4AF37] text-black text-[9px] font-black h-4 w-4 rounded-full flex items-center justify-center border border-black">
-                          {items.length}
-                       </span>
-                    </Link>
-                  )}
-                  
                   {user ? (
                     <div className="flex items-center gap-6">
-                      {!isMenuPage && (
-                        <Link href="/menu">
-                          <button className="gold-gradient text-black font-black uppercase tracking-widest text-[10px] px-6 py-3 rounded-xl hover:scale-105 transition-all gold-glow">
-                            Order Now
-                          </button>
-                        </Link>
-                      )}
+                      <HeartlandOrderLink>
+                        <span className="gold-gradient text-black font-black uppercase tracking-widest text-[10px] px-6 py-3 rounded-xl hover:scale-105 transition-all gold-glow cursor-pointer">
+                          Order Online
+                        </span>
+                      </HeartlandOrderLink>
                       <UserNav
                         image={user?.imageUrl}
                         name={user?.fullName!}
@@ -162,18 +130,15 @@ export default function Header() {
                       <Link href="/sign-in" className="text-white/70 text-[10px] font-black uppercase tracking-[0.2em] hover:text-[#D4AF37] transition-all">
                         Sign In
                       </Link>
-                      {!isMenuPage && (
-                        <Link href="/menu">
-                          <button className="gold-gradient text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-xl hover:brightness-110 transition-all gold-glow">
-                            Order Now
-                          </button>
-                        </Link>
-                      )}
+                      <HeartlandOrderLink>
+                        <span className="gold-gradient text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-xl hover:brightness-110 transition-all gold-glow cursor-pointer">
+                          Order Online
+                        </span>
+                      </HeartlandOrderLink>
                     </>
                   )}
                 </div>
 
-                {/* Mobile menu button */}
                 <div className="flex items-center lg:hidden">
                   <DisclosureButton className="inline-flex items-center justify-center rounded-md p-2 text-[#D4AF37] hover:bg-[#1A1A1A] focus:outline-none transition-colors">
                     <span className="sr-only">Open main menu</span>
@@ -187,7 +152,6 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Mobile Menu — order, account, cart + nav links */}
             <DisclosurePanel className="lg:hidden bg-[#0A0A0A] border-b border-white/10">
               <div className="space-y-1 px-4 pb-10 pt-4">
                 {user && (
@@ -209,22 +173,6 @@ export default function Header() {
                   </div>
                 )}
 
-                {items.length > 0 && (
-                  <DisclosureButton
-                    as={Link}
-                    href="/menu"
-                    className="flex items-center justify-between py-4 px-1 text-white font-black uppercase tracking-tight border-b border-white/5 mb-2"
-                  >
-                    <span className="flex items-center gap-3">
-                      <ShoppingBag size={20} className="text-[#D4AF37]" />
-                      Cart
-                    </span>
-                    <span className="bg-[#D4AF37] text-black text-[10px] font-black h-6 min-w-6 px-1.5 rounded-full flex items-center justify-center">
-                      {items.length}
-                    </span>
-                  </DisclosureButton>
-                )}
-
                 {[...navigation, ...moreLinks].map((item) => (
                   <DisclosureButton
                     key={item.name}
@@ -232,7 +180,7 @@ export default function Header() {
                     href={item.href}
                     className={cn(
                       "block py-4 text-xl font-black uppercase tracking-tighter transition-all",
-                      pathname === item.href ? "text-[#D4AF37]" : "text-white"
+                      pathname === item.href ? "text-[#D4AF37]" : "text-white",
                     )}
                   >
                     {item.name}
@@ -244,7 +192,7 @@ export default function Header() {
                   href="/rewards"
                   className="block py-3 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-[#D4AF37] transition-all"
                 >
-                  Get $5 Off — Join the Roster
+                  Join the Roster
                 </DisclosureButton>
 
                 <div className="mt-8 pt-8 border-t border-white/5 flex flex-col gap-4">
@@ -262,13 +210,15 @@ export default function Header() {
                       Sign Out
                     </DisclosureButton>
                   )}
-                  {!isMenuPage && (
-                    <Link href="/menu">
-                      <DisclosureButton className="w-full py-5 text-center text-black gold-gradient font-black uppercase tracking-widest rounded-2xl gold-glow shadow-xl">
-                        Order Now
-                      </DisclosureButton>
-                    </Link>
-                  )}
+                  <DisclosureButton
+                    as="a"
+                    href={HEARTLAND_ORDER_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-5 text-center text-black gold-gradient font-black uppercase tracking-widest rounded-2xl gold-glow shadow-xl"
+                  >
+                    Order Online
+                  </DisclosureButton>
                 </div>
               </div>
             </DisclosurePanel>

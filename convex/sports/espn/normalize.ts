@@ -114,7 +114,7 @@ function extractBroadcast(competition: {
     ?.flatMap((b) => b.names ?? (b.shortName ? [b.shortName] : []))
     .filter(Boolean);
   if (!names?.length) return null;
-  return [...new Set(names)].join(", ");
+  return Array.from(new Set(names)).join(", ");
 }
 
 type EspnCompetitor = Parameters<typeof normalizeCompetitor>[0] & {

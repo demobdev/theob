@@ -22,6 +22,7 @@ export default function MenuManagementPage() {
   const products = useQuery(api.admin_products.getAdminProducts);
   const categories = useQuery(api.products.getCategories);
   const toggleStock = useMutation(api.admin_products.toggleStockStatus);
+  const updatePrice = useMutation(api.admin_products.updatePrice);
   const createProduct = useMutation(api.admin_products.createProduct);
   const updateProduct = useMutation(api.admin_products.updateProduct);
   const deleteProduct = useMutation(api.admin_products.deleteProduct);

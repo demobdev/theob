@@ -53,7 +53,7 @@ const faqs = [
   },
   {
     q: "How do I contact the restaurant?",
-    a: "Use the contact form on our Locations page, call (864) 555-0123, or message us on social during business hours.",
+    a: "Use the contact form on our Locations page, call (864) 555-0123, or DM us on Instagram @ownersbox.gvl or TikTok @ownersbox.gvl during business hours.",
   },
 ];
 

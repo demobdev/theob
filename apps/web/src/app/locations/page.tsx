@@ -6,6 +6,9 @@ import Footer from "@/components/home/Footer";
 import { MapPin, Phone, Clock, Navigation, Mail } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import HeartlandOrderLink from "@/components/common/HeartlandOrderLink";
+import SocialLinks from "@/components/common/SocialLinks";
+import { INSTAGRAM_URL, TIKTOK_URL } from "@/lib/socialLinks";
 import {
   OB_COORDS,
   OB_ADDRESS,
@@ -152,14 +155,11 @@ export default function LocationsPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/menu" className="flex-1">
-                  <button
-                    type="button"
-                    className="w-full py-4 rounded-xl gold-gradient text-black font-black uppercase tracking-widest text-xs gold-glow hover:scale-105 transition-all"
-                  >
-                    Order Now
-                  </button>
-                </Link>
+                <HeartlandOrderLink className="flex-1">
+                  <span className="flex w-full justify-center py-4 rounded-xl gold-gradient text-black font-black uppercase tracking-widest text-xs gold-glow hover:scale-105 transition-all cursor-pointer">
+                    Order Online
+                  </span>
+                </HeartlandOrderLink>
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${OB_COORDS.lat},${OB_COORDS.lng}`}
                   target="_blank"
@@ -271,6 +271,31 @@ export default function LocationsPage() {
           <p className="text-gray-600 text-[10px] font-medium mt-6 uppercase tracking-widest">
             Or call {OB_ADDRESS.phone} · {OB_ADDRESS.full}
           </p>
+          <div className="mt-10 pt-8 border-t border-white/5">
+            <p className="text-white font-black uppercase tracking-widest text-[10px] mb-4">
+              Follow Us
+            </p>
+            <SocialLinks className="mb-4" />
+            <p className="text-gray-500 text-xs font-medium">
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D4AF37] hover:text-white transition-colors"
+              >
+                @ownersbox.gvl
+              </a>
+              {" · "}
+              <a
+                href={TIKTOK_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D4AF37] hover:text-white transition-colors"
+              >
+                TikTok
+              </a>
+            </p>
+          </div>
         </div>
       </section>
 

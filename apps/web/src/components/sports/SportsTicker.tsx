@@ -6,13 +6,35 @@ import { api } from "../../../../../convex/_generated/api";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
+type TickerGame = NonNullable<
+  ReturnType<typeof useQuery<typeof api.sports_queries.getTodayGames>>
+>[number];
+
+function isTickerGame(
+  game: TickerGame,
+): game is TickerGame & {
+  awayTeam: { abbr: string; logoUrl: string; score?: number };
+  homeTeam: { abbr: string; logoUrl: string; score?: number };
+} {
+  return Boolean(
+    game.awayTeam?.logoUrl &&
+      game.homeTeam?.logoUrl &&
+      game.awayTeam?.abbr &&
+      game.homeTeam?.abbr,
+  );
+}
+
 export default function SportsTicker() {
   const games = useQuery(api.sports_queries.getTodayGames);
 
   if (!games || games.length === 0) return null;
 
+  const displayGames = games.filter(isTickerGame);
+
+  if (displayGames.length === 0) return null;
+
   // Duplicate for seamless loop
-  const displayGames = [...games, ...games, ...games];
+  const marqueeGames = [...displayGames, ...displayGames, ...displayGames];
 
   return (
     <div className="bg-black border-y border-white/5 py-4 overflow-hidden relative group">
@@ -20,7 +42,7 @@ export default function SportsTicker() {
       <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-black to-transparent z-10" />
       
       <div className="flex animate-marquee-slow group-hover:pause">
-        {displayGames.map((game, i) => (
+        {marqueeGames.map((game, i) => (
           <div key={`${game._id}-${i}`} className="flex items-center gap-6 px-10 border-r border-white/5 whitespace-nowrap">
             
             {/* Sport Badge */}

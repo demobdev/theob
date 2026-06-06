@@ -85,11 +85,11 @@ export default function SportsAdminPage() {
                   <td className="p-4">
                     <div className="flex items-center gap-4">
                        <div className="flex -space-x-2">
-                          <img src={game.awayTeam.logoUrl} className="w-8 h-8 rounded-full bg-[#111] border border-[#222]" />
-                          <img src={game.homeTeam.logoUrl} className="w-8 h-8 rounded-full bg-[#111] border border-[#222]" />
+                          <img src={game.awayTeam?.logoUrl ?? ""} alt="" className="w-8 h-8 rounded-full bg-[#111] border border-[#222]" />
+                          <img src={game.homeTeam?.logoUrl ?? ""} alt="" className="w-8 h-8 rounded-full bg-[#111] border border-[#222]" />
                        </div>
                        <div>
-                          <p className="text-white font-bold text-sm tracking-tight">{game.awayTeam.abbr} @ {game.homeTeam.abbr}</p>
+                          <p className="text-white font-bold text-sm tracking-tight">{game.awayTeam?.abbr ?? "TBD"} @ {game.homeTeam?.abbr ?? "TBD"}</p>
                           <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">{game.sport} • {new Date(game.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                        </div>
                     </div>

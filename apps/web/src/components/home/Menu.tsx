@@ -77,7 +77,7 @@ const Menu = () => {
                 </p>
                 <div className="mt-6">
                   <Link href="/menu" className="inline-flex items-center gap-2 text-[#D4AF37] font-black uppercase tracking-widest text-xs">
-                    View Full Lineup 
+                    Browse Full Lineup
                     <span className="text-xl leading-none">›</span>
                   </Link>
                 </div>
@@ -86,10 +86,10 @@ const Menu = () => {
           ))}
         </div>
 
-        <div className="mt-16 text-center">
+        <div className="mt-16 text-center flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link href="/menu">
-            <button className="px-12 py-5 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-lg hover:bg-white/10 transition-all">
-              See the Full Menu
+            <button type="button" className="px-12 py-5 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-lg hover:bg-white/10 transition-all">
+              Browse the Menu
             </button>
           </Link>
         </div>

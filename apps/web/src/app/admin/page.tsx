@@ -39,6 +39,7 @@ const StatCard = ({ title, value, icon: Icon, description, trend, trendColor }: 
   </div>
 );
 
+export default function AdminDashboard() {
   const stats = useQuery(api.admin.getAdminStats);
   const repairImages = useMutation(api.admin_products.backfillProductImages);
   const [repairStatus, setRepairStatus] = useState<string | null>(null);

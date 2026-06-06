@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { QrCode, Zap, Trophy, Star, Clock } from "lucide-react";
-import Link from "next/link";
+import AppStoreBadges from "@/components/common/AppStoreBadges";
 
 const appFeatures = [
   { icon: Zap, text: "Reorder favorites in a few taps" },
@@ -100,26 +100,7 @@ export default function AppPromoBanner() {
               ))}
             </ul>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6">
-              <Link href="#" className="transition-transform hover:scale-105 active:scale-95">
-                <Image 
-                  src="/apple-app-store.svg" 
-                  alt="Download on the App Store" 
-                  width={160}
-                  height={52}
-                  className="h-[52px] w-auto"
-                />
-              </Link>
-              <Link href="#" className="transition-transform hover:scale-105 active:scale-95">
-                <Image 
-                  src="/google-play.svg" 
-                  alt="Get it on Google Play" 
-                  width={160}
-                  height={52}
-                  className="h-[52px] w-auto"
-                />
-              </Link>
-            </div>
+            <AppStoreBadges direction="row" className="justify-center lg:justify-start" />
           </div>
           
         </div>

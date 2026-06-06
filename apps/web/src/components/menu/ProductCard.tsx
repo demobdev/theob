@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { Plus } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Doc } from "../../../../../convex/_generated/dataModel";
 import { resolveProductImageSrc } from "@/lib/productImage";
 
@@ -62,10 +62,10 @@ export default function ProductCard({ product, onSelect }: Props) {
 
       <div className="mt-auto pt-4 flex items-center justify-between border-t border-white/5">
         <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest group-hover:text-gray-400 transition-colors">
-          View Customizations
+          View Details
         </span>
         <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center text-gray-500 group-hover:bg-[#D4AF37] group-hover:text-black transition-all">
-          <Plus size={16} />
+          <ChevronRight size={16} />
         </div>
       </div>
     </div>
