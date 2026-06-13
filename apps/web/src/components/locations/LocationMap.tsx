@@ -14,11 +14,26 @@ const goldMarkerIcon = L.divIcon({
   popupAnchor: [0, -28],
 });
 
-function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }) {
+function FitMapBounds({
+  store,
+  userLocation,
+  zoom,
+}: {
+  store: [number, number];
+  userLocation: [number, number] | null;
+  zoom: number;
+}) {
   const map = useMap();
+
   useEffect(() => {
-    map.setView(center, zoom);
-  }, [center, zoom, map]);
+    if (userLocation) {
+      const bounds = L.latLngBounds([store, userLocation]);
+      map.fitBounds(bounds, { padding: [48, 48], maxZoom: 16 });
+    } else {
+      map.setView(store, zoom);
+    }
+  }, [map, store, userLocation, zoom]);
+
   return null;
 }
 
@@ -43,18 +58,15 @@ export default function LocationMap({
     return <div className="h-full w-full bg-[#121212] animate-pulse rounded-2xl" />;
   }
 
-  const center = userLocation ?? location;
-  const mapZoom = userLocation ? Math.max(zoom, 14) : zoom;
-
   return (
     <div className="h-full w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl z-0">
       <MapContainer
-        center={center}
-        zoom={mapZoom}
+        center={location}
+        zoom={zoom}
         scrollWheelZoom={true}
         className="h-full w-full"
       >
-        <ChangeView center={center} zoom={mapZoom} />
+        <FitMapBounds store={location} userLocation={userLocation} zoom={zoom} />
 
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'

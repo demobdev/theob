@@ -13,7 +13,11 @@ const lato = Lato({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "The Owner's Box | Greenville's Sports Bar",
-  description: "Watch live sports, order food, and earn rewards at The Owner's Box in Greenville, SC.",
+  description: "Watch live sports, order food, and enjoy game day at The Owner's Box in Greenville, SC.",
+  icons: {
+    icon: "/ob-icon.png",
+    apple: "/ob-icon.png",
+  },
 };
 
 export default function RootLayout({

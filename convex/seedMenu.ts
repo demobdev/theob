@@ -469,90 +469,23 @@ export const populate = mutation({
       ]
     });
     await ctx.db.insert("products", {
-      name: "Coca-Cola Fountain",
-      description: "Classic Coca-Cola from the fountain. Free refills.",
-      price: 3.50,
-      pointsWorth: 3,
-      categoryId: catMap["Drinks"],
-      image: "coca_cola",
-      isFeatured: true,
-      modifiers: [fountainSize, icePreference],
-    });
-    await ctx.db.insert("products", {
-      name: "Diet Coke Fountain",
-      description: "Diet Coke from the fountain. Free refills.",
-      price: 3.50,
-      pointsWorth: 3,
-      categoryId: catMap["Drinks"],
-      image: "diet_coke",
-      isFeatured: false,
-      modifiers: [fountainSize, icePreference],
-    });
-    await ctx.db.insert("products", {
-      name: "Coke Zero Fountain",
-      description: "Coke Zero Sugar from the fountain. Free refills.",
-      price: 3.50,
-      pointsWorth: 3,
-      categoryId: catMap["Drinks"],
-      image: "coke_zero",
-      isFeatured: false,
-      modifiers: [fountainSize, icePreference],
-    });
-    await ctx.db.insert("products", {
-      name: "Sprite Fountain",
-      description: "Crisp lemon-lime Sprite from the fountain. Free refills.",
-      price: 3.50,
-      pointsWorth: 3,
-      categoryId: catMap["Drinks"],
-      image: "sprite",
-      isFeatured: false,
-      modifiers: [fountainSize, icePreference],
-    });
-    await ctx.db.insert("products", {
-      name: "Coca-Cola Bottle (20oz)",
-      description: "Chilled 20oz bottled Coca-Cola. To-go friendly.",
-      price: 4.50,
-      pointsWorth: 4,
-      categoryId: catMap["Drinks"],
-      image: "bottled_coke",
-      isFeatured: false,
-    });
-    await ctx.db.insert("products", {
-      name: "Diet Coke Bottle (20oz)",
-      description: "Chilled 20oz bottled Diet Coke. To-go friendly.",
-      price: 4.50,
-      pointsWorth: 4,
-      categoryId: catMap["Drinks"],
-      image: "bottled_diet_coke",
-      isFeatured: false,
-    });
-    await ctx.db.insert("products", {
-      name: "Sprite Bottle (20oz)",
-      description: "Chilled 20oz bottled Sprite. To-go friendly.",
-      price: 4.50,
-      pointsWorth: 4,
-      categoryId: catMap["Drinks"],
-      image: "bottled_sprite",
-      isFeatured: false,
-    });
-    await ctx.db.insert("products", {
       name: "Fountain Soda",
-      description: "Other fountain flavors — Dr Pepper, Fanta & more. Free refills.",
+      description: "Pepsi products. Free refills.",
       price: 3.50,
       pointsWorth: 3,
       categoryId: catMap["Drinks"],
       image: "soda",
-      isFeatured: false,
+      isFeatured: true,
       modifiers: [
         {
           name: "Flavor",
           type: "single_select",
           required: true,
           options: [
-            { name: "Dr Pepper", priceExtra: 0, defaultSelected: true },
-            { name: "Fanta Orange", priceExtra: 0 },
-            { name: "Barq's Root Beer", priceExtra: 0 },
-            { name: "Mello Yello", priceExtra: 0 },
+            { name: "Pepsi", priceExtra: 0, defaultSelected: true },
+            { name: "Diet Pepsi", priceExtra: 0 },
+            { name: "Mountain Dew", priceExtra: 0 },
+            { name: "Starbucks Frappuccino", priceExtra: 0 },
           ],
         },
         fountainSize,

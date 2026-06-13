@@ -10,7 +10,7 @@ const TestimonialsData = [
   {
     quote: "The OB Wings are non-negotiable. Don’t even look at the rest of the menu until you’ve ordered them. Smoked, then fried, then perfect.",
     name: "Sarah T.",
-    designation: "Roster Member",
+    designation: "Regular",
   },
   {
     quote: "Easiest pickup experience I’ve had. Order in the app, walk in, game is on, food is ready. This is how hospitality should work.",
@@ -31,7 +31,7 @@ const Testimonials = () => {
             The Local Buzz
           </span>
           <h2 className="text-white text-4xl sm:text-5xl font-black uppercase tracking-tight mb-6">
-            Straight From the Roster.
+            Straight From the Stands.
           </h2>
         </div>
 

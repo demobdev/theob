@@ -1,22 +1,15 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dialog, Transition } from "@headlessui/react";
-import { Gift, Star, Tv, X, Zap } from "lucide-react";
-import AppStoreBadges from "@/components/common/AppStoreBadges";
+import { MapPin, UtensilsCrossed, X } from "lucide-react";
 
-export const WEB_PROMO_DISMISS_KEY = "ob-web-promo-dismissed";
+export const WEB_PROMO_DISMISS_KEY = "ob-open-announcement-dismissed";
 const DISMISS_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
-const PROMO_PATHS = ["/", "/menu", "/rewards"];
-
-const bullets = [
-  { icon: Tv, text: "Live games & fight nights" },
-  { icon: Star, text: "Earn points & order history" },
-  { icon: Zap, text: "Faster reorder" },
-  { icon: Gift, text: "Roster rewards" },
-] as const;
+const PROMO_PATHS = ["/", "/menu"];
 
 function isDismissed(): boolean {
   if (typeof window === "undefined") return true;
@@ -72,8 +65,8 @@ export default function AppDownloadPromoModal() {
         as="div"
         className="relative z-[1200]"
         onClose={handleDismiss}
-        aria-labelledby="web-app-promo-title"
-        aria-describedby="web-app-promo-description"
+        aria-labelledby="open-announcement-title"
+        aria-describedby="open-announcement-description"
       >
         <Transition.Child
           as={Fragment}
@@ -105,66 +98,57 @@ export default function AppDownloadPromoModal() {
                 <button
                   type="button"
                   onClick={handleDismiss}
-                  aria-label="Close app download promo"
+                  aria-label="Close announcement"
                   className="absolute top-4 right-4 z-20 rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
                 >
                   <X size={22} />
                 </button>
 
-                <div className="relative z-10 p-8 pt-10">
+                <div className="relative z-10 p-8 pt-10 text-center">
                   <span className="mb-4 inline-block rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37]">
-                    Join the Roster
+                    We&apos;re Open
                   </span>
 
                   <Dialog.Title
-                    id="web-app-promo-title"
+                    id="open-announcement-title"
                     className="text-3xl font-black uppercase leading-tight tracking-tight text-white"
                   >
-                    Get the full experience{" "}
-                    <span className="gold-text-gradient">in the app</span>
+                    Grand opening was{" "}
+                    <span className="gold-text-gradient">yesterday.</span>
                   </Dialog.Title>
 
                   <Dialog.Description
-                    id="web-app-promo-description"
-                    className="mt-3 text-sm font-medium leading-relaxed text-gray-400"
+                    id="open-announcement-description"
+                    className="mt-4 text-base font-medium leading-relaxed text-gray-300"
                   >
-                    Most features live on your phone — live games, rewards, and
-                    the fastest way to order.
+                    We&apos;re open now and ready for game day. Come see us at 1757 Woodruff Rd in Greenville — great food, cold drinks, and wall-to-wall sports.
                   </Dialog.Description>
 
-                  <ul className="mt-6 space-y-3">
-                    {bullets.map(({ icon: Icon, text }) => (
-                      <li key={text} className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
-                          <Icon className="h-4 w-4 text-[#D4AF37]" />
-                        </div>
-                        <span className="text-sm font-bold uppercase tracking-wide text-white">
-                          {text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="mt-6 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-4 py-3">
-                    <p className="text-sm font-black uppercase tracking-wide text-[#D4AF37]">
-                      $5 off your first order
-                    </p>
-                    <p className="mt-1 text-xs font-medium text-gray-400">
-                      Join the Roster in the app — same offer as on the site.
-                    </p>
+                  <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                    <Link
+                      href="/locations"
+                      onClick={handleDismiss}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#D4AF37] px-5 py-3 text-sm font-black uppercase tracking-widest text-black transition-transform hover:scale-[1.02] active:scale-95"
+                    >
+                      <MapPin size={16} />
+                      Visit Us
+                    </Link>
+                    <Link
+                      href="/menu"
+                      onClick={handleDismiss}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-black uppercase tracking-widest text-white transition-colors hover:border-[#D4AF37]/50 hover:text-[#D4AF37]"
+                    >
+                      <UtensilsCrossed size={16} />
+                      View Menu
+                    </Link>
                   </div>
-
-                  <AppStoreBadges
-                    direction="row"
-                    className="mt-8 justify-center sm:justify-start"
-                  />
 
                   <button
                     type="button"
                     onClick={handleDismiss}
                     className="mt-6 w-full text-center text-xs font-bold uppercase tracking-widest text-gray-500 transition-colors hover:text-gray-300"
                   >
-                    Continue on web
+                    Got it
                   </button>
                 </div>
               </Dialog.Panel>

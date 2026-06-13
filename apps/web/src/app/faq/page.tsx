@@ -9,35 +9,35 @@ export const metadata = {
 const faqs = [
   {
     q: "What are your hours?",
-    a: "Sun – Thu: 11AM – 11PM. Fri – Sat: 11AM – 1AM. Kitchen hours may vary on holidays — check the app or call ahead.",
+    a: "Sun – Thu: 11AM – 11PM. Fri – Sat: 11AM – 1AM. Kitchen hours may vary on holidays — call ahead or check our locations page.",
   },
   {
     q: "Where are you located?",
-    a: "1757 Woodruff Rd. STE A, Greenville, SC 29607. One location for dine-in, pickup, and curbside.",
+    a: "1757 Woodruff Rd. STE A, Greenville, SC 29607. One location for dine-in and pickup.",
   },
   {
     q: "Can I order online?",
-    a: "Yes — browse the menu on the web, then complete pickup or curbside orders in our app for the fastest checkout and rewards.",
+    a: "Browse the full menu on our website. For takeout, use the Order Takeout button to checkout on our Heartland online ordering site. We do not offer in-browser checkout on the web.",
   },
   {
     q: "Do you offer delivery?",
-    a: "In-app delivery may be limited during launch. Third-party delivery partners (DoorDash, Uber Eats, etc.) cover most delivery zones.",
+    a: "Yes — order delivery through DoorDash using the Order on DoorDash button on our site.",
   },
   {
-    q: "How do rewards work?",
-    a: "Join The Roster in the app to earn points on qualifying orders. Redeem for food, drinks, and member perks. Sign in with the same account on web and app.",
+    q: "Are mobile apps available?",
+    a: "iOS and Android apps are coming soon. Live game schedules and more features will launch with the apps.",
   },
   {
     q: "What is curbside pickup?",
-    a: "Order ahead, park in designated spots, and tell us your vehicle make/model/color in the app — we bring your order out.",
+    a: "Order takeout through our online ordering site, then pick up at the restaurant. Call if you need help finding us when you arrive.",
   },
   {
     q: "Can I order alcohol for pickup?",
-    a: "Beer and wine to-go follow South Carolina law and ID checks at pickup. Dine-in full bar service is available inside.",
+    a: "No. Alcohol cannot be ordered for pickup or takeout. Beer and wine are available for dine-in only, with ID checks at the bar.",
   },
   {
     q: "How do I see what games are on?",
-    a: "Download the app for live TV schedules, fight nights, and event maps. The bar always runs major national matchups on game day.",
+    a: "We run major national matchups on 14 HD screens. Full TV schedules will be available in our mobile apps when they launch.",
   },
   {
     q: "Do you host private events?",
@@ -53,7 +53,7 @@ const faqs = [
   },
   {
     q: "How do I contact the restaurant?",
-    a: "Use the contact form on our Locations page, call (864) 555-0123, or DM us on Instagram @ownersbox.gvl or TikTok @ownersbox.gvl during business hours.",
+    a: "Use the contact form on our Locations page, email support@ownersboxgvl.com, or call (864) 555-0123 during business hours.",
   },
 ];
 

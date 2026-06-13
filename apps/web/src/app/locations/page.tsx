@@ -1,14 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/home/Footer";
-import { MapPin, Phone, Clock, Navigation, Mail } from "lucide-react";
+import { MapPin, Phone, Clock, Navigation, Mail, LocateFixed } from "lucide-react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
-import HeartlandOrderLink from "@/components/common/HeartlandOrderLink";
-import SocialLinks from "@/components/common/SocialLinks";
-import { INSTAGRAM_URL, TIKTOK_URL } from "@/lib/socialLinks";
 import {
   OB_COORDS,
   OB_ADDRESS,
@@ -16,6 +12,9 @@ import {
   haversineMiles,
   formatDistanceAndDrive,
 } from "@/lib/storeLocation";
+import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import DoorDashButton from "@/components/common/DoorDashButton";
+import { ExternalLink } from "lucide-react";
 
 const LocationMap = dynamic(() => import("@/components/locations/LocationMap"), {
   ssr: false,
@@ -27,6 +26,7 @@ const LocationMap = dynamic(() => import("@/components/locations/LocationMap"), 
 });
 
 const OB_LOCATION: [number, number] = [OB_COORDS.lat, OB_COORDS.lng];
+const SUPPORT_EMAIL = "support@ownersboxgvl.com";
 
 function geoErrorMessage(code: number): string {
   switch (code) {
@@ -41,11 +41,21 @@ function geoErrorMessage(code: number): string {
   }
 }
 
+function buildDirectionsUrl(userLocation: [number, number] | null): string {
+  const dest = `${OB_COORDS.lat},${OB_COORDS.lng}`;
+  if (userLocation) {
+    const origin = `${userLocation[0]},${userLocation[1]}`;
+    return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}`;
+  }
+  return `https://www.google.com/maps/dir/?api=1&destination=${dest}`;
+}
+
 export default function LocationsPage() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [distanceLabel, setDistanceLabel] = useState<string | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
+  const orderUrl = getHeartlandOrderUrl();
 
   const requestLocation = useCallback(() => {
     if (typeof window === "undefined" || !("geolocation" in navigator)) {
@@ -82,13 +92,9 @@ export default function LocationsPage() {
         setGeoError(geoErrorMessage(error.code));
         setGeoLoading(false);
       },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 },
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 120000 },
     );
   }, []);
-
-  useEffect(() => {
-    requestLocation();
-  }, [requestLocation]);
 
   return (
     <main className="bg-[#0A0A0A] min-h-screen flex flex-col">
@@ -154,14 +160,29 @@ export default function LocationsPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <HeartlandOrderLink className="flex-1">
-                  <span className="flex w-full justify-center py-4 rounded-xl gold-gradient text-black font-black uppercase tracking-widest text-xs gold-glow hover:scale-105 transition-all cursor-pointer">
-                    Order Online
-                  </span>
-                </HeartlandOrderLink>
+              <button
+                type="button"
+                onClick={requestLocation}
+                disabled={geoLoading}
+                className="w-full mb-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <LocateFixed className="h-3.5 w-3.5" />
+                {geoLoading ? "Locating…" : "Use My Location"}
+              </button>
+
+              <div className="flex flex-col gap-3">
+                <a href={orderUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
+                  <button
+                    type="button"
+                    className="w-full py-4 rounded-xl gold-gradient text-black font-black uppercase tracking-widest text-xs gold-glow hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
+                  >
+                    Order Takeout
+                    <ExternalLink size={12} />
+                  </button>
+                </a>
+                <DoorDashButton fullWidth />
                 <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${OB_COORDS.lat},${OB_COORDS.lng}`}
+                  href={buildDirectionsUrl(userLocation)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1"
@@ -199,21 +220,6 @@ export default function LocationsPage() {
             userLocation={userLocation}
             zoom={OB_MAP_ZOOM}
           />
-
-          <div className="absolute bottom-6 left-6 right-6 md:left-auto md:w-80 bg-black/80 backdrop-blur-md border border-white/10 p-4 rounded-xl z-10 pointer-events-none">
-            <div className="flex items-center justify-between mb-2">
-              <h5 className="text-white text-[10px] font-black uppercase tracking-widest">
-                Live Status
-              </h5>
-              <span className="flex items-center gap-1.5 text-green-500 text-[10px] font-black uppercase tracking-widest">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                Open Now
-              </span>
-            </div>
-            <p className="text-gray-400 text-[10px] font-medium">
-              Current wait time: <span className="text-white font-bold">~15 mins</span> for a table.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -238,7 +244,7 @@ export default function LocationsPage() {
               const message = (form.elements.namedItem("message") as HTMLTextAreaElement).value;
               const subject = encodeURIComponent(`Contact from ${name}`);
               const body = encodeURIComponent(`${message}\n\n— ${name}\n${email}`);
-              window.location.href = `mailto:hello@theownersbox.com?subject=${subject}&body=${body}`;
+              window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
             }}
           >
             <input
@@ -269,33 +275,8 @@ export default function LocationsPage() {
             </button>
           </form>
           <p className="text-gray-600 text-[10px] font-medium mt-6 uppercase tracking-widest">
-            Or call {OB_ADDRESS.phone} · {OB_ADDRESS.full}
+            Opens your email app — we reply during business hours · {SUPPORT_EMAIL}
           </p>
-          <div className="mt-10 pt-8 border-t border-white/5">
-            <p className="text-white font-black uppercase tracking-widest text-[10px] mb-4">
-              Follow Us
-            </p>
-            <SocialLinks className="mb-4" />
-            <p className="text-gray-500 text-xs font-medium">
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#D4AF37] hover:text-white transition-colors"
-              >
-                @ownersbox.gvl
-              </a>
-              {" · "}
-              <a
-                href={TIKTOK_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#D4AF37] hover:text-white transition-colors"
-              >
-                TikTok
-              </a>
-            </p>
-          </div>
         </div>
       </section>
 

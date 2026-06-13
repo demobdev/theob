@@ -36,6 +36,18 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'r2.thesportsdb.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.api-sports.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'img.clerk.com',
         port: '',
         pathname: '/**',

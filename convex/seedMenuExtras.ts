@@ -422,11 +422,10 @@ export const addExtras = mutation({
 });
 
 /**
- * Adds Coca-Cola fountain & bottled drinks to an existing menu.
- * Safe to re-run — skips products that already exist by name.
- * Run AFTER seedMenu:populate (or on any menu that lacks Coke lineup).
+ * Ensures Fountain Soda exists with Pepsi lineup. Skips removed Coke SKUs.
+ * Safe to re-run. Run AFTER seedMenu:populate if Fountain Soda is missing.
  */
-export const addCokeDrinks = mutation({
+export const ensureFountainSoda = mutation({
   args: {},
   handler: async (ctx) => {
     const cats = await ctx.db.query("categories").collect();
@@ -436,7 +435,7 @@ export const addCokeDrinks = mutation({
     }
 
     const existing = await ctx.db.query("products").collect();
-    const names = new Set(existing.map((p) => p.name));
+    const fountain = existing.find((p) => p.name === "Fountain Soda");
 
     const icePreference = {
       name: "Ice Preference",
@@ -459,79 +458,54 @@ export const addCokeDrinks = mutation({
       ],
     };
 
-    const cokeDrinks = [
-      {
-        name: "Coca-Cola Fountain",
-        description: "Classic Coca-Cola from the fountain. Free refills.",
-        price: 3.5,
-        pointsWorth: 3,
-        image: "coca_cola",
+    if (fountain) {
+      await ctx.db.patch(fountain._id, {
+        description: "Pepsi products. Free refills.",
         isFeatured: true,
-        modifiers: [fountainSize, icePreference],
-      },
-      {
-        name: "Diet Coke Fountain",
-        description: "Diet Coke from the fountain. Free refills.",
-        price: 3.5,
-        pointsWorth: 3,
-        image: "diet_coke",
-        isFeatured: false,
-        modifiers: [fountainSize, icePreference],
-      },
-      {
-        name: "Coke Zero Fountain",
-        description: "Coke Zero Sugar from the fountain. Free refills.",
-        price: 3.5,
-        pointsWorth: 3,
-        image: "coke_zero",
-        isFeatured: false,
-        modifiers: [fountainSize, icePreference],
-      },
-      {
-        name: "Sprite Fountain",
-        description: "Crisp lemon-lime Sprite from the fountain. Free refills.",
-        price: 3.5,
-        pointsWorth: 3,
-        image: "sprite",
-        isFeatured: false,
-        modifiers: [fountainSize, icePreference],
-      },
-      {
-        name: "Coca-Cola Bottle (20oz)",
-        description: "Chilled 20oz bottled Coca-Cola. To-go friendly.",
-        price: 4.5,
-        pointsWorth: 4,
-        image: "bottled_coke",
-        isFeatured: false,
-      },
-      {
-        name: "Diet Coke Bottle (20oz)",
-        description: "Chilled 20oz bottled Diet Coke. To-go friendly.",
-        price: 4.5,
-        pointsWorth: 4,
-        image: "bottled_diet_coke",
-        isFeatured: false,
-      },
-      {
-        name: "Sprite Bottle (20oz)",
-        description: "Chilled 20oz bottled Sprite. To-go friendly.",
-        price: 4.5,
-        pointsWorth: 4,
-        image: "bottled_sprite",
-        isFeatured: false,
-      },
-    ];
-
-    let added = 0;
-    for (const drink of cokeDrinks) {
-      if (names.has(drink.name)) continue;
-      await ctx.db.insert("products", {
-        ...drink,
-        categoryId: drinksCat._id,
+        modifiers: [
+          {
+            name: "Flavor",
+            type: "single_select",
+            required: true,
+            options: [
+              { name: "Pepsi", priceExtra: 0, defaultSelected: true },
+              { name: "Diet Pepsi", priceExtra: 0 },
+              { name: "Mountain Dew", priceExtra: 0 },
+              { name: "Starbucks Frappuccino", priceExtra: 0 },
+            ],
+          },
+          fountainSize,
+          icePreference,
+        ],
       });
-      added++;
+      return "Updated Fountain Soda to Pepsi lineup.";
     }
 
-    return `Added ${added} Coca-Cola drink product(s).`;
+    await ctx.db.insert("products", {
+      name: "Fountain Soda",
+      description: "Pepsi products. Free refills.",
+      price: 3.5,
+      pointsWorth: 3,
+      categoryId: drinksCat._id,
+      image: "soda",
+      isFeatured: true,
+      modifiers: [
+        {
+          name: "Flavor",
+          type: "single_select",
+          required: true,
+          options: [
+            { name: "Pepsi", priceExtra: 0, defaultSelected: true },
+            { name: "Diet Pepsi", priceExtra: 0 },
+            { name: "Mountain Dew", priceExtra: 0 },
+            { name: "Starbucks Frappuccino", priceExtra: 0 },
+          ],
+        },
+        fountainSize,
+        icePreference,
+      ],
+    });
+
+    return "Added Fountain Soda with Pepsi lineup.";
   },
 });

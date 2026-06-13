@@ -12,7 +12,7 @@ const Logo = ({ isMobile }: Props) => {
       <div className="flex gap-3 items-center group">
         <div className="relative h-8 w-8 sm:h-9 sm:w-9 shrink-0">
           <Image
-            src="/images/ob-icon.png"
+            src="/ob-icon.png"
             fill
             alt="The Owner's Box"
             className="object-contain group-hover:scale-110 transition-transform duration-300"

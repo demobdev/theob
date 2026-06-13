@@ -23,6 +23,7 @@ import type * as lib_locations from "../lib/locations.js";
 import type * as lib_requireAdmin from "../lib/requireAdmin.js";
 import type * as lib_venueTimezone from "../lib/venueTimezone.js";
 import type * as loyalty from "../loyalty.js";
+import type * as menuCleanup from "../menuCleanup.js";
 import type * as notes from "../notes.js";
 import type * as openai from "../openai.js";
 import type * as orders from "../orders.js";
@@ -75,6 +76,7 @@ declare const fullApi: ApiFromModules<{
   "lib/requireAdmin": typeof lib_requireAdmin;
   "lib/venueTimezone": typeof lib_venueTimezone;
   loyalty: typeof loyalty;
+  menuCleanup: typeof menuCleanup;
   notes: typeof notes;
   openai: typeof openai;
   orders: typeof orders;

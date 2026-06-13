@@ -1,24 +1,23 @@
 import React from "react";
 import Logo from "../common/Logo";
 import Link from "next/link";
-import { MapPin, Phone } from "lucide-react";
-import AppStoreBadges from "@/components/common/AppStoreBadges";
-import SocialLinks from "@/components/common/SocialLinks";
-import { HEARTLAND_ORDER_URL } from "@/lib/heartlandLinks";
-import { WVFM_LABS_URL } from "@/lib/socialLinks";
+import { Instagram, Facebook, Twitter, MapPin, Phone } from "lucide-react";
+import AppComingSoonBadges from "@/components/common/AppComingSoonBadges";
 
-type FooterLink = { name: string; href: string; external?: boolean };
-
-const footerNav: {
-  explore: FooterLink[];
-  visit: FooterLink[];
-} = {
+const socialLinks = [
+  {
+    icon: Instagram,
+    href: "https://www.instagram.com/ownersbox.gvl/",
+    label: "Instagram",
+  },
+  { icon: Facebook, href: "#", label: "Facebook" },
+  { icon: Twitter, href: "#", label: "Twitter" },
+];
+const footerNav = {
   explore: [
     { name: "The Lineup", href: "/menu" },
     { name: "Live Games", href: "/games" },
-    { name: "The Roster", href: "/rewards" },
-    { name: "Order Online", href: HEARTLAND_ORDER_URL, external: true },
-    { name: "Gift Cards", href: "/gift-cards" },
+    { name: "Order Online", href: "/menu" },
   ],
   visit: [
     { name: "Greenville, SC", href: "/locations" },
@@ -43,9 +42,22 @@ const Footer = () => {
           <div className="space-y-8">
             <Logo />
             <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-xs">
-              Greenville’s premier sports bar experience. Where game-day energy meets modern hospitality and the best craft pizza in the Upstate.
+              Greenville&apos;s premier sports bar experience. Where game-day energy meets modern hospitality — great food, cold drinks, and wall-to-wall sports in the Upstate.
             </p>
-            <SocialLinks />
+            <div className="flex gap-4">
+              {socialLinks.map(({ icon: Icon, href, label }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  aria-label={label}
+                  className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-all"
+                >
+                  <Icon size={18} />
+                </Link>
+              ))}
+            </div>
           </div>
 
           {/* Explore */}
@@ -54,20 +66,9 @@ const Footer = () => {
             <ul className="space-y-4">
               {footerNav.explore.map((item) => (
                 <li key={item.name}>
-                  {item.external ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-500 hover:text-[#D4AF37] transition-colors text-xs font-black uppercase tracking-widest"
-                    >
-                      {item.name}
-                    </a>
-                  ) : (
-                    <Link href={item.href} className="text-gray-500 hover:text-[#D4AF37] transition-colors text-xs font-black uppercase tracking-widest">
-                      {item.name}
-                    </Link>
-                  )}
+                  <Link href={item.href} className="text-gray-500 hover:text-[#D4AF37] transition-colors text-xs font-black uppercase tracking-widest">
+                    {item.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -90,8 +91,9 @@ const Footer = () => {
           {/* Contact & Apps */}
           <div className="space-y-10">
             <div>
-              <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-6">Download the App</h4>
-              <AppStoreBadges />
+              <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-2">Mobile Apps</h4>
+              <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-4">Launching soon</p>
+              <AppComingSoonBadges />
             </div>
             <div className="pt-6 border-t border-white/5 space-y-4">
                <div className="flex items-center gap-3 text-gray-500">
@@ -110,7 +112,7 @@ const Footer = () => {
         <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.2em]">
-              © {new Date().getFullYear()} The Owner’s Box Bar & Grill
+              © {new Date().getFullYear()} The Owner&apos;s Box Bar & Grill
             </p>
             <div className="flex gap-8">
               <Link href="/privacy" className="text-gray-600 hover:text-white text-[10px] font-black uppercase tracking-widest transition-colors">Privacy</Link>
@@ -118,17 +120,17 @@ const Footer = () => {
             </div>
           </div>
           
-          <p className="text-gray-500 text-[10px] font-medium tracking-wide">
-            Made with love ❤️{" "}
-            <a
-              href={WVFM_LABS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#D4AF37] font-black uppercase tracking-widest hover:text-white transition-colors"
-            >
-              WVFM Labs
-            </a>
-          </p>
+          <div className="flex items-center gap-2">
+             <span className="text-gray-700 text-[8px] font-black uppercase tracking-[0.3em]">Crafted by</span>
+             <Link
+               href="https://wvfmlabs.com"
+               target="_blank"
+               rel="noopener noreferrer"
+               className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors"
+             >
+               WVFM Labs
+             </Link>
+          </div>
         </div>
       </div>
     </footer>

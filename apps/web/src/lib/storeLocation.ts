@@ -1,8 +1,8 @@
 /** Greenville store — keep in sync with convex/lib/locations.ts */
 
 export const OB_COORDS = {
-  lat: 34.8289,
-  lng: -82.3235,
+  lat: 34.8200749,
+  lng: -82.2714396,
 } as const;
 
 export const OB_ADDRESS = {
@@ -15,7 +15,7 @@ export const OB_ADDRESS = {
   phone: "(864) 555-0123",
 } as const;
 
-export const OB_MAP_ZOOM = 15;
+export const OB_MAP_ZOOM = 17;
 
 export function haversineMiles(
   lat1: number,
