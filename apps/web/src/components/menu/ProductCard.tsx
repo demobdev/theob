@@ -32,6 +32,7 @@ export default function ProductCard({ product, onSelect }: Props) {
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             alt={product.name}
             sizes="(max-width: 768px) 100vw, 400px"
+            unoptimized={imageSrc.includes("convex.cloud") || imageSrc.includes("convex.site")}
             onError={(e) => {
               const t = e.target as HTMLImageElement;
               if (!t.src.endsWith("/loading-icon.png")) {

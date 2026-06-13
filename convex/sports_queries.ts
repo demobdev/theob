@@ -124,27 +124,30 @@ export const getGamesForDate = query({
 
 /**
  * Returns today's games for the homepage ticker — live, closed (with scores), and upcoming.
- * Also includes last night's finished games so the carousel always has content.
- *
- * Uses a wide UTC window to handle ET evening games stored as next-day UTC by APIs.
+ * Uses venue calendar date (America/New_York) so evening games stored as next-day UTC
+ * (e.g. NBA Finals at 8:30pm ET → 00:30Z next day) still appear on the board tonight.
  */
 export const getTodayGames = query({
   args: {},
+  returns: v.array(v.any()),
   handler: async (ctx) => {
-    const now = new Date();
-    const todayStr = now.toISOString().split("T")[0];
+    const todayStr = getVenueCalendarDate(new Date());
+    const prevDay = addCalendarDays(todayStr, -1);
+    const dayAfterNext = addCalendarDays(todayStr, 2);
+    const dayStart = `${prevDay}T00:00:00Z`;
+    const dayEnd = `${dayAfterNext}T00:00:00Z`;
 
-    // Wide window: today 00:00Z through 28 hours later
-    // Captures 8pm ET games stored as next-day UTC (00:00-03:59Z)
-    const windowStart = todayStr + "T00:00:00Z";
-    const windowEnd   = todayStr + "T28:00:00Z";
-
-    return await ctx.db.query("upcoming_games")
+    const games = await ctx.db
+      .query("upcoming_games")
       .withIndex("by_startsAt", (q) =>
-        q.gte("startsAt", windowStart).lt("startsAt", windowEnd)
+        q.gte("startsAt", dayStart).lt("startsAt", dayEnd),
       )
       .order("asc")
       .collect();
+
+    return games.filter(
+      (g) => getVenueCalendarDate(g.startsAt) === todayStr,
+    );
   },
 });
 

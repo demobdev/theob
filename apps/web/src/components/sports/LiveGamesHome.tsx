@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQuery } from "convex/react";
 import { ChevronDown } from "lucide-react";
 import { api } from "../../../../../convex/_generated/api";
 import { cn } from "@/lib/utils";
 
 type GameDoc = NonNullable<
-  ReturnType<typeof useQuery<typeof api.sports_queries.getLiveGames>>
+  ReturnType<typeof useQuery<typeof api.sports_queries.getTodayGames>>
 >[number];
 
 const SPORT_LABELS: Record<string, string> = {
@@ -22,46 +22,35 @@ const SPORT_LABELS: Record<string, string> = {
   UFC: "UFC",
   NASCAR: "NASCAR",
   F1: "Formula 1",
+  CRICKET: "Cricket",
 };
 
-/** Every sport we sync — always shown in the filter, even with no games today. */
-const HOME_SPORT_FILTER_OPTIONS = [
-  "NFL",
+const SPORT_ORDER = [
   "NBA",
-  "NHL",
+  "NFL",
   "MLB",
+  "NHL",
   "NCAAF",
-  "UFC",
   "GOLF",
+  "UFC",
   "NASCAR",
   "F1",
+  "CRICKET",
 ] as const;
 
 function sportLabel(sport: string): string {
   return SPORT_LABELS[sport] ?? sport;
 }
 
+function isDisplayableGame(game: GameDoc): boolean {
+  if (game.awayTeam?.logoUrl && game.homeTeam?.logoUrl) return true;
+  if (game.tournamentName) return true;
+  return false;
+}
+
 function emptyStateMessage(sport: string): string {
   const label = sportLabel(sport);
-  const month = new Date().getMonth();
-
-  if (sport === "NFL" || sport === "NCAAF") {
-    if (month >= 2 && month <= 6) {
-      return `${label} picks up again in the fall. Check the ticker below for what's on our screens today.`;
-    }
-  }
-  if (sport === "NBA" || sport === "NHL") {
-    if (month >= 6 && month <= 8) {
-      return `${label} returns in October. Nothing on the board for ${label} today — try another sport or scroll the ticker.`;
-    }
-  }
-  if (sport === "MLB") {
-    if (month === 11 || month === 0) {
-      return `${label} is in the off-season. Check the ticker below for other matchups on our screens.`;
-    }
-  }
-
-  return `Nothing live or scheduled for ${label} today. Check the ticker below or pick another sport.`;
+  return `Nothing on the board for ${label} right now. Check another sport or scroll the ticker below.`;
 }
 
 /** Spread live cards across sports so one league doesn't dominate. */
@@ -80,8 +69,8 @@ function diversifyLiveGames(games: GameDoc[], maxPerSport = 2): GameDoc[] {
   let round = 0;
   while (result.length < 10) {
     let added = false;
-    for (const sport of sports) {
-      const game = bySport.get(sport)?.[round];
+    for (const s of sports) {
+      const game = bySport.get(s)?.[round];
       if (game) {
         result.push(game);
         added = true;
@@ -93,23 +82,56 @@ function diversifyLiveGames(games: GameDoc[], maxPerSport = 2): GameDoc[] {
   return result;
 }
 
+function formatStartTime(startsAt: string): string {
+  return new Date(startsAt).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "America/New_York",
+  });
+}
+
 function GameRow({
   game,
   live,
 }: {
-  game: {
-    _id: string;
-    sport: string;
-    status: string;
-    startsAt: string;
-    awayTeam?: { abbr?: string; score?: number; logoUrl?: string };
-    homeTeam?: { abbr?: string; score?: number; logoUrl?: string };
-  };
+  game: GameDoc;
   live?: boolean;
 }) {
   const awayLogo = game.awayTeam?.logoUrl;
   const homeLogo = game.homeTeam?.logoUrl;
-  if (!awayLogo || !homeLogo) return null;
+
+  if (!awayLogo || !homeLogo) {
+    if (!game.tournamentName) return null;
+
+    return (
+      <div
+        className={cn(
+          "flex flex-col gap-2 px-5 py-4 rounded-2xl border bg-black/40 backdrop-blur-sm min-w-[260px]",
+          live ? "border-red-500/40 bg-red-950/20" : "border-white/10",
+        )}
+      >
+        <span className="text-[#D4AF37] font-black text-[9px] uppercase tracking-widest">
+          {game.sport}
+        </span>
+        <p className="text-white font-black text-sm uppercase tracking-tight leading-snug">
+          {game.tournamentName}
+        </p>
+        {game.venue?.name && (
+          <p className="text-gray-500 text-[10px] font-medium">{game.venue.name}</p>
+        )}
+        {live ? (
+          <span className="flex items-center gap-1.5 text-red-500 font-black uppercase text-[9px] tracking-widest">
+            <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+            Live
+          </span>
+        ) : (
+          <span className="text-[#D4AF37] font-black uppercase text-[9px] tracking-widest">
+            {formatStartTime(game.startsAt)}
+          </span>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -123,9 +145,11 @@ function GameRow({
       </span>
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <div className="h-6 w-6 relative shrink-0">
-          <Image src={awayLogo} fill className="object-contain" alt="" />
+          <Image src={awayLogo} fill className="object-contain" alt="" sizes="24px" />
         </div>
-        <span className="text-white font-black text-xs uppercase truncate">{game.awayTeam?.abbr ?? "TBD"}</span>
+        <span className="text-white font-black text-xs uppercase truncate">
+          {game.awayTeam?.abbr ?? "TBD"}
+        </span>
         {game.status !== "scheduled" && (
           <span className="text-white font-black text-xs">{game.awayTeam?.score ?? 0}</span>
         )}
@@ -133,9 +157,11 @@ function GameRow({
         {game.status !== "scheduled" && (
           <span className="text-white font-black text-xs">{game.homeTeam?.score ?? 0}</span>
         )}
-        <span className="text-white font-black text-xs uppercase truncate">{game.homeTeam?.abbr ?? "TBD"}</span>
+        <span className="text-white font-black text-xs uppercase truncate">
+          {game.homeTeam?.abbr ?? "TBD"}
+        </span>
         <div className="h-6 w-6 relative shrink-0">
-          <Image src={homeLogo} fill className="object-contain" alt="" />
+          <Image src={homeLogo} fill className="object-contain" alt="" sizes="24px" />
         </div>
       </div>
       {live ? (
@@ -144,52 +170,60 @@ function GameRow({
           Live
         </span>
       ) : game.status === "closed" ? (
-        <span className="text-gray-500 font-black uppercase text-[9px] tracking-widest shrink-0">Final</span>
+        <span className="text-gray-500 font-black uppercase text-[9px] tracking-widest shrink-0">
+          Final
+        </span>
       ) : (
         <span className="text-[#D4AF37] font-black uppercase text-[9px] tracking-widest shrink-0">
-          {new Date(game.startsAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+          {formatStartTime(game.startsAt)}
         </span>
       )}
     </div>
   );
 }
 
-export default function LiveGamesHome() {
+type LiveGamesHomeProps = {
+  sport: string;
+  onSportChange: (sport: string) => void;
+};
+
+export default function LiveGamesHome({ sport, onSportChange }: LiveGamesHomeProps) {
   const liveGames = useQuery(api.sports_queries.getLiveGames);
   const todayGames = useQuery(api.sports_queries.getTodayGames);
-  const [sport, setSport] = useState("ALL");
 
-  const sportOptions = useMemo(() => ["ALL", ...HOME_SPORT_FILTER_OPTIONS], []);
+  const sportOptions = useMemo(() => {
+    const inData = new Set((todayGames ?? []).map((g) => g.sport));
+    const ordered = SPORT_ORDER.filter((s) => inData.has(s));
+    const extras = Array.from(inData).filter(
+      (s) => !SPORT_ORDER.includes(s as (typeof SPORT_ORDER)[number]),
+    );
+    return ["ALL", ...ordered, ...extras.sort()];
+  }, [todayGames]);
 
   const filteredLive = useMemo(() => {
-    const live = liveGames ?? [];
+    const live = (liveGames ?? []).filter(isDisplayableGame);
     if (sport === "ALL") return diversifyLiveGames(live);
     return live.filter((g) => g.sport === sport);
   }, [liveGames, sport]);
 
-  const filteredToday = useMemo(() => {
+  const filteredUpcoming = useMemo(() => {
     const today = todayGames ?? [];
     const forSport = sport === "ALL" ? today : today.filter((g) => g.sport === sport);
     return forSport
-      .filter((g) => g.status !== "inprogress")
-      .filter((g) => g.awayTeam?.logoUrl && g.homeTeam?.logoUrl)
+      .filter((g) => g.status === "scheduled" || g.status === "postponed")
+      .filter(isDisplayableGame)
+      .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
       .slice(0, 8);
-  }, [todayGames, sport]);
-
-  const liveCountForSport = useMemo(() => {
-    if (sport === "ALL") return liveGames?.length ?? 0;
-    return (liveGames ?? []).filter((g) => g.sport === sport).length;
-  }, [liveGames, sport]);
-
-  const todayCountForSport = useMemo(() => {
-    if (sport === "ALL") return todayGames?.length ?? 0;
-    return (todayGames ?? []).filter((g) => g.sport === sport).length;
   }, [todayGames, sport]);
 
   const hasAnyToday = (todayGames?.length ?? 0) > 0;
   const hasAnyLive = (liveGames?.length ?? 0) > 0;
+  const showLiveSection = filteredLive.length > 0;
+  const showUpcomingSection = filteredUpcoming.length > 0;
 
   if (!hasAnyToday && !hasAnyLive) return null;
+
+  const upcomingIsPrimary = !showLiveSection && showUpcomingSection;
 
   return (
     <section className="py-16 border-y border-white/5 bg-[#050505]">
@@ -203,73 +237,77 @@ export default function LiveGamesHome() {
               What&apos;s On Today
             </h2>
             <p className="text-gray-500 text-sm font-medium mt-3 max-w-xl">
-              Live scores on our 14 HD screens. Pick a sport to see what&apos;s on right now — everything else scrolls in the ticker below.
+              {showLiveSection
+                ? "Live scores on our 14 HD screens — plus what's coming up next."
+                : "Tonight's matchups on our 14 HD screens. Pick a sport to focus the board."}
             </p>
           </div>
 
           <div className="relative shrink-0 w-full sm:w-auto sm:min-w-[220px]">
-              <label htmlFor="live-sport-filter" className="sr-only">
-                Filter by sport
-              </label>
-              <select
-                id="live-sport-filter"
-                value={sport}
-                onChange={(e) => setSport(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-white/10 bg-black px-4 py-3 pr-10 text-[11px] font-black uppercase tracking-widest text-white focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/30"
-              >
-                {sportOptions.map((option) => (
-                  <option key={option} value={option} className="bg-[#121212]">
-                    {sportLabel(option)}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D4AF37]"
-                aria-hidden
-              />
-            </div>
+            <label htmlFor="live-sport-filter" className="sr-only">
+              Filter by sport
+            </label>
+            <select
+              id="live-sport-filter"
+              value={sport}
+              onChange={(e) => onSportChange(e.target.value)}
+              className="w-full appearance-none rounded-xl border border-white/10 bg-black px-4 py-3 pr-10 text-[11px] font-black uppercase tracking-widest text-white focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/30"
+            >
+              {sportOptions.map((option) => (
+                <option key={option} value={option} className="bg-[#121212]">
+                  {sportLabel(option)}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D4AF37]"
+              aria-hidden
+            />
+          </div>
         </div>
 
-        <div>
-          <p className="text-red-500 font-black uppercase tracking-[0.2em] text-[10px] mb-4 flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-            Live Now
-          </p>
-
-          {filteredLive.length > 0 ? (
+        {showLiveSection && (
+          <div className="mb-8">
+            <p className="text-red-500 font-black uppercase tracking-[0.2em] text-[10px] mb-4 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+              Live Now
+            </p>
             <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
               {filteredLive.map((game) => (
                 <GameRow key={game._id} game={game} live />
               ))}
             </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 px-5 py-6">
-              <p className="text-gray-400 text-sm font-medium leading-relaxed">
-                {sport === "ALL"
-                  ? "Nothing live across our boards right now. Scroll the ticker below for today's scores and start times."
-                  : emptyStateMessage(sport)}
-              </p>
-              {sport !== "ALL" && todayCountForSport === 0 && liveCountForSport === 0 && (
-                <p className="text-gray-600 text-xs font-medium mt-3">
-                  We sync scores from ESPN throughout the day — check back closer to game time.
-                </p>
-              )}
-            </div>
-          )}
+          </div>
+        )}
 
-          {filteredLive.length === 0 && filteredToday.length > 0 && (
-            <div className="mt-8">
-              <p className="text-[#D4AF37] font-black uppercase tracking-[0.2em] text-[10px] mb-4">
-                {sport === "ALL" ? "On Deck Today" : `${sportLabel(sport)} Today`}
-              </p>
-              <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-                {filteredToday.map((game) => (
-                  <GameRow key={game._id} game={game} />
-                ))}
-              </div>
+        {showUpcomingSection && (
+          <div>
+            <p
+              className={cn(
+                "font-black uppercase tracking-[0.2em] text-[10px] mb-4 flex items-center gap-2",
+                upcomingIsPrimary ? "text-[#D4AF37]" : "text-gray-400",
+              )}
+            >
+              {!upcomingIsPrimary && <span className="h-1.5 w-1.5 rounded-full bg-[#D4AF37]" />}
+              {upcomingIsPrimary ? "Upcoming" : "Also Coming Up"}
+            </p>
+            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+              {filteredUpcoming.map((game) => (
+                <GameRow key={game._id} game={game} />
+              ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {!showLiveSection && !showUpcomingSection && (
+          <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 px-5 py-6">
+            <p className="text-gray-400 text-sm font-medium leading-relaxed">
+              {sport === "ALL"
+                ? "Nothing on our boards for this filter right now. Scroll the ticker below for today's scores."
+                : emptyStateMessage(sport)}
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

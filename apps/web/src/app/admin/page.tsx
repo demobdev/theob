@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useAction } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { 
   ShoppingBag, 
@@ -41,7 +41,7 @@ const StatCard = ({ title, value, icon: Icon, description, trend, trendColor }: 
 
 export default function AdminDashboard() {
   const stats = useQuery(api.admin.getAdminStats);
-  const repairImages = useMutation(api.admin_products.backfillProductImages);
+  const syncImagesToStorage = useAction(api.menuImageActions.syncProductImagesToStorage);
   const [repairStatus, setRepairStatus] = useState<string | null>(null);
 
   if (!stats) {
@@ -150,24 +150,30 @@ export default function AdminDashboard() {
            </h3>
            <button 
             onClick={async () => {
-              setRepairStatus("Repairing...");
+              setRepairStatus("Uploading to storage...");
               try {
-                const result = await repairImages();
-                setRepairStatus(`Fixed ${result.updatedCount} images!`);
+                const result = await syncImagesToStorage({
+                  baseUrl: window.location.origin,
+                });
+                setRepairStatus(
+                  `Uploaded ${result.uploaded} images (${result.failed.length} failed)`,
+                );
               } catch (e) {
-                setRepairStatus("Failed to repair");
+                setRepairStatus("Failed to upload images");
               }
-              setTimeout(() => setRepairStatus(null), 3000);
+              setTimeout(() => setRepairStatus(null), 5000);
             }}
             disabled={!!repairStatus}
             className="w-full flex items-center gap-4 p-4 bg-[#161618] border border-[#222] rounded-lg hover:border-[#FFA500]/50 transition-all text-left"
            >
               <div className="p-2 bg-[#0f0f11] rounded-md">
-                 {repairStatus?.includes("Fixed") ? <CheckCircle2 size={16} className="text-green-500" /> : <ImageIcon size={16} className="text-gray-400" />}
+                 {repairStatus?.includes("Uploaded") ? <CheckCircle2 size={16} className="text-green-500" /> : <ImageIcon size={16} className="text-gray-400" />}
               </div>
               <div>
-                 <p className="text-white font-bold text-xs">{repairStatus || "Repair Image Links"}</p>
-                 <p className="text-gray-500 text-[10px] font-medium uppercase tracking-widest">Sync database with local assets</p>
+                 <p className="text-white font-bold text-xs">{repairStatus || "Upload Menu Images to Storage"}</p>
+                 <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-1">
+                   Pulls /images/food/*.png from this site into Convex file storage
+                 </p>
               </div>
            </button>
         </div>

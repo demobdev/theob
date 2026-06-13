@@ -68,6 +68,36 @@
     background-attachment: fixed;
   }
 
+  /* Subtle charcoal tile grid — less busy than leather for full-width sections */
+  .surface-tile {
+    background-color: #0a0a0a;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(rgba(212, 175, 55, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212, 175, 55, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px, 32px 32px, 128px 128px, 128px 128px;
+    background-position: center;
+  }
+
+  .plaid-pattern {
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 10px,
+        rgba(212, 175, 55, 0.12) 10px,
+        rgba(212, 175, 55, 0.12) 11px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 10px,
+        rgba(212, 175, 55, 0.12) 10px,
+        rgba(212, 175, 55, 0.12) 11px
+      );
+  }
+
   .gold-gradient {
     background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
   }

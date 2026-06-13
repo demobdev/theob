@@ -9,6 +9,7 @@
     "dev:web": "npm run dev --workspace=web-app",
     "build:vercel": "node scripts/vercel-build.mjs",
     "seed": "convex run seedMenu:populate && convex run seedRewards:seedRewards",
+    "upload:menu-images": "node scripts/upload-menu-images-via-cli.mjs",
     "sync:env": "node scripts/sync-convex-env.mjs",
     "ios": "npm run ios --workspace=native",
     "android": "npm run android --workspace=native",

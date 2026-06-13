@@ -75,6 +75,10 @@ export default function ProductDetailModal({
                       className="object-cover object-center"
                       alt={product.name}
                       sizes="(max-width: 768px) 100vw, 42vw"
+                      unoptimized={
+                        imageSrc.includes("convex.cloud") ||
+                        imageSrc.includes("convex.site")
+                      }
                       onError={(e) => {
                         const t = e.target as HTMLImageElement;
                         if (!t.src.endsWith("/loading-icon.png")) {

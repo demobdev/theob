@@ -93,7 +93,11 @@ export const generateUploadUrl = mutation({
 });
 
 export const updateProductImage = mutation({
-  args: { productId: v.id("products"), storageId: v.string() },
+  args: {
+    productId: v.id("products"),
+    storageId: v.id("_storage"),
+  },
+  returns: v.object({ imageUrl: v.string() }),
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
     const imageUrl = await ctx.storage.getUrl(args.storageId);
@@ -106,26 +110,43 @@ export const updateProductImage = mutation({
 
 export const backfillProductImages = mutation({
   args: {},
+  returns: v.object({ updatedCount: v.number() }),
   handler: async (ctx) => {
     await requireAdmin(ctx);
     const products = await ctx.db.query("products").collect();
-    
-    const mapping: Record<string, string> = {
-      "Crab Dip": "/images/food/crab_dip.png",
-      "The Owner's Wings": "/images/food/wings.png",
-      "Spicy Bang-Bang Shrimp": "/images/food/bang_bang_shrimp.png",
-      "The Bar Chicken": "/images/food/chicken_sandwich.png",
-      "Classic Philly": "/images/food/philly.png",
-      "Crispy Fried Shrimp": "/images/food/fried_shrimp.png",
+
+    const slugByName: Record<string, string> = {
+      "Crab Dip": "crab_dip",
+      "Crispy Fried Shrimp": "fried_shrimp",
+      "Queso & Chorizo": "queso_chorizo",
+      "Spicy Bang-Bang Shrimp": "spicy_bang_bang",
+      "Loaded Short Rib Nachos": "short_rib_nachos",
+      "Classic Caesar Salad": "caesar_salad",
+      "Chopped House Salad": "chopped_salad",
+      "Fried Goat Cheese & Arugula": "goat_cheese_salad",
+      Chicago: "chicago_dog",
+      "The Bar Chicken": "bar_chicken",
+      "Crab Cake": "crab_cake",
+      "Classic Philly": "philly",
+      "Jumbo Wings": "jumbo_wings",
+      "Rib Eye Steak": "rib_eye",
+      "Picanha Steak": "picanha_steak",
+      "Build Your Own Pizza": "cheese_pizza",
+      "Meat Lover Pizza": "meat_lover_pizza",
+      "Classic Two-Egg Breakfast": "egg_breakfast",
+      "Draft Bud Light": "beer",
+      "Fountain Drink": "soda",
+      "Fountain Soda": "soda",
     };
 
     let updatedCount = 0;
     for (const product of products) {
-      const newImage = mapping[product.name];
-      if (newImage && product.image !== newImage) {
-        await ctx.db.patch(product._id, { image: newImage });
-        updatedCount++;
-      }
+      const slug = slugByName[product.name];
+      if (!slug) continue;
+      if (product.image === slug) continue;
+      if (product.image?.startsWith("http")) continue;
+      await ctx.db.patch(product._id, { image: slug });
+      updatedCount++;
     }
 
     return { updatedCount };

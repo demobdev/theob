@@ -20,10 +20,13 @@ import type * as integrations_genius_queries from "../integrations/genius/querie
 import type * as integrations_genius_submitOrder from "../integrations/genius/submitOrder.js";
 import type * as integrations_genius_types from "../integrations/genius/types.js";
 import type * as lib_locations from "../lib/locations.js";
+import type * as lib_menuImagePaths from "../lib/menuImagePaths.js";
 import type * as lib_requireAdmin from "../lib/requireAdmin.js";
 import type * as lib_venueTimezone from "../lib/venueTimezone.js";
 import type * as loyalty from "../loyalty.js";
 import type * as menuCleanup from "../menuCleanup.js";
+import type * as menuImageActions from "../menuImageActions.js";
+import type * as menuImages from "../menuImages.js";
 import type * as notes from "../notes.js";
 import type * as openai from "../openai.js";
 import type * as orders from "../orders.js";
@@ -73,10 +76,13 @@ declare const fullApi: ApiFromModules<{
   "integrations/genius/submitOrder": typeof integrations_genius_submitOrder;
   "integrations/genius/types": typeof integrations_genius_types;
   "lib/locations": typeof lib_locations;
+  "lib/menuImagePaths": typeof lib_menuImagePaths;
   "lib/requireAdmin": typeof lib_requireAdmin;
   "lib/venueTimezone": typeof lib_venueTimezone;
   loyalty: typeof loyalty;
   menuCleanup: typeof menuCleanup;
+  menuImageActions: typeof menuImageActions;
+  menuImages: typeof menuImages;
   notes: typeof notes;
   openai: typeof openai;
   orders: typeof orders;
