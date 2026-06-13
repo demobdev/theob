@@ -106,22 +106,22 @@ export default function AppDownloadPromoModal() {
 
                 <div className="relative z-10 p-8 pt-10 text-center">
                   <span className="mb-4 inline-block rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37]">
-                    We&apos;re Open
+                    Now Open
                   </span>
 
                   <Dialog.Title
                     id="open-announcement-title"
                     className="text-3xl font-black uppercase leading-tight tracking-tight text-white"
                   >
-                    Grand opening was{" "}
-                    <span className="gold-text-gradient">yesterday.</span>
+                    We&apos;re open in{" "}
+                    <span className="gold-text-gradient">Greenville.</span>
                   </Dialog.Title>
 
                   <Dialog.Description
                     id="open-announcement-description"
                     className="mt-4 text-base font-medium leading-relaxed text-gray-300"
                   >
-                    We&apos;re open now and ready for game day. Come see us at 1757 Woodruff Rd in Greenville — great food, cold drinks, and wall-to-wall sports.
+                    Stop by 1757 Woodruff Rd for game day food, cold drinks, and wall-to-wall sports — or browse the menu and order takeout online.
                   </Dialog.Description>
 
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
