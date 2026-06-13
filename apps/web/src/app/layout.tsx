@@ -12,8 +12,8 @@ const montserrat = Montserrat({ subsets: ["latin"] });
 const lato = Lato({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "The Owner's Box | Greenville's Sports Bar",
-  description: "Watch live sports, order food, and enjoy game day at The Owner's Box in Greenville, SC.",
+  title: "The Owner's Box | Sports Bar & Grill",
+  description: "Now open on Woodruff Road. Game day food, 14 HD screens, takeout ordering, and DoorDash delivery.",
   icons: {
     icon: "/ob-icon.png",
     apple: "/ob-icon.png",

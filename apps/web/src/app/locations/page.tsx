@@ -110,7 +110,7 @@ export default function LocationsPage() {
               Location & Contact
             </h1>
             <p className="text-gray-400 font-medium leading-relaxed">
-              Greenville&apos;s premier sports bar experience. One address, full menu, and game-day energy on Woodruff Road.
+              Now open at 1757 Woodruff Rd. Dine in, order takeout online, or get DoorDash delivery — one address with the full menu and game-day energy.
             </p>
           </div>
 

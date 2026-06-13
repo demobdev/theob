@@ -5,7 +5,7 @@ import { Zap, Trophy, Star, Smartphone } from "lucide-react";
 import AppComingSoonBadges from "@/components/common/AppComingSoonBadges";
 
 const appFeatures = [
-  { icon: Zap, text: "Reorder favorites in a few taps" },
+  { icon: Zap, text: "Reorder favorites in a few taps — coming in the app" },
   { icon: Star, text: "Live game schedules on every screen" },
   { icon: Trophy, text: "See what's on TV and what's coming up" },
   { icon: Smartphone, text: "Mobile apps launching soon" },
@@ -101,7 +101,7 @@ export default function AppPromoBanner() {
               <span className="gold-text-gradient">In Your Pocket.</span>
             </h2>
             <p className="text-gray-400 text-lg md:text-xl font-medium max-w-xl mx-auto lg:mx-0 leading-relaxed mb-10">
-              Our mobile apps are on the way. Until then, browse the menu here and order takeout or delivery from the site.
+              Our mobile apps are on the way. Until then, browse the menu here and use Order Takeout or DoorDash from the header.
             </p>
 
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">

@@ -113,15 +113,15 @@ export default function AppDownloadPromoModal() {
                     id="open-announcement-title"
                     className="text-3xl font-black uppercase leading-tight tracking-tight text-white"
                   >
-                    We&apos;re open in{" "}
-                    <span className="gold-text-gradient">Greenville.</span>
+                    Ready for{" "}
+                    <span className="gold-text-gradient">game day.</span>
                   </Dialog.Title>
 
                   <Dialog.Description
                     id="open-announcement-description"
                     className="mt-4 text-base font-medium leading-relaxed text-gray-300"
                   >
-                    Stop by 1757 Woodruff Rd for game day food, cold drinks, and wall-to-wall sports — or browse the menu and order takeout online.
+                    Wings, craft pizza, cold drinks, and 14 HD screens. Pull up to 1757 Woodruff Rd, order takeout online, or get delivery on DoorDash.
                   </Dialog.Description>
 
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">

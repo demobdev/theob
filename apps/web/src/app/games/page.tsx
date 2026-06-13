@@ -35,7 +35,7 @@ export default function GamesPage() {
               Never Wonder What&apos;s On.
             </h1>
             <p className="text-gray-400 text-base sm:text-lg font-medium leading-relaxed">
-              Live schedules, fight nights, and TV maps are coming to our mobile apps — the fastest way to see what&apos;s playing at The Owner&apos;s Box before you head in.
+              Check live scores on the homepage ticker today. Full TV schedules, fight nights, and screen maps launch with our mobile apps — the fastest way to plan your visit.
             </p>
           </div>
 
@@ -50,7 +50,7 @@ export default function GamesPage() {
                     Apps launching soon
                   </p>
                   <p className="text-gray-400 text-sm font-medium">
-                    Fight nights, NFL Sunday Ticket matchups, and wall-to-wall TV maps — built for Greenville.
+                    Fight nights, NFL Sunday Ticket matchups, and wall-to-wall TV maps — in the apps when they launch.
                   </p>
                 </div>
                 <AppComingSoonBadges direction="row" className="justify-center md:justify-start" />
@@ -84,7 +84,7 @@ export default function GamesPage() {
                 href="/locations"
                 className="text-sm font-black uppercase tracking-widest hover:text-[#D4AF37]"
               >
-                Greenville Location
+                Visit Us
               </Link>
             </div>
           </div>

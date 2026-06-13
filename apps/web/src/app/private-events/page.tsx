@@ -58,7 +58,7 @@ export default function PrivateEventsPage() {
         </div>
 
         <p className="text-gray-500 text-sm mb-8">
-          Online catering checkout isn&apos;t on the app yet — inquiries go through our team directly.
+          Online catering checkout isn&apos;t on the site yet — inquiries go through our team directly.
         </p>
         <Link href="/locations#contact">
           <button

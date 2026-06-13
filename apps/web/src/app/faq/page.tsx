@@ -9,7 +9,7 @@ export const metadata = {
 const faqs = [
   {
     q: "What are your hours?",
-    a: "Sun – Thu: 11AM – 11PM. Fri – Sat: 11AM – 1AM. Kitchen hours may vary on holidays — call ahead or check our locations page.",
+    a: "Sun – Thu: 11AM – 11PM. Fri – Sat: 11AM – 1AM. Kitchen hours may vary on holidays — call ahead or visit our location page.",
   },
   {
     q: "Where are you located?",
@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     q: "Can I order online?",
-    a: "Browse the full menu on our website. For takeout, use the Order Takeout button to checkout on our Heartland online ordering site. We do not offer in-browser checkout on the web.",
+    a: "Browse the full menu on our website. For takeout, use Order Takeout in the header — it opens our Heartland online ordering site. Delivery is available through DoorDash.",
   },
   {
     q: "Do you offer delivery?",
@@ -25,7 +25,7 @@ const faqs = [
   },
   {
     q: "Are mobile apps available?",
-    a: "iOS and Android apps are coming soon. Live game schedules and more features will launch with the apps.",
+    a: "iOS and Android apps are coming soon. Until then, check live scores on the homepage sport filter and ticker. Full TV schedules launch with the apps.",
   },
   {
     q: "What is curbside pickup?",
@@ -37,11 +37,11 @@ const faqs = [
   },
   {
     q: "How do I see what games are on?",
-    a: "We run major national matchups on 14 HD screens. Full TV schedules will be available in our mobile apps when they launch.",
+    a: "Use the homepage sport filter and scrolling ticker for today's live scores and start times. Full TV schedules and screen assignments launch with our mobile apps.",
   },
   {
     q: "Do you host private events?",
-    a: "Yes — groups and watch parties. Visit our Private Events page or contact us through the location page form.",
+    a: "Yes — groups and watch parties. Visit our Private Events page or contact us through the Visit Us page form.",
   },
   {
     q: "Is there a dress code?",
@@ -53,7 +53,7 @@ const faqs = [
   },
   {
     q: "How do I contact the restaurant?",
-    a: "Use the contact form on our Locations page, email support@ownersboxgvl.com, or call (864) 555-0123 during business hours.",
+    a: "Use the contact form on our Visit Us page, email support@ownersboxgvl.com, or call (864) 555-0123 during business hours.",
   },
 ];
 

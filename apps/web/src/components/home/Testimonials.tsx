@@ -13,9 +13,9 @@ const TestimonialsData = [
     designation: "Regular",
   },
   {
-    quote: "Easiest pickup experience I’ve had. Order in the app, walk in, game is on, food is ready. This is how hospitality should work.",
+    quote: "Easiest pickup experience I’ve had. Order takeout online, walk in, game is on, food is ready. This is how hospitality should work.",
     name: "James D.",
-    designation: "MVP Guest",
+    designation: "Regular",
   },
 ];
 

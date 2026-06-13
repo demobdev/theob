@@ -18,7 +18,7 @@ import DoorDashButton from "./common/DoorDashButton";
 const navigation = [
   { name: "Menu", href: "/menu" },
   { name: "Live Games", href: "/games" },
-  { name: "Locations", href: "/locations" },
+  { name: "Visit Us", href: "/locations" },
 ];
 
 const moreLinks = [

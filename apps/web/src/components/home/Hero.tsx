@@ -21,7 +21,7 @@ const Hero = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-sm font-bold uppercase tracking-[0.2em] mb-6 animate-fade-in">
-            The Owner&apos;s Favorites
+            Now Open
           </span>
           <h1 className="font-montserrat text-white text-5xl sm:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.9] mb-8">
             Craft Pizza, <br />
@@ -29,7 +29,7 @@ const Hero = () => {
             <br /> Game Day Energy
           </h1>
           <p className="text-gray-300 text-lg sm:text-xl font-medium leading-relaxed mb-12 max-w-2xl mx-auto lg:mx-0">
-            The Owner&apos;s Box brings together scratch-made favorites, real-time sports, easy online ordering, and a game-day atmosphere built for regulars. Come in for the game. Stay for the food.
+            Now open with scratch-made favorites, wall-to-wall sports, and a game-day atmosphere built for regulars. Browse the menu here — order takeout or DoorDash delivery from the header.
           </p>
 
           <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center lg:justify-start">

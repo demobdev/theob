@@ -15,12 +15,12 @@ const socialLinks = [
 ];
 const footerNav = {
   explore: [
-    { name: "The Lineup", href: "/menu" },
+    { name: "View Menu", href: "/menu" },
     { name: "Live Games", href: "/games" },
-    { name: "Order Online", href: "/menu" },
+    { name: "Visit Us", href: "/locations" },
   ],
   visit: [
-    { name: "Greenville, SC", href: "/locations" },
+    { name: "Visit Us", href: "/locations" },
     { name: "Private Events", href: "/private-events" },
     { name: "About the Box", href: "/about" },
     { name: "FAQ", href: "/faq" },
@@ -42,7 +42,7 @@ const Footer = () => {
           <div className="space-y-8">
             <Logo />
             <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-xs">
-              Greenville&apos;s premier sports bar experience. Where game-day energy meets modern hospitality — great food, cold drinks, and wall-to-wall sports in the Upstate.
+              Now open on Woodruff Road. Scratch-made food, cold drinks, and game day on 14 HD screens.
             </p>
             <div className="flex gap-4">
               {socialLinks.map(({ icon: Icon, href, label }) => (

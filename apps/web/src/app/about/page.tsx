@@ -6,7 +6,7 @@ import Link from "next/link";
 export const metadata = {
   title: "About | The Owner's Box",
   description:
-    "Owner's Box Bar & Grill in Greenville, SC — sports bar, scratch-made food, EST 2026.",
+    "Now open on Woodruff Road — sports bar, scratch-made food, takeout, and DoorDash delivery.",
 };
 
 export default function AboutPage() {
@@ -32,7 +32,7 @@ export default function AboutPage() {
             Wall-to-wall screens, NFL Sunday Ticket, and a kitchen that doesn&apos;t cut corners. Whether you&apos;re in for lunch, brunch, or a late-night finish, you get real hospitality and a menu built for sharing.
           </p>
           <p>
-            Order ahead in our app, earn rewards on every visit, and see what&apos;s on TV before you walk in. One location on Woodruff Road — for now — with more Upstate neighborhoods on the radar.
+            Browse the menu on our site, order takeout through Heartland, or get delivery on DoorDash. Mobile apps are on the way with live schedules and faster reorder. One location on Woodruff Road — pull up for the full experience.
           </p>
         </div>
         <div className="mt-12 flex flex-wrap gap-4">
