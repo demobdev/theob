@@ -422,7 +422,7 @@ export const addExtras = mutation({
 });
 
 /**
- * Ensures Fountain Soda exists with Pepsi lineup. Skips removed Coke SKUs.
+ * Ensures Fountain Drink exists with Pepsi lineup. Skips removed Coke SKUs.
  * Safe to re-run. Run AFTER seedMenu:populate if Fountain Soda is missing.
  */
 export const ensureFountainSoda = mutation({
@@ -435,7 +435,9 @@ export const ensureFountainSoda = mutation({
     }
 
     const existing = await ctx.db.query("products").collect();
-    const fountain = existing.find((p) => p.name === "Fountain Soda");
+    const fountain = existing.find(
+      (p) => p.name === "Fountain Drink" || p.name === "Fountain Soda",
+    );
 
     const icePreference = {
       name: "Ice Preference",
@@ -460,7 +462,8 @@ export const ensureFountainSoda = mutation({
 
     if (fountain) {
       await ctx.db.patch(fountain._id, {
-        description: "Pepsi products. Free refills.",
+        name: "Fountain Drink",
+        description: "Pepsi fountain lineup. Free refills.",
         isFeatured: true,
         modifiers: [
           {
@@ -478,12 +481,12 @@ export const ensureFountainSoda = mutation({
           icePreference,
         ],
       });
-      return "Updated Fountain Soda to Pepsi lineup.";
+      return "Updated Fountain Drink to Pepsi lineup.";
     }
 
     await ctx.db.insert("products", {
-      name: "Fountain Soda",
-      description: "Pepsi products. Free refills.",
+      name: "Fountain Drink",
+      description: "Pepsi fountain lineup. Free refills.",
       price: 3.5,
       pointsWorth: 3,
       categoryId: drinksCat._id,
@@ -506,6 +509,6 @@ export const ensureFountainSoda = mutation({
       ],
     });
 
-    return "Added Fountain Soda with Pepsi lineup.";
+    return "Added Fountain Drink with Pepsi lineup.";
   },
 });

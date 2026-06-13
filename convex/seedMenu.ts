@@ -469,8 +469,8 @@ export const populate = mutation({
       ]
     });
     await ctx.db.insert("products", {
-      name: "Fountain Soda",
-      description: "Pepsi products. Free refills.",
+      name: "Fountain Drink",
+      description: "Pepsi fountain lineup. Free refills.",
       price: 3.50,
       pointsWorth: 3,
       categoryId: catMap["Drinks"],

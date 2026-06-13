@@ -11,6 +11,18 @@ const REMOVED_DRINK_NAMES = [
   "Sprite Bottle (20oz)",
 ] as const;
 
+const REMOVED_DRINK_IMAGE_KEYS = new Set([
+  "coca_cola",
+  "diet_coke",
+  "coke_zero",
+  "sprite",
+  "bottled_coke",
+  "bottled_diet_coke",
+  "bottled_sprite",
+]);
+
+const FOUNTAIN_DRINK_NAMES = ["Fountain Soda", "Fountain Drink"] as const;
+
 const PEPSI_FLAVOR_MODIFIER = {
   name: "Flavor",
   type: "single_select" as const,
@@ -35,23 +47,53 @@ export const removeCokeDrinks = mutation({
     let deleted = 0;
 
     for (const product of products) {
-      if (REMOVED_DRINK_NAMES.includes(product.name as (typeof REMOVED_DRINK_NAMES)[number])) {
+      const isNamedCokeSku = REMOVED_DRINK_NAMES.includes(
+        product.name as (typeof REMOVED_DRINK_NAMES)[number],
+      );
+      const isCokeImageSku =
+        product.image != null && REMOVED_DRINK_IMAGE_KEYS.has(product.image);
+
+      if (isNamedCokeSku || isCokeImageSku) {
         await ctx.db.delete(product._id);
         deleted++;
       }
     }
 
-    const fountain = products.find((p) => p.name === "Fountain Soda");
+    const fountain = products.find(
+      (p) =>
+        FOUNTAIN_DRINK_NAMES.includes(
+          p.name as (typeof FOUNTAIN_DRINK_NAMES)[number],
+        ) && !REMOVED_DRINK_NAMES.includes(p.name as (typeof REMOVED_DRINK_NAMES)[number]),
+    );
     if (fountain) {
-      const flavorMod = fountain.modifiers?.find((m) => m.name === "Flavor");
-      const otherMods = fountain.modifiers?.filter((m) => m.name !== "Flavor") ?? [];
+      const otherMods =
+        fountain.modifiers?.filter((m) => m.name !== "Flavor") ?? [];
       await ctx.db.patch(fountain._id, {
-        description: "Pepsi products. Free refills.",
+        name: "Fountain Drink",
+        description: "Pepsi fountain lineup. Free refills.",
         isFeatured: true,
+        image: "soda",
         modifiers: [PEPSI_FLAVOR_MODIFIER, ...otherMods],
       });
+    } else {
+      const drinksCat = await ctx.db
+        .query("categories")
+        .filter((q) => q.eq(q.field("name"), "Drinks"))
+        .first();
+      if (drinksCat) {
+        await ctx.db.insert("products", {
+          name: "Fountain Drink",
+          description: "Pepsi fountain lineup. Free refills.",
+          price: 3.5,
+          pointsWorth: 3,
+          categoryId: drinksCat._id,
+          image: "soda",
+          isFeatured: true,
+          modifiers: [PEPSI_FLAVOR_MODIFIER],
+        });
+      }
     }
 
-    return `Removed ${deleted} Coke/Sprite drink product(s); updated Fountain Soda.`;
+    return `Removed ${deleted} Coke/Sprite drink product(s); Fountain Drink updated.`;
   },
 });

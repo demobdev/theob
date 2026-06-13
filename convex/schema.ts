@@ -1,6 +1,30 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+const teamInfo = v.object({
+  id: v.string(),
+  name: v.string(),
+  abbr: v.optional(v.string()),
+  logoUrl: v.optional(v.string()),
+  logoUrlSmall: v.optional(v.string()),
+  flagUrl: v.optional(v.string()),
+  wins: v.optional(v.number()),
+  losses: v.optional(v.number()),
+  draws: v.optional(v.number()),
+  runs: v.optional(v.number()),
+  hits: v.optional(v.number()),
+  errors: v.optional(v.number()),
+  score: v.optional(v.number()),
+  probablePitcher: v.optional(
+    v.object({
+      fullName: v.string(),
+      wins: v.optional(v.number()),
+      losses: v.optional(v.number()),
+      era: v.optional(v.number()),
+    }),
+  ),
+});
+
 export default defineSchema({
   notes: defineTable({
     userId: v.string(),
@@ -15,54 +39,8 @@ export default defineSchema({
     status: v.string(),
     startsAt: v.string(),
     startsAtLocal: v.optional(v.string()),
-    homeTeam: v.optional(
-      v.object({
-        id: v.string(),
-        name: v.string(),
-        abbr: v.optional(v.string()),
-        logoUrl: v.optional(v.string()),
-        logoUrlSmall: v.optional(v.string()),
-        wins: v.optional(v.number()),
-        losses: v.optional(v.number()),
-        draws: v.optional(v.number()),
-        runs: v.optional(v.number()),
-        hits: v.optional(v.number()),
-        errors: v.optional(v.number()),
-        score: v.optional(v.number()),
-        probablePitcher: v.optional(
-          v.object({
-            fullName: v.string(),
-            wins: v.optional(v.number()),
-            losses: v.optional(v.number()),
-            era: v.optional(v.number()),
-          })
-        ),
-      })
-    ),
-    awayTeam: v.optional(
-      v.object({
-        id: v.string(),
-        name: v.string(),
-        abbr: v.optional(v.string()),
-        logoUrl: v.optional(v.string()),
-        logoUrlSmall: v.optional(v.string()),
-        wins: v.optional(v.number()),
-        losses: v.optional(v.number()),
-        draws: v.optional(v.number()),
-        runs: v.optional(v.number()),
-        hits: v.optional(v.number()),
-        errors: v.optional(v.number()),
-        score: v.optional(v.number()),
-        probablePitcher: v.optional(
-          v.object({
-            fullName: v.string(),
-            wins: v.optional(v.number()),
-            losses: v.optional(v.number()),
-            era: v.optional(v.number()),
-          })
-        ),
-      })
-    ),
+    homeTeam: v.optional(teamInfo),
+    awayTeam: v.optional(teamInfo),
     tournamentName: v.optional(v.string()),
     venue: v.optional(
       v.object({

@@ -6,7 +6,7 @@ const foodHighlights = [
     id: "pizza",
     title: "Craft Pizza",
     description: "House-made dough, aged for 48 hours. Topped with artisan mozzarella and premium local ingredients.",
-    image: "/images/food/pizza.png",
+    image: "/images/food/official/featured-pizza.png",
     tag: "Signature"
   },
   {

@@ -121,6 +121,32 @@ export default function ProductDetailModal({
                         </p>
                       </div>
                     )}
+
+                    {product.modifiers && product.modifiers.length > 0 && (
+                      <div className="space-y-5 mb-8">
+                        {product.modifiers.map((modifier) => (
+                          <div key={modifier.name}>
+                            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#D4AF37] mb-3">
+                              {modifier.name}
+                              {modifier.required ? "" : " (optional)"}
+                            </p>
+                            <ul className="flex flex-wrap gap-2">
+                              {modifier.options.map((option) => (
+                                <li
+                                  key={option.name}
+                                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-gray-300"
+                                >
+                                  {option.name}
+                                  {option.priceExtra > 0
+                                    ? ` +$${option.priceExtra.toFixed(2)}`
+                                    : null}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-6 md:p-8 border-t border-white/10 bg-black shrink-0">

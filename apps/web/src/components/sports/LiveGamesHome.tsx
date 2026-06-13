@@ -13,19 +13,55 @@ type GameDoc = NonNullable<
 
 const SPORT_LABELS: Record<string, string> = {
   ALL: "All Sports",
-  MLB: "MLB",
-  NBA: "NBA",
-  NHL: "NHL",
   NFL: "NFL",
   NCAAF: "College Football",
-  NCAAB: "College Basketball",
-  MLS: "MLS",
-  SOCCER: "Soccer",
-  GOLF: "Golf",
+  NBA: "NBA",
+  MLB: "MLB",
+  NHL: "NHL",
+  GOLF: "PGA Tour",
+  UFC: "UFC",
+  NASCAR: "NASCAR",
+  F1: "Formula 1",
 };
+
+/** Every sport we sync — always shown in the filter, even with no games today. */
+const HOME_SPORT_FILTER_OPTIONS = [
+  "NFL",
+  "NBA",
+  "NHL",
+  "MLB",
+  "NCAAF",
+  "UFC",
+  "GOLF",
+  "NASCAR",
+  "F1",
+] as const;
 
 function sportLabel(sport: string): string {
   return SPORT_LABELS[sport] ?? sport;
+}
+
+function emptyStateMessage(sport: string): string {
+  const label = sportLabel(sport);
+  const month = new Date().getMonth();
+
+  if (sport === "NFL" || sport === "NCAAF") {
+    if (month >= 2 && month <= 6) {
+      return `${label} picks up again in the fall. Check the ticker below for what's on our screens today.`;
+    }
+  }
+  if (sport === "NBA" || sport === "NHL") {
+    if (month >= 6 && month <= 8) {
+      return `${label} returns in October. Nothing on the board for ${label} today — try another sport or scroll the ticker.`;
+    }
+  }
+  if (sport === "MLB") {
+    if (month === 11 || month === 0) {
+      return `${label} is in the off-season. Check the ticker below for other matchups on our screens.`;
+    }
+  }
+
+  return `Nothing live or scheduled for ${label} today. Check the ticker below or pick another sport.`;
 }
 
 /** Spread live cards across sports so one league doesn't dominate. */
@@ -123,24 +159,32 @@ export default function LiveGamesHome() {
   const todayGames = useQuery(api.sports_queries.getTodayGames);
   const [sport, setSport] = useState("ALL");
 
-  const sportOptions = useMemo(() => {
-    const sports = new Set<string>();
-    for (const game of [...(liveGames ?? []), ...(todayGames ?? [])]) {
-      if (game.sport) sports.add(game.sport);
-    }
-    const ordered = ["MLB", "NBA", "NHL", "NFL", "MLS", "SOCCER", "NCAAF", "NCAAB", "GOLF"];
-    const sorted = [
-      ...ordered.filter((s) => sports.has(s)),
-      ...Array.from(sports).filter((s) => !ordered.includes(s)).sort(),
-    ];
-    return ["ALL", ...sorted];
-  }, [liveGames, todayGames]);
+  const sportOptions = useMemo(() => ["ALL", ...HOME_SPORT_FILTER_OPTIONS], []);
 
   const filteredLive = useMemo(() => {
     const live = liveGames ?? [];
     if (sport === "ALL") return diversifyLiveGames(live);
     return live.filter((g) => g.sport === sport);
   }, [liveGames, sport]);
+
+  const filteredToday = useMemo(() => {
+    const today = todayGames ?? [];
+    const forSport = sport === "ALL" ? today : today.filter((g) => g.sport === sport);
+    return forSport
+      .filter((g) => g.status !== "inprogress")
+      .filter((g) => g.awayTeam?.logoUrl && g.homeTeam?.logoUrl)
+      .slice(0, 8);
+  }, [todayGames, sport]);
+
+  const liveCountForSport = useMemo(() => {
+    if (sport === "ALL") return liveGames?.length ?? 0;
+    return (liveGames ?? []).filter((g) => g.sport === sport).length;
+  }, [liveGames, sport]);
+
+  const todayCountForSport = useMemo(() => {
+    if (sport === "ALL") return todayGames?.length ?? 0;
+    return (todayGames ?? []).filter((g) => g.sport === sport).length;
+  }, [todayGames, sport]);
 
   const hasAnyToday = (todayGames?.length ?? 0) > 0;
   const hasAnyLive = (liveGames?.length ?? 0) > 0;
@@ -163,8 +207,7 @@ export default function LiveGamesHome() {
             </p>
           </div>
 
-          {sportOptions.length > 1 && (
-            <div className="relative shrink-0 w-full sm:w-auto sm:min-w-[200px]">
+          <div className="relative shrink-0 w-full sm:w-auto sm:min-w-[220px]">
               <label htmlFor="live-sport-filter" className="sr-only">
                 Filter by sport
               </label>
@@ -185,7 +228,6 @@ export default function LiveGamesHome() {
                 aria-hidden
               />
             </div>
-          )}
         </div>
 
         <div>
@@ -201,9 +243,31 @@ export default function LiveGamesHome() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm font-medium py-6 px-5 rounded-2xl border border-dashed border-white/10 bg-black/20">
-              Nothing live for {sportLabel(sport)} right now. Check the ticker below for scores and start times.
-            </p>
+            <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 px-5 py-6">
+              <p className="text-gray-400 text-sm font-medium leading-relaxed">
+                {sport === "ALL"
+                  ? "Nothing live across our boards right now. Scroll the ticker below for today's scores and start times."
+                  : emptyStateMessage(sport)}
+              </p>
+              {sport !== "ALL" && todayCountForSport === 0 && liveCountForSport === 0 && (
+                <p className="text-gray-600 text-xs font-medium mt-3">
+                  We sync scores from ESPN throughout the day — check back closer to game time.
+                </p>
+              )}
+            </div>
+          )}
+
+          {filteredLive.length === 0 && filteredToday.length > 0 && (
+            <div className="mt-8">
+              <p className="text-[#D4AF37] font-black uppercase tracking-[0.2em] text-[10px] mb-4">
+                {sport === "ALL" ? "On Deck Today" : `${sportLabel(sport)} Today`}
+              </p>
+              <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                {filteredToday.map((game) => (
+                  <GameRow key={game._id} game={game} />
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>
