@@ -1,3 +1,3 @@
 {
-  "buildCommand": "cd ../.. && npx convex deploy --cmd 'npm run build --workspace=web-app' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL"
+  "buildCommand": "cd ../.. && node scripts/vercel-build.mjs"
 }
