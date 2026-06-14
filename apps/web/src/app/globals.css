@@ -30,11 +30,16 @@
 
   --animate-marquee: marquee 30s linear infinite;
   --animate-marquee-slow: marquee 60s linear infinite;
+  --animate-marquee-extra-slow: marquee 95s linear infinite;
 }
 
 @layer base {
+  html {
+    @apply bg-white text-[#05070B];
+  }
+
   body {
-    @apply bg-[#0A0A0A] text-white antialiased selection:bg-[#D4AF37] selection:text-black;
+    @apply bg-white text-[#05070B] antialiased selection:bg-[#D4AF37] selection:text-black;
   }
   
   *,
@@ -183,4 +188,68 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  html.ob-dark-mode,
+  html.ob-dark-mode body {
+    background: #05070b;
+    color: #f2ead4;
+  }
+
+  html.ob-dark-mode .ob-theme-root,
+  html.ob-dark-mode .ob-canvas,
+  html.ob-dark-mode .ob-nav-surface {
+    background: #05070b !important;
+    color: #f2ead4 !important;
+  }
+
+  html.ob-dark-mode .ob-surface {
+    background: #101014 !important;
+    color: #f2ead4 !important;
+    border-color: rgba(212, 175, 55, 0.45) !important;
+  }
+
+  html.ob-dark-mode .ob-menu-modal-backdrop {
+    background: rgba(0, 0, 0, 0.9) !important;
+  }
+
+  html.ob-dark-mode .ob-menu-modal-panel {
+    background: #0a0a0a !important;
+    color: #f2ead4 !important;
+  }
+
+  html.ob-dark-mode .ob-menu-modal-close {
+    background: rgba(0, 0, 0, 0.5) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  html.ob-dark-mode .ob-menu-modal-image,
+  html.ob-dark-mode .ob-menu-modal-footer {
+    background: #000000 !important;
+  }
+
+  html.ob-dark-mode .ob-menu-modal-image-gradient {
+    background-image: linear-gradient(to top, #0a0a0a, transparent) !important;
+  }
+
+  @media (min-width: 768px) {
+    html.ob-dark-mode .ob-menu-modal-image-gradient {
+      background-image: linear-gradient(to right, #0a0a0a, rgba(10, 10, 10, 0.4), transparent) !important;
+    }
+  }
+
+  html.ob-dark-mode .ob-menu-modal-panel h2,
+  html.ob-dark-mode .ob-menu-modal-panel p,
+  html.ob-dark-mode .ob-menu-modal-option {
+    color: #f2ead4 !important;
+  }
+
+  html.ob-dark-mode .ob-menu-modal-note,
+  html.ob-dark-mode .ob-menu-modal-option,
+  html.ob-dark-mode .ob-menu-modal-button {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+  }
+
 }

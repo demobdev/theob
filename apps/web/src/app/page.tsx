@@ -1,30 +1,23 @@
-"use client";
-
-import { useState } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/home/Footer";
-import FooterHero from "@/components/home/FooterHero";
-import Hero from "@/components/home/Hero";
-import Menu from "@/components/home/Menu";
-import SportsTicker from "@/components/sports/SportsTicker";
-import LiveGamesHome from "@/components/sports/LiveGamesHome";
-import AppPromoBanner from "@/components/home/AppPromoBanner";
+import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
+import AltHomeGalleryCarousel from "@/components/home-alt/AltHomeGalleryCarousel";
+import AltHomeGoodTimes from "@/components/home-alt/AltHomeGoodTimes";
+import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
+import AltHomeHero from "@/components/home-alt/AltHomeHero";
+import AltHomeShopCollection from "@/components/home-alt/AltHomeShopCollection";
+import AltHomeStackedCards from "@/components/home-alt/AltHomeStackedCards";
+import AltHomeStorySection from "@/components/home-alt/AltHomeStorySection";
 
 export default function Home() {
-  const [sportFilter, setSportFilter] = useState("ALL");
-
   return (
-    <main className="bg-[#0A0A0A] min-h-screen">
-      <Header />
-      <Hero />
-      <LiveGamesHome sport={sportFilter} onSportChange={setSportFilter} />
-      <div className="relative z-10">
-        <SportsTicker sportFilter={sportFilter} />
-      </div>
-      <Menu />
-      <AppPromoBanner />
-      <FooterHero />
-      <Footer />
+    <main className="ob-theme-root min-h-screen bg-white">
+      <AltHomeHeader />
+      <AltHomeHero />
+      <AltHomeGoodTimes />
+      <AltHomeStackedCards />
+      <AltHomeShopCollection />
+      <AltHomeGalleryCarousel />
+      <AltHomeStorySection />
+      <AltHomeFooter />
     </main>
   );
 }

@@ -42,7 +42,7 @@ export default function ProductDetailModal({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm" />
+          <div className="ob-menu-modal-backdrop fixed inset-0 bg-white/90 backdrop-blur-sm" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -56,17 +56,17 @@ export default function ProductDetailModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-5xl transform overflow-hidden bg-[#0A0A0A] sm:rounded-[40px] shadow-2xl transition-all flex flex-col md:flex-row max-h-[calc(100vh-5rem)] sm:max-h-[calc(100vh-4rem)] md:max-h-[min(90vh,880px)]">
+              <Dialog.Panel className="ob-menu-modal-panel w-full max-w-5xl transform overflow-hidden bg-white text-[#05070B] sm:rounded-[40px] shadow-2xl transition-all flex flex-col md:flex-row max-h-[calc(100vh-5rem)] sm:max-h-[calc(100vh-4rem)] md:max-h-[min(90vh,880px)]">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="absolute top-6 right-6 z-50 h-10 w-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/10"
+                  className="ob-menu-modal-close absolute top-6 right-6 z-50 h-10 w-10 bg-white/85 backdrop-blur-md rounded-full flex items-center justify-center text-[#05070B] border border-[#05070B]/15"
                 >
                   <X size={20} />
                 </button>
 
                 <div
-                  className={`w-full md:w-[42%] relative bg-black flex items-center justify-center shrink-0 ${imageBoxClass} md:max-h-none md:h-auto md:min-h-[320px]`}
+                  className={`ob-menu-modal-image w-full md:w-[42%] relative bg-white flex items-center justify-center shrink-0 ${imageBoxClass} md:max-h-none md:h-auto md:min-h-[320px]`}
                 >
                   {imageSrc ? (
                     <Image
@@ -97,7 +97,7 @@ export default function ProductDetailModal({
                       />
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent md:bg-gradient-to-r md:from-[#0A0A0A] md:via-[#0A0A0A]/40 md:to-transparent pointer-events-none" />
+                  <div className="ob-menu-modal-image-gradient absolute inset-0 bg-gradient-to-t from-white/75 via-transparent to-transparent md:bg-gradient-to-r md:from-white md:via-white/35 md:to-transparent pointer-events-none" />
                 </div>
 
                 <div className="w-full md:w-[58%] flex flex-col overflow-hidden min-h-0">
@@ -105,22 +105,22 @@ export default function ProductDetailModal({
                     <span className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.3em] mb-2 block">
                       Menu Item
                     </span>
-                    <h2 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tight mb-4">
+                    <h2 className="text-2xl md:text-4xl font-black text-[#05070B] uppercase tracking-tight mb-4">
                       {product.name}
                     </h2>
                     <p className="text-[#D4AF37] text-2xl md:text-3xl font-black mb-6">
                       ${product.price.toFixed(2)}
                     </p>
                     {product.description && (
-                      <p className="text-gray-400 text-sm font-medium leading-relaxed mb-8">
+                      <p className="text-[#05070B]/65 text-sm font-medium leading-relaxed mb-8">
                         {product.description}
                       </p>
                     )}
 
                     {product.disclaimer && (
-                      <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex gap-3 mb-8">
+                      <div className="ob-menu-modal-note bg-[#05070B]/5 border border-[#05070B]/10 rounded-xl p-4 flex gap-3 mb-8">
                         <Info className="h-5 w-5 text-[#D4AF37] shrink-0" />
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+                        <p className="text-[10px] text-[#05070B]/65 font-bold uppercase tracking-widest leading-relaxed">
                           {product.disclaimer}
                         </p>
                       </div>
@@ -138,7 +138,7 @@ export default function ProductDetailModal({
                               {modifier.options.map((option) => (
                                 <li
                                   key={option.name}
-                                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-gray-300"
+                                  className="ob-menu-modal-option rounded-lg border border-[#05070B]/10 bg-[#05070B]/5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#05070B]/70"
                                 >
                                   {option.name}
                                   {option.priceExtra > 0
@@ -153,11 +153,11 @@ export default function ProductDetailModal({
                     )}
                   </div>
 
-                  <div className="p-6 md:p-8 border-t border-white/10 bg-black shrink-0">
+                  <div className="ob-menu-modal-footer p-6 md:p-8 border-t border-[#05070B]/10 bg-white shrink-0">
                     <button
                       type="button"
                       onClick={onClose}
-                      className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-sm hover:bg-white/10 transition-all"
+                      className="ob-menu-modal-button w-full py-4 rounded-2xl bg-white border border-[#05070B] text-[#05070B] font-black uppercase tracking-widest text-sm hover:bg-[#05070B] hover:text-white transition-all"
                     >
                       Close
                     </button>

@@ -1,10 +1,22 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/home/Footer";
-import { MapPin, Phone, Clock, Navigation, Mail, LocateFixed } from "lucide-react";
+import Image from "next/image";
 import dynamic from "next/dynamic";
+import {
+  CalendarDays,
+  Clock,
+  ExternalLink,
+  LocateFixed,
+  Mail,
+  MapPin,
+  Navigation,
+  Phone,
+  Trophy,
+  UtensilsCrossed,
+} from "lucide-react";
+import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
+import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
 import {
   OB_COORDS,
   OB_ADDRESS,
@@ -14,7 +26,6 @@ import {
 } from "@/lib/storeLocation";
 import { getHeartlandOrderUrl } from "@/lib/orderLinks";
 import DoorDashButton from "@/components/common/DoorDashButton";
-import { ExternalLink } from "lucide-react";
 
 const LocationMap = dynamic(() => import("@/components/locations/LocationMap"), {
   ssr: false,
@@ -27,6 +38,35 @@ const LocationMap = dynamic(() => import("@/components/locations/LocationMap"), 
 
 const OB_LOCATION: [number, number] = [OB_COORDS.lat, OB_COORDS.lng];
 const SUPPORT_EMAIL = "support@ownersboxgvl.com";
+
+const featureTiles = [
+  {
+    title: "Chalk Up",
+    text: "Pool, game-day screens, and a room built for regulars.",
+    image: "/images/hero-bg.png",
+  },
+  {
+    title: "Happy Hour",
+    text: "Cold drinks, easy hangs, and Greenville nights out.",
+    image: "/sports-feature.jpg",
+  },
+  {
+    title: "Good Eats",
+    text: "Pizza, wings, shareables, and bar favorites.",
+    image: "/images/food/official/featured-pizza.png",
+  },
+];
+
+const galleryImages = [
+  "/sports-feature.jpg",
+  "/images/hero-bg.png",
+  "/images/food/official/featured-pizza.png",
+  "/images/food/official/IMGL6785.jpg",
+  "/images/food/jumbo_wings.png",
+  "/images/food/crab_dip.png",
+];
+
+const dailySpecials = ["Monday", "Tuesday", "Wednesday"];
 
 function geoErrorMessage(code: number): string {
   switch (code) {
@@ -97,145 +137,305 @@ export default function LocationsPage() {
   }, []);
 
   return (
-    <main className="bg-[#0A0A0A] min-h-screen flex flex-col">
-      <Header />
+    <main className="ob-theme-root min-h-screen bg-white text-[#05070B]">
+      <AltHomeHeader />
 
-      <section className="flex-1 container mx-auto px-4 py-12 md:py-20 flex flex-col lg:flex-row gap-12">
-        <div className="w-full lg:w-1/3 flex flex-col gap-8">
-          <div>
-            <span className="text-[#D4AF37] font-bold uppercase tracking-[0.3em] text-sm mb-4 block">
-              Find Us
-            </span>
-            <h1 className="text-5xl md:text-7xl font-black text-white uppercase tracking-tighter mb-4">
-              Location & Contact
-            </h1>
-            <p className="text-gray-400 font-medium leading-relaxed">
-              Now open at 1757 Woodruff Rd. Dine in, order takeout online, or get DoorDash delivery — one address with the full menu and game-day energy.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            <div className="premium-card p-8 border-[#D4AF37]/30 bg-[#D4AF37]/5 relative group">
-              <div className="absolute top-6 right-6 h-12 w-12 rounded-xl bg-[#D4AF37] flex items-center justify-center text-black">
-                <MapPin className="h-6 w-6" />
-              </div>
-
-              <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-2">
-                {OB_ADDRESS.name}
-              </h3>
-              <p className="text-[#D4AF37] text-xs font-bold uppercase tracking-widest mb-6">
-                Greenville, SC
+      <section className="bg-white px-4 pb-12 text-[#05070B] sm:px-6">
+        <div className="mx-auto max-w-[1600px] overflow-hidden rounded-b-[28px] bg-white pb-10">
+          <div className="relative min-h-[520px] overflow-hidden rounded-[24px] border-2 border-[#05070B]/10">
+            <Image
+              src="/sports-feature.jpg"
+              alt="The Owner's Box Greenville location"
+              fill
+              priority
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 1600px"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/78 via-black/34 to-black/5" />
+            <div className="absolute left-5 top-5 w-[min(440px,calc(100%-40px))] rounded-[24px] border border-white/20 bg-white p-5 text-[#05070B] shadow-2xl sm:left-8 sm:top-8 sm:p-7">
+              <p className="mb-3 text-[10px] font-black uppercase tracking-[0.28em] text-[#05070B]/60">
+                Greenville
               </p>
-
-              {distanceLabel && (
-                <p className="text-white text-xs font-black uppercase tracking-widest mb-4 bg-black/30 rounded-lg px-3 py-2 inline-block">
-                  {distanceLabel}
-                </p>
-              )}
-
-              <div className="space-y-4 mb-8">
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-gray-500 shrink-0 mt-1" />
-                  <div className="text-gray-300 text-sm font-medium">
-                    {OB_ADDRESS.line1}
-                    <br />
-                    {OB_ADDRESS.city}, {OB_ADDRESS.state} {OB_ADDRESS.zip}
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-gray-500 shrink-0" />
-                  <a
-                    href={`tel:${OB_ADDRESS.phone.replace(/\D/g, "")}`}
-                    className="text-gray-300 text-sm font-medium hover:text-[#D4AF37]"
-                  >
-                    {OB_ADDRESS.phone}
-                  </a>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Clock className="h-5 w-5 text-gray-500 shrink-0 mt-1" />
-                  <div className="text-gray-300 text-sm font-medium">
-                    <span className="block mb-1">Sun – Thu: 11AM – 11PM</span>
-                    <span className="block">Fri – Sat: 11AM – 1AM</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={requestLocation}
-                disabled={geoLoading}
-                className="w-full mb-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <LocateFixed className="h-3.5 w-3.5" />
-                {geoLoading ? "Locating…" : "Use My Location"}
-              </button>
-
-              <div className="flex flex-col gap-3">
-                <a href={orderUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
-                  <button
-                    type="button"
-                    className="w-full py-4 rounded-xl gold-gradient text-black font-black uppercase tracking-widest text-xs gold-glow hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
-                  >
-                    Order Takeout
-                    <ExternalLink size={12} />
-                  </button>
+              <h1 className="font-montserrat text-5xl font-black uppercase leading-[0.82] tracking-[-0.08em] sm:text-6xl">
+                Come
+                <br />
+                See Us
+              </h1>
+              <div className="mt-6 grid gap-2">
+                <a
+                  href={orderUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full border-2 border-[#05070B] bg-[#05070B] px-5 py-3 text-center text-[10px] font-black uppercase tracking-widest text-white"
+                >
+                  Order takeout
                 </a>
-                <DoorDashButton fullWidth />
                 <a
                   href={buildDirectionsUrl(userLocation)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1"
+                  className="rounded-full border-2 border-[#05070B] bg-white px-5 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#05070B]"
                 >
-                  <button
-                    type="button"
-                    className="w-full py-4 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all flex items-center justify-center gap-2"
-                  >
-                    <Navigation className="h-3 w-3" />
-                    Directions
-                  </button>
+                  Get directions
                 </a>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="ob-canvas bg-white px-4 py-16 text-[#05070B] sm:px-6">
+        <div className="mx-auto grid max-w-[1600px] gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div>
+            <p className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-[#05070B]/55">
+              Location + contact
+            </p>
+            <h2 className="font-montserrat text-5xl font-black uppercase leading-[0.82] tracking-[-0.08em] sm:text-7xl">
+              Come See Us
+            </h2>
+          </div>
+          <div className="max-w-2xl text-sm font-semibold leading-relaxed text-[#05070B]/68">
+            Now open at {OB_ADDRESS.line1}. Dine in, order takeout online, or get DoorDash delivery
+            from one address with the full menu and game-day energy.
+          </div>
+        </div>
+      </section>
+
+      <section className="ob-canvas bg-white px-4 pb-16 text-[#05070B] sm:px-6">
+        <div className="mx-auto grid max-w-[1600px] overflow-hidden rounded-[28px] border border-[#05070B]/10 lg:grid-cols-2">
+          {featureTiles.map((tile, index) => (
+            <div
+              key={tile.title}
+              className={`grid min-h-[360px] ${index === 2 ? "lg:col-span-2 lg:grid-cols-2" : ""}`}
+            >
+              <div className={`relative min-h-[280px] ${index % 2 === 1 ? "lg:order-2" : ""}`}>
+                <Image
+                  src={tile.image}
+                  alt={tile.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 800px"
+                />
+                <div className="absolute inset-0 bg-black/20" />
+              </div>
+              <div className="flex flex-col justify-center bg-white p-8 text-center">
+                <h3 className="font-montserrat text-4xl font-black uppercase leading-[0.85] tracking-[-0.06em]">
+                  {tile.title}
+                </h3>
+                <p className="mx-auto mt-5 max-w-xs text-xs font-semibold leading-relaxed text-[#05070B]/62">
+                  {tile.text}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="ob-canvas bg-white px-4 pb-16 text-[#05070B] sm:px-6">
+        <div className="mx-auto grid max-w-[1600px] gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-[28px] border border-[#05070B]/10 bg-[#101014] p-7 text-white sm:p-10">
+            <div className="mb-8 flex items-start justify-between gap-6">
+              <div>
+                <p className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/55">
+                  Woodruff Rd
+                </p>
+                <h3 className="font-montserrat text-4xl font-black uppercase leading-[0.85] tracking-[-0.06em]">
+                  {OB_ADDRESS.name}
+                </h3>
+              </div>
+              <MapPin className="h-8 w-8 text-white" />
+            </div>
+
+            {distanceLabel && (
+              <p className="mb-5 inline-block rounded-full border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white">
+                {distanceLabel}
+              </p>
+            )}
+
+            <div className="mb-8 grid gap-4 text-sm font-semibold text-white/72">
+              <div className="flex items-start gap-3">
+                <MapPin className="mt-1 h-5 w-5 shrink-0 text-white/45" />
+                <p>
+                  {OB_ADDRESS.line1}
+                  <br />
+                  {OB_ADDRESS.city}, {OB_ADDRESS.state} {OB_ADDRESS.zip}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone className="h-5 w-5 shrink-0 text-white/45" />
+                <a href={`tel:${OB_ADDRESS.phone.replace(/\D/g, "")}`} className="hover:text-white">
+                  {OB_ADDRESS.phone}
+                </a>
+              </div>
+              <div className="flex items-start gap-3">
+                <Clock className="mt-1 h-5 w-5 shrink-0 text-white/45" />
+                <p>
+                  Sun - Thu: 11AM - 11PM
+                  <br />
+                  Fri - Sat: 11AM - 1AM
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={requestLocation}
+              disabled={geoLoading}
+              className="mb-3 flex w-full items-center justify-center gap-2 rounded-full border-2 border-white/30 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-[#05070B] disabled:opacity-50"
+            >
+              <LocateFixed className="h-3.5 w-3.5" />
+              {geoLoading ? "Locating..." : "Use My Location"}
+            </button>
+
+            <div className="grid gap-3">
+              <a
+                href={orderUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-full border-2 border-white bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest text-[#05070B]"
+              >
+                Order Takeout
+                <ExternalLink size={12} />
+              </a>
+              <DoorDashButton fullWidth />
+              <a
+                href={buildDirectionsUrl(userLocation)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-full border-2 border-white/30 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-[#05070B]"
+              >
+                <Navigation className="h-3 w-3" />
+                Directions
+              </a>
+            </div>
 
             {geoError && (
-              <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-200/90 text-xs font-bold uppercase tracking-widest leading-relaxed">
+              <div className="mt-5 rounded-2xl border border-white/15 bg-white/5 p-4 text-xs font-bold uppercase leading-relaxed tracking-widest text-white/80">
                 {geoError}
                 <button
                   type="button"
                   onClick={requestLocation}
                   disabled={geoLoading}
-                  className="mt-3 block text-[#D4AF37] hover:underline normal-case tracking-normal font-black"
+                  className="mt-3 block font-black normal-case tracking-normal text-white underline"
                 >
-                  {geoLoading ? "Locating…" : "Try again"}
+                  {geoLoading ? "Locating..." : "Try again"}
                 </button>
               </div>
             )}
           </div>
-        </div>
 
-        <div className="w-full lg:w-2/3 min-h-[500px] lg:min-h-[560px] relative">
-          <LocationMap
-            location={OB_LOCATION}
-            userLocation={userLocation}
-            zoom={OB_MAP_ZOOM}
-          />
+          <div className="min-h-[520px] overflow-hidden rounded-[28px] border border-[#05070B]/10">
+            <LocationMap location={OB_LOCATION} userLocation={userLocation} zoom={OB_MAP_ZOOM} />
+          </div>
         </div>
       </section>
 
-      <section id="contact" className="border-t border-white/5 bg-black/40 py-20 scroll-mt-28">
-        <div className="container mx-auto px-4 max-w-2xl">
-          <div className="flex items-center gap-3 mb-6">
-            <Mail className="h-6 w-6 text-[#D4AF37]" />
-            <h2 className="text-3xl font-black text-white uppercase tracking-tight">
-              Contact Us
+      <div className="ob-canvas overflow-hidden border-y border-[#05070B]/10 bg-white py-2 text-[#05070B]">
+        <div className="flex w-max animate-marquee whitespace-nowrap">
+          {[...Array(4)].map((_, index) => (
+            <div key={index} className="flex items-center">
+              <span className="px-6 font-montserrat text-4xl font-black uppercase tracking-[-0.06em] sm:text-6xl">
+                Good Times
+              </span>
+              <span className="px-6 font-montserrat text-4xl font-black uppercase tracking-[-0.06em] sm:text-6xl">
+                Come See Us
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <section className="ob-canvas bg-white px-4 py-16 text-[#05070B] sm:px-6">
+        <div className="mx-auto grid max-w-[1600px] gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+          <div>
+            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-[#05070B]/55">
+              Daily specials
+            </p>
+            <h2 className="font-montserrat text-5xl font-black uppercase leading-[0.82] tracking-[-0.08em]">
+              Daily
+              <br />
+              Specials
             </h2>
           </div>
-          <p className="text-gray-400 text-sm font-medium mb-8 leading-relaxed">
-            Questions about your order, private events, or hosting a group? Reach out — we&apos;ll get back to you during business hours.
-          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {dailySpecials.map((special) => (
+              <div key={special} className="rounded-[24px] border border-white/10 bg-white p-6 text-[#05070B]">
+                <CalendarDays className="mb-8 h-8 w-8" />
+                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#05070B]/55">
+                  {special}
+                </p>
+                <p className="mt-2 font-montserrat text-3xl font-black uppercase leading-[0.85] tracking-[-0.06em]">
+                  Ask What&apos;s On
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="ob-canvas bg-white px-4 pb-16 text-[#05070B] sm:px-6">
+        <div className="mx-auto grid max-w-[1600px] gap-8 rounded-[28px] border border-[#05070B]/10 bg-[#101014] p-7 text-white sm:p-10 lg:grid-cols-[0.65fr_1fr]">
+          <div>
+            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/55">
+              League play
+            </p>
+            <h2 className="font-montserrat text-5xl font-black uppercase leading-[0.82] tracking-[-0.08em]">
+              League
+              <br />
+              Play
+            </h2>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-start">
+            <Trophy className="h-10 w-10" />
+            <div>
+              <p className="text-sm font-semibold leading-relaxed text-white/68">
+                Pool nights, watch parties, regular meetups, and Greenville groups can use this
+                page as the jump-off point. Swap in the final league details when they are ready.
+              </p>
+              <a
+                href="#contact"
+                className="mt-6 inline-flex rounded-full border-2 border-white px-5 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-[#05070B]"
+              >
+                Ask about groups
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="ob-canvas overflow-hidden bg-white pb-16">
+        <div className="flex w-max animate-marquee-slow gap-4 px-4">
+          {[...galleryImages, ...galleryImages].map((src, index) => (
+            <div
+              key={`${src}-${index}`}
+              className="relative h-40 w-40 shrink-0 overflow-hidden rounded-2xl border border-[#05070B]/10 bg-white sm:h-56 sm:w-56"
+            >
+              <Image src={src} alt="" fill className="object-cover" sizes="224px" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="contact" className="ob-canvas scroll-mt-28 bg-white px-4 pb-20 text-[#05070B] sm:px-6">
+        <div className="mx-auto grid max-w-[1600px] gap-8 rounded-[28px] border border-[#05070B]/10 bg-white p-7 text-[#05070B] sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <Mail className="mb-8 h-9 w-9" />
+            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-[#05070B]/55">
+              Talk to us
+            </p>
+            <h2 className="font-montserrat text-5xl font-black uppercase leading-[0.82] tracking-[-0.08em]">
+              Contact
+              <br />
+              Us
+            </h2>
+            <p className="mt-6 max-w-sm text-sm font-semibold leading-relaxed text-[#05070B]/65">
+              Questions about your order, private events, or hosting a group? We reply during
+              business hours.
+            </p>
+          </div>
+
           <form
-            className="space-y-4"
+            className="grid gap-4"
             onSubmit={(e) => {
               e.preventDefault();
               const form = e.currentTarget;
@@ -243,7 +443,7 @@ export default function LocationsPage() {
               const email = (form.elements.namedItem("email") as HTMLInputElement).value;
               const message = (form.elements.namedItem("message") as HTMLTextAreaElement).value;
               const subject = encodeURIComponent(`Contact from ${name}`);
-              const body = encodeURIComponent(`${message}\n\n— ${name}\n${email}`);
+              const body = encodeURIComponent(`${message}\n\n- ${name}\n${email}`);
               window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
             }}
           >
@@ -251,36 +451,36 @@ export default function LocationsPage() {
               name="name"
               required
               placeholder="Your name"
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white text-sm focus:outline-none focus:border-[#D4AF37]/50"
+              className="rounded-2xl border-2 border-[#05070B]/15 bg-white px-4 py-4 text-sm font-black uppercase tracking-widest text-[#05070B] placeholder:text-[#05070B]/35 focus:border-[#05070B] focus:outline-none"
             />
             <input
               name="email"
               type="email"
               required
               placeholder="Email"
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white text-sm focus:outline-none focus:border-[#D4AF37]/50"
+              className="rounded-2xl border-2 border-[#05070B]/15 bg-white px-4 py-4 text-sm font-black uppercase tracking-widest text-[#05070B] placeholder:text-[#05070B]/35 focus:border-[#05070B] focus:outline-none"
             />
             <textarea
               name="message"
               required
               rows={4}
               placeholder="How can we help?"
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white text-sm focus:outline-none focus:border-[#D4AF37]/50"
+              className="rounded-2xl border-2 border-[#05070B]/15 bg-white px-4 py-4 text-sm font-black uppercase tracking-widest text-[#05070B] placeholder:text-[#05070B]/35 focus:border-[#05070B] focus:outline-none"
             />
             <button
               type="submit"
-              className="w-full py-4 rounded-xl gold-gradient text-black font-black uppercase tracking-widest text-xs gold-glow"
+              className="rounded-full border-2 border-[#05070B] bg-[#05070B] px-5 py-4 text-[10px] font-black uppercase tracking-widest text-white"
             >
               Send Message
             </button>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#05070B]/45">
+              Opens your email app - {SUPPORT_EMAIL}
+            </p>
           </form>
-          <p className="text-gray-600 text-[10px] font-medium mt-6 uppercase tracking-widest">
-            Opens your email app — we reply during business hours · {SUPPORT_EMAIL}
-          </p>
         </div>
       </section>
 
-      <Footer />
+      <AltHomeFooter />
     </main>
   );
 }

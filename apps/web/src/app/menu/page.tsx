@@ -1,17 +1,89 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/home/Footer";
 import Image from "next/image";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { Search, Download, ChevronRight, Menu as MenuIcon } from "lucide-react";
-import ProductCard from "@/components/menu/ProductCard";
 import ProductDetailModal from "@/components/menu/ProductDetailModal";
 import { Doc } from "../../../../../convex/_generated/dataModel";
 import { categoryHeroImage } from "@/lib/categoryHero";
+import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
+import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
+import { resolveProductImageSrc } from "@/lib/productImage";
+
+type ProductDoc = Doc<"products">;
+
+function MenuProductCard({
+  product,
+  onSelect,
+}: {
+  product: ProductDoc;
+  onSelect: (product: ProductDoc) => void;
+}) {
+  const imageSrc = resolveProductImageSrc(product.image);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(product)}
+      className="group grid overflow-hidden rounded-[24px] border-2 border-[#05070B]/10 bg-white text-left shadow-[0_12px_0_rgba(5,7,11,0.06)] transition-transform hover:-translate-y-1 md:grid-cols-[190px_1fr]"
+    >
+      <div className="relative aspect-[4/3] bg-[#171713] md:aspect-auto md:min-h-[210px]">
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            alt={product.name}
+            sizes="(max-width: 768px) 100vw, 240px"
+            unoptimized={imageSrc.includes("convex.cloud") || imageSrc.includes("convex.site")}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (!target.src.endsWith("/ob-icon.png")) {
+                target.src = "/ob-icon.png";
+              }
+            }}
+          />
+        ) : (
+          <Image src="/ob-icon.png" fill className="object-contain p-10" alt={product.name} sizes="220px" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
+        {product.isFeatured && (
+          <span className="absolute left-3 top-3 rounded-full border border-white bg-white px-3 py-1 text-[8px] font-black uppercase tracking-widest text-[#05070B]">
+            Popular
+          </span>
+        )}
+      </div>
+
+      <div className="flex min-h-[210px] flex-col justify-between p-5">
+        <div>
+          <div className="mb-3 flex items-start justify-between gap-4">
+            <h3 className="font-montserrat text-2xl font-black uppercase leading-[0.9] tracking-[-0.05em] text-[#05070B] group-hover:text-black">
+              {product.name}
+            </h3>
+            <span className="shrink-0 rounded-full bg-[#05070B] px-3 py-1 text-xs font-black text-white">
+              ${product.price.toFixed(2)}
+            </span>
+          </div>
+          {product.description && (
+            <p className="line-clamp-3 text-sm font-semibold leading-relaxed text-[#05070B]/65">
+              {product.description}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-5 flex items-center justify-between border-t border-[#05070B]/10 pt-4">
+          <span className="text-[9px] font-black uppercase tracking-[0.24em] text-[#05070B]/65">
+            View Details
+          </span>
+          <ChevronRight className="h-4 w-4 text-[#05070B]" />
+        </div>
+      </div>
+    </button>
+  );
+}
 
 export default function MenuPage() {
   const categories = useQuery(api.products.getCategories);
@@ -47,79 +119,54 @@ export default function MenuPage() {
   })).filter(cat => cat.items.length > 0);
 
   return (
-    <main className="bg-[#0A0A0A] min-h-screen">
-      <Header />
+    <main className="ob-theme-root min-h-screen bg-white text-[#05070B]">
+      <AltHomeHeader />
 
-      {/* Compact hero — atmosphere + food mosaic */}
-      <section className="relative border-b border-[#D4AF37]/15 overflow-hidden mb-6 md:mb-8">
-        <div className="grid grid-cols-12 h-[160px] sm:h-[200px] md:h-[240px]">
-          <div className="col-span-4 md:col-span-3 relative">
+      <section className="bg-white px-4 pb-10 text-[#05070B] sm:px-6">
+        <div className="mx-auto max-w-[1600px] overflow-hidden rounded-b-[28px] bg-white pb-10">
+          <div className="relative min-h-[430px] overflow-hidden rounded-[24px] border-2 border-[#171713]/10 sm:min-h-[560px] lg:min-h-[620px]">
             <Image
-              src="/hero.png"
+              src="/images/food/official/featured-pizza.png"
               fill
               className="object-cover"
-              alt="The Owner's Box dining room"
+              alt="The Owner's Box featured pizza"
               priority
-              sizes="(max-width: 768px) 33vw, 25vw"
+              sizes="(max-width: 768px) 100vw, 1400px"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#0A0A0A]/80" />
-          </div>
-          <div className="col-span-8 md:col-span-9 grid grid-cols-3">
-            {[
-              { src: "/images/menu/jumbo_wings.png", alt: "Jumbo wings" },
-              { src: "/images/menu/rib_eye.png", alt: "Rib eye steak" },
-              { src: "/images/menu/meat_lover_pizza.png", alt: "Meat lover pizza" },
-            ].map((photo) => (
-              <div key={photo.src} className="relative overflow-hidden">
-                <Image
-                  src={photo.src}
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-700"
-                  alt={photo.alt}
-                  sizes="(max-width: 768px) 22vw, 25vw"
-                />
-                <div className="absolute inset-0 bg-black/25" />
-              </div>
-            ))}
-          </div>
-        </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/30 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 to-transparent" />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/50 to-transparent pointer-events-none" />
-
-        <div className="absolute inset-x-0 bottom-0 z-10">
-          <div className="container mx-auto px-4 pb-5 md:pb-6 pt-12 md:pt-16">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-5">
-              <div className="min-w-0">
-                <div className="h-px w-12 bg-[#D4AF37] mb-2.5" />
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white uppercase tracking-tight leading-none">
-                  Menu Board
-                </h1>
-                <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.25em] mt-2">
-                  Display only · Order from the header
-                </p>
-              </div>
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-10">
+              <p className="mb-4 w-fit rounded-full border border-white/40 bg-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-white backdrop-blur">
+                Scratch-made favorites
+              </p>
+              <h1 className="font-montserrat text-[clamp(4rem,13vw,12rem)] font-black uppercase leading-[0.78] tracking-[-0.08em] text-[#F2EAD4]">
+                Good Eats
+              </h1>
+              <p className="mt-4 max-w-xl text-sm font-semibold leading-relaxed text-[#F2EAD4]/80 sm:text-base">
+                Browse the lineup, pick your category, and tap a dish for details. Order links stay simple.
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="absolute top-3 right-3 md:top-4 md:right-4 z-20 flex items-center gap-2">
+        <div className="mx-auto mt-5 flex max-w-[1600px] justify-end">
           <a
             href="/menu.pdf"
             download
-            className="flex items-center gap-2 px-3 py-2 bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/10 rounded-xl text-white transition-all"
+            className="flex items-center gap-2 rounded-full border-2 border-[#05070B] bg-white px-4 py-2 text-[#05070B] shadow-[3px_3px_0_#05070B] transition-transform hover:-translate-y-0.5"
           >
-            <Download size={14} className="text-[#D4AF37]" />
-            <span className="font-black uppercase tracking-widest text-[9px] hidden sm:inline">PDF</span>
+            <Download size={14} />
+            <span className="text-[9px] font-black uppercase tracking-widest">PDF Menu</span>
           </a>
         </div>
       </section>
 
-      {/* Sticky category nav — no duplicate order CTAs (use header) */}
       {categories && categories.length > 0 && (
-        <div className="sticky top-20 z-40 border-b border-white/5 bg-[#0A0A0A]/95 backdrop-blur-md">
-          <div className="container mx-auto px-4 py-2.5">
+        <div className="sticky top-0 z-40 border-y border-[#05070B]/10 bg-white shadow-[0_12px_30px_rgba(0,0,0,0.12)]">
+          <div className="mx-auto max-w-[1600px] px-4 py-3 sm:px-6">
             <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
-              <span className="shrink-0 text-gray-600 text-[9px] font-black uppercase tracking-[0.2em] hidden sm:inline">
+              <span className="hidden shrink-0 text-[9px] font-black uppercase tracking-[0.24em] text-[#05070B]/65 sm:inline">
                 Jump to
               </span>
               {categories.map((cat) => (
@@ -127,10 +174,10 @@ export default function MenuPage() {
                   key={cat._id}
                   type="button"
                   onClick={() => scrollToCategory(cat._id)}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all ${
+                  className={`shrink-0 rounded-full border-2 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest transition-all ${
                     activeCategory === cat._id
-                      ? "bg-[#D4AF37] text-black border-[#D4AF37]"
-                      : "text-white/60 border-white/10 hover:border-[#D4AF37]/40 hover:text-white"
+                      ? "border-[#05070B] bg-[#05070B] text-white"
+                      : "border-[#05070B]/20 text-[#05070B] hover:border-[#05070B] hover:bg-[#05070B] hover:text-white"
                   }`}
                 >
                   {cat.name}
@@ -141,16 +188,13 @@ export default function MenuPage() {
         </div>
       )}
 
-      {/* Main Layout */}
-      <section className="noise-overlay pb-20">
-        <div className="container mx-auto px-4 pt-4 md:pt-6 flex flex-col lg:flex-row gap-6 lg:gap-8 relative z-30">
-
-          {/* Sidebar — search (+ categories on desktop only) */}
+      <section className="ob-canvas bg-white px-4 py-12 text-[#05070B] sm:px-6">
+        <div className="mx-auto flex max-w-[1600px] flex-col gap-6 rounded-[28px] bg-white p-4 shadow-[0_28px_90px_rgba(0,0,0,0.24)] md:p-8 lg:flex-row lg:gap-8">
           <aside className="w-full lg:w-72 shrink-0">
-             <div className="sticky top-36 space-y-6">
-                <div className="hidden lg:block premium-card p-6 border-white/10 bg-black/80 backdrop-blur-xl">
-                   <h3 className="text-white font-black uppercase tracking-widest text-xs mb-6 flex items-center gap-2 px-1">
-                     <MenuIcon size={14} className="text-[#D4AF37]" />
+             <div className="sticky top-24 space-y-6">
+                <div className="hidden rounded-[24px] border-2 border-[#05070B]/10 bg-white p-5 lg:block">
+                   <h3 className="mb-5 flex items-center gap-2 px-1 text-xs font-black uppercase tracking-widest text-[#05070B]">
+                     <MenuIcon size={14} className="text-[#05070B]/65" />
                      Categories
                    </h3>
                    <div className="flex flex-col gap-1">
@@ -159,10 +203,10 @@ export default function MenuPage() {
                             key={cat._id}
                             type="button"
                             onClick={() => scrollToCategory(cat._id)}
-                            className={`flex items-center justify-between px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-left ${
+                            className={`flex items-center justify-between rounded-xl px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest transition-all ${
                               activeCategory === cat._id
-                                ? "bg-[#D4AF37] text-black"
-                                : "text-gray-400 hover:text-white hover:bg-white/5"
+                                ? "bg-[#05070B] text-white"
+                                : "text-[#05070B]/65 hover:bg-[#05070B] hover:text-white"
                             }`}
                           >
                             {cat.name}
@@ -173,48 +217,47 @@ export default function MenuPage() {
                 </div>
 
                 <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
+                  <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#05070B]/65" />
                   <input
                     type="text"
                     placeholder="Search menu..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-[#121212] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-xs font-bold uppercase tracking-widest focus:border-[#D4AF37]/50 focus:outline-none transition-all placeholder:text-gray-600"
+                    className="w-full rounded-2xl border-2 border-[#05070B] bg-white py-4 pl-12 pr-4 text-xs font-black uppercase tracking-widest text-[#05070B] transition-all placeholder:text-[#05070B]/40 focus:border-[#05070B] focus:outline-none"
                   />
                 </div>
              </div>
           </aside>
 
-          {/* Product Feed */}
-          <div className="flex-1 space-y-24">
+          <div className="flex-1 space-y-20">
              {productsByCategory?.map((category) => (
                 <div
                   key={category._id}
                   ref={el => { categoryRefs.current[category._id] = el; }}
-                  className="scroll-mt-48"
+                  className="scroll-mt-44"
                 >
-                   <div className="relative rounded-2xl overflow-hidden mb-12 min-h-[100px] flex items-end">
+                   <div className="relative mb-8 flex min-h-[170px] items-end overflow-hidden rounded-[24px] border-2 border-[#171713]/10">
                       <Image
                         src={categoryHeroImage(category.name)}
                         fill
-                        className="object-cover opacity-50"
+                        className="object-cover"
                         alt=""
                         sizes="100vw"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
-                      <div className="relative z-10 p-6 md:p-8 flex items-end gap-6 w-full">
-                        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter">
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-transparent" />
+                      <div className="relative z-10 flex w-full items-end gap-6 p-6 md:p-8">
+                        <h2 className="font-montserrat text-4xl font-black uppercase tracking-[-0.06em] text-[#F2EAD4] md:text-5xl lg:text-6xl">
                           {category.name}
                         </h2>
-                        <span className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.3em] mb-2 hidden sm:block">
+                        <span className="mb-2 hidden text-[10px] font-black uppercase tracking-[0.3em] text-white/70 sm:block">
                           The Lineup
                         </span>
                       </div>
                    </div>
 
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 xl:gap-10">
+                   <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 xl:gap-8">
                       {category.items.map((product) => (
-                        <ProductCard
+                        <MenuProductCard
                           key={product._id}
                           product={product}
                           onSelect={(p) => {
@@ -229,14 +272,14 @@ export default function MenuPage() {
              ))}
 
              {productsByCategory?.length === 0 && (
-               <div className="text-center py-40 bg-white/5 rounded-[40px] border border-white/5">
-                  <div className="h-20 w-20 bg-black rounded-full flex items-center justify-center mx-auto mb-8">
-                     <Search size={32} className="text-gray-700" />
+               <div className="rounded-[28px] border-2 border-[#05070B]/10 bg-white py-32 text-center">
+                  <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full bg-[#05070B]">
+                     <Search size={32} className="text-white" />
                   </div>
-                  <p className="text-gray-500 text-xl font-black uppercase tracking-tight">No matchups found.</p>
+                  <p className="text-xl font-black uppercase tracking-tight text-[#05070B]">No menu items found.</p>
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="mt-6 text-[#D4AF37] font-black uppercase tracking-widest hover:underline"
+                    className="mt-6 font-black uppercase tracking-widest text-[#05070B] hover:underline"
                   >
                     Reset Search
                   </button>
@@ -246,7 +289,7 @@ export default function MenuPage() {
         </div>
       </section>
 
-      <Footer />
+      <AltHomeFooter />
 
       <ProductDetailModal
         product={selectedProduct}
