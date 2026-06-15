@@ -7,7 +7,7 @@ export default function AltHomeShopCollection() {
       <div className="ob-surface ob-surface-light relative z-10 mx-auto grid max-w-[1600px] items-center gap-10 rounded-[28px] border border-[#05070B]/8 bg-white p-6 shadow-[0_24px_90px_rgba(0,0,0,0.12)] md:grid-cols-[0.9fr_1.1fr] md:p-12 xl:p-16">
         <div>
           <p className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-[#05070B]/65">
-            Coming March
+            Coming soon
           </p>
           <h2 className="font-montserrat text-5xl font-black uppercase leading-[0.85] tracking-[-0.08em] sm:text-7xl">
             Shop The

@@ -12,7 +12,7 @@ const eventFeatures = [
   {
     icon: Users,
     title: "Groups & celebrations",
-    text: "Birthdays, corporate outings, watch parties, and league drafts with flexible seating for mid-size groups.",
+    text: "Birthdays, corporate outings, watch parties, and fantasy draft nights with flexible seating for mid-size groups.",
   },
   {
     icon: Tv,
@@ -54,7 +54,7 @@ export default function PrivateEventsPage() {
                 Starts Here
               </h1>
               <p className="mt-5 max-w-xl text-sm font-semibold leading-relaxed text-white/78 sm:text-base">
-                Bring the crew for birthdays, watch parties, league drafts, and Greenville nights
+                Bring the crew for birthdays, watch parties, fantasy draft nights, and Greenville nights
                 out. We handle the screens, food, and room energy.
               </p>
             </div>

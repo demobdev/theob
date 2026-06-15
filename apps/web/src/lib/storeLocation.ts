@@ -1,4 +1,4 @@
-/** Greenville store — keep in sync with convex/lib/locations.ts */
+/** Greenville store — keep in sync with convex/lib/locations.ts and Google Business Profile */
 
 export const OB_COORDS = {
   lat: 34.8200749,
@@ -6,14 +6,33 @@ export const OB_COORDS = {
 } as const;
 
 export const OB_ADDRESS = {
-  name: "The Owner's Box",
+  name: "The Owner's Box Bar & Grill",
   line1: "1757 Woodruff Rd. STE A",
   city: "Greenville",
   state: "SC",
   zip: "29607",
   full: "1757 Woodruff Rd. STE A, Greenville, SC 29607",
-  phone: "(864) 555-0123",
+  phone: "(864) 732-6963",
+  phoneTel: "+18647326963",
 } as const;
+
+/** Display + schema hours — verify against Google Business Profile when they change. */
+export const OB_HOURS = {
+  lines: ["Sun – Thu: 11AM – 11PM", "Fri – Sat: 11AM – 12AM"],
+  schema: [
+    { days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"], opens: "11:00", closes: "23:00" },
+    { days: ["Friday", "Saturday"], opens: "11:00", closes: "00:00" },
+  ],
+} as const;
+
+export const OB_AMENITIES = [
+  "Wall-to-wall sports screens",
+  "Kids menu",
+  "Wi-Fi",
+  "Dogs allowed outside",
+  "Takeout",
+  "Delivery via DoorDash",
+] as const;
 
 export const OB_MAP_ZOOM = 17;
 

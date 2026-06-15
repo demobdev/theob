@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
 import AltThemeToggle from "./AltThemeToggle";
 import AltHomeMobileMenu from "./AltHomeMobileMenu";
 import { getHeartlandOrderUrl } from "@/lib/orderLinks";
 import { OB_ADDRESS } from "@/lib/storeLocation";
+import { OB_SOCIAL } from "@/lib/localSeo";
 
 const navLinks = [
   { label: "Events", href: "/private-events" },
@@ -13,16 +14,15 @@ const navLinks = [
 ];
 
 const utilityLinks = [
-  { label: "Careers", href: "/locations#contact" },
+  { label: "Careers", href: "/careers" },
   { label: "Shop", href: "/#shop" },
   { label: "Our Story", href: "/our-story" },
   { label: "Feedback", href: "/locations#contact" },
 ];
 
 const socialLinks = [
-  { icon: Facebook, label: "Facebook", href: "#" },
-  { icon: Twitter, label: "X", href: "#" },
-  { icon: Instagram, label: "Instagram", href: "https://www.instagram.com/ownersbox.gvl/" },
+  { icon: Facebook, label: "Facebook", href: OB_SOCIAL.facebook },
+  { icon: Instagram, label: "Instagram", href: OB_SOCIAL.instagram },
 ];
 
 export default function AltHomeHeader() {

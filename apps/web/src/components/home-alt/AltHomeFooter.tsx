@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
+import { OB_GOOGLE_REVIEW_URL, OB_SOCIAL } from "@/lib/localSeo";
 
 const footerColumns = [
   [
@@ -10,20 +11,19 @@ const footerColumns = [
   ],
   [
     { label: "Menu", href: "/menu" },
-    { label: "Private Events", href: "/private-events" },
-    { label: "Visit Us", href: "/locations" },
+    { label: "Now Hiring", href: "/careers" },
+    { label: "FAQ", href: "/faq" },
   ],
   [
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms & Conditions", href: "/terms" },
-    { label: "Feedback", href: "/locations#contact" },
+    { label: "Leave a Review", href: OB_GOOGLE_REVIEW_URL, external: true },
   ],
 ];
 
 const socialLinks = [
-  { icon: Facebook, label: "Facebook", href: "#" },
-  { icon: Twitter, label: "X", href: "#" },
-  { icon: Instagram, label: "Instagram", href: "https://www.instagram.com/ownersbox.gvl/" },
+  { icon: Facebook, label: "Facebook", href: OB_SOCIAL.facebook },
+  { icon: Instagram, label: "Instagram", href: OB_SOCIAL.instagram },
 ];
 
 export default function AltHomeFooter() {
@@ -47,6 +47,8 @@ export default function AltHomeFooter() {
                       <Link
                         key={link.label}
                         href={link.href}
+                        target={"external" in link && link.external ? "_blank" : undefined}
+                        rel={"external" in link && link.external ? "noopener noreferrer" : undefined}
                         className="block text-[11px] font-black uppercase tracking-tight text-[#F2EAD4]/70 transition-colors hover:text-[#F2EAD4]"
                       >
                         {link.label}

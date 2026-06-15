@@ -14,7 +14,7 @@ export const LEGAL_CONTACT = {
   businessName: "The Owner's Box Bar & Grill",
   address: "1757 Woodruff Rd. STE A, Greenville, SC 29607",
   email: "privacy@theownersbox.com",
-  phone: "(864) 555-0123",
+  phone: "(864) 732-6963",
 } as const;
 
 export const privacyPolicy: LegalDocument = {

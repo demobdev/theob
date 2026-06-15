@@ -62,26 +62,26 @@ const heroSlides: HeroSlide[] = [
     badge: "Good Eats",
   },
   {
-    id: "knicks",
+    id: "basketball",
     label: "Basketball Watch Party",
-    heading: "Knicks In 5!",
+    heading: "Your Game On The Wall",
     subheading: "Bring the crew for basketball, wings, pizza, and game-day sound when the matchup is on.",
-    ctaHref: "/locations",
-    ctaLabel: "Visit us",
+    ctaHref: "/private-events",
+    ctaLabel: "Book a party",
     image: "/images/sports/knicks-finals-watch.png",
-    imageAlt: "New York Knicks championship celebration",
+    imageAlt: "Guests watching basketball at The Owner's Box",
     objectPosition: "center",
     badge: "NBA Nights",
   },
   {
-    id: "nhl",
+    id: "hockey",
     label: "Hockey Watch Party",
-    heading: "Stanley Cup Energy",
+    heading: "Puck Drop Energy",
     subheading: "Hockey nights, cold drinks, and a room ready for every shift.",
     ctaHref: "/private-events",
     ctaLabel: "Book a party",
     image: "/images/sports/stanley-cup-watch.png",
-    imageAlt: "Hockey players skating onto the ice",
+    imageAlt: "Hockey on the screens at The Owner's Box",
     objectPosition: "center",
     badge: "Hockey Ready",
   },
@@ -91,8 +91,8 @@ function splitHeading(heading: string): string[] {
   if (heading === "Nothing But Good Times") return ["Nothing But", "Good Times"];
   if (heading === "Delicious Cocktails") return ["Delicious", "Cocktails"];
   if (heading === "Pizza Worth Staying For") return ["Pizza Worth", "Staying For"];
-  if (heading === "Knicks In 5!") return ["Knicks In", "5!"];
-  if (heading === "Stanley Cup Energy") return ["Stanley Cup", "Energy"];
+  if (heading === "Your Game On The Wall") return ["Your Game", "On The Wall"];
+  if (heading === "Puck Drop Energy") return ["Puck Drop", "Energy"];
   return [heading];
 }
 

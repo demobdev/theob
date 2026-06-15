@@ -5,9 +5,10 @@ import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
 import { getHeartlandOrderUrl } from "@/lib/orderLinks";
 
 export const metadata = {
-  title: "Our Story | The Owner's Box",
+  title: "Our Story | Family-Friendly Sports Bar in Greenville SC",
   description:
-    "Greenville's game-day bar on Woodruff Road — wall-to-wall screens, scratch-made food, and a room built for regulars.",
+    "The Owners Box Bar & Grill on Woodruff Road — Greenville's upscale game-day sports bar with scratch-made food, big screens, and room for the whole crew.",
+  alternates: { canonical: "/our-story" },
 };
 
 export default function OurStoryPage() {

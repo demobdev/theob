@@ -103,12 +103,12 @@ const cards = [
     peekImagePosition: "center 42%",
     strip: "bg-[#071B2F] text-[#F2EAD4]",
     body: "bg-[#101014] text-[#F2EAD4]",
-    marquee: ["Sports Bar", "Cold Drinks", "Live Games"],
+    marquee: ["Sports Bar", "Cold Drinks", "Big Screens"],
   },
   {
     eyebrow: "Groups, parties, regulars",
     title: "The Party Starts Here",
-    text: "Bring the crew for birthdays, watch parties, league drafts, and Greenville nights out.",
+    text: "Bring the crew for birthdays, watch parties, fantasy draft nights, and Greenville nights out.",
     href: "/private-events",
     cta: "Book A Party",
     image: "/images/atmosphere/friends-and-family.jpg",
@@ -122,7 +122,7 @@ const cards = [
       {
         icon: Users,
         label: "Groups & celebrations",
-        detail: "Birthdays, league drafts, and nights out with your crew.",
+        detail: "Birthdays, fantasy draft nights, and nights out with your crew.",
       },
       {
         icon: MonitorPlay,

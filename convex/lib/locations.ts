@@ -13,7 +13,7 @@ export const GREENVILLE_LOCATION = {
   fullAddress: "1757 Woodruff Rd. STE A, Greenville, SC 29607",
   latitude: 34.8200749,
   longitude: -82.2714396,
-  phone: "", // store line — fill when ops provides
+  phone: "(864) 732-6963",
   timezone: "America/New_York",
   /** Kitchen service window (local hour, 24h) */
   kitchenOpenHour: 11,

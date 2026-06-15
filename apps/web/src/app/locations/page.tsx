@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import {
   CalendarDays,
@@ -21,10 +22,13 @@ import {
   OB_COORDS,
   OB_ADDRESS,
   OB_MAP_ZOOM,
+  OB_HOURS,
+  OB_AMENITIES,
   haversineMiles,
   formatDistanceAndDrive,
 } from "@/lib/storeLocation";
 import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import { OB_GOOGLE_REVIEW_URL, OB_SUPPORT_EMAIL } from "@/lib/localSeo";
 import DoorDashButton from "@/components/common/DoorDashButton";
 
 const LocationMap = dynamic(() => import("@/components/locations/LocationMap"), {
@@ -37,18 +41,17 @@ const LocationMap = dynamic(() => import("@/components/locations/LocationMap"), 
 });
 
 const OB_LOCATION: [number, number] = [OB_COORDS.lat, OB_COORDS.lng];
-const SUPPORT_EMAIL = "support@ownersboxgvl.com";
 
 const featureTiles = [
   {
-    title: "Chalk Up",
-    text: "Pool, game-day screens, and a room built for regulars.",
+    title: "Game Day",
+    text: "Fourteen HD screens, cold drinks, and a room built for regulars.",
     image: "/images/atmosphere/cinematic-dtl-1.jpg",
     imagePosition: "center 28%",
   },
   {
-    title: "Happy Hour",
-    text: "Cold drinks, easy hangs, and Greenville nights out.",
+    title: "Cold Drinks",
+    text: "Craft cocktails, beer, and wine for dine-in — easy hangs and Greenville nights out.",
     image: "/images/couple-at-bar.png.jpg",
     imagePosition: "center 35%",
   },
@@ -83,7 +86,20 @@ const galleryImageAlts: Record<string, string> = {
   "/images/drinks/cocktail-on-bar-1.jpg": "Cocktail on the bar",
 };
 
-const dailySpecials = ["Monday", "Tuesday", "Wednesday"];
+const barSpecials = [
+  {
+    label: "Scratch-made menu",
+    title: "Wings & Pizza",
+  },
+  {
+    label: "Dine-in bar",
+    title: "Beer & Wine",
+  },
+  {
+    label: "Wall-to-wall screens",
+    title: "Sports On TV",
+  },
+];
 
 function FeatureImageTile({
   src,
@@ -268,7 +284,7 @@ export default function LocationsPage() {
           <div className="relative min-h-[520px] overflow-hidden rounded-[24px] border-2 border-[#05070B]/10">
             <Image
               src="/sports-feature.jpg"
-              alt="The Owner's Box Greenville location"
+              alt="The Owner's Box sports bar and grill in Greenville SC on Woodruff Road"
               fill
               priority
               className="object-cover"
@@ -277,13 +293,16 @@ export default function LocationsPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-black/78 via-black/34 to-black/5" />
             <div className="absolute left-5 top-5 w-[min(440px,calc(100%-40px))] rounded-[24px] border border-white/20 bg-white p-5 text-[#05070B] shadow-2xl sm:left-8 sm:top-8 sm:p-7">
               <p className="mb-3 text-[10px] font-black uppercase tracking-[0.28em] text-[#05070B]/60">
-                Greenville
+                Sports bar & grill · Greenville, SC
               </p>
               <h1 className="font-montserrat text-5xl font-black uppercase leading-[0.82] tracking-[-0.08em] sm:text-6xl">
                 Come
                 <br />
                 See Us
               </h1>
+              <p className="mt-4 text-xs font-semibold leading-relaxed text-[#05070B]/68">
+                Family-friendly dining on Woodruff Road — kids menu, big screens, and game-day energy.
+              </p>
               <div className="mt-6 grid gap-2">
                 <a
                   href={orderUrl}
@@ -318,8 +337,9 @@ export default function LocationsPage() {
             </h2>
           </div>
           <div className="max-w-2xl text-sm font-semibold leading-relaxed text-[#05070B]/68">
-            Now open at {OB_ADDRESS.line1}. Dine in, order takeout online, or get DoorDash delivery
-            from one address with the full menu and game-day energy.
+            Now open at {OB_ADDRESS.line1} in Greenville, SC. A family-friendly sports bar and grill
+            with scratch-made wings, pizza, and steaks — dine in, order takeout online, or get DoorDash
+            delivery.
           </div>
         </div>
       </section>
@@ -389,17 +409,23 @@ export default function LocationsPage() {
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 shrink-0 text-white/45" />
-                <a href={`tel:${OB_ADDRESS.phone.replace(/\D/g, "")}`} className="hover:text-white">
+                <a href={`tel:${OB_ADDRESS.phoneTel}`} className="hover:text-white">
                   {OB_ADDRESS.phone}
                 </a>
               </div>
               <div className="flex items-start gap-3">
                 <Clock className="mt-1 h-5 w-5 shrink-0 text-white/45" />
                 <p>
-                  Sun - Thu: 11AM - 11PM
-                  <br />
-                  Fri - Sat: 11AM - 1AM
+                  {OB_HOURS.lines.map((line) => (
+                    <span key={line} className="block">
+                      {line}
+                    </span>
+                  ))}
                 </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <UtensilsCrossed className="mt-1 h-5 w-5 shrink-0 text-white/45" />
+                <p>{OB_AMENITIES.join(" · ")}</p>
               </div>
             </div>
 
@@ -424,6 +450,15 @@ export default function LocationsPage() {
                 <ExternalLink size={12} />
               </a>
               <DoorDashButton fullWidth />
+              <a
+                href={OB_GOOGLE_REVIEW_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-full border-2 border-[#D4AF37] bg-[#D4AF37] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-[#05070B] transition-colors hover:bg-[#c9a430]"
+              >
+                Leave a Google review
+                <ExternalLink size={12} />
+              </a>
               <a
                 href={buildDirectionsUrl(userLocation)}
                 target="_blank"
@@ -484,23 +519,23 @@ export default function LocationsPage() {
         <div className="mx-auto grid max-w-[1600px] gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div>
             <p className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-[#05070B]/55">
-              Daily specials
+              What we serve
             </p>
             <h2 className="font-montserrat text-5xl font-black uppercase leading-[0.82] tracking-[-0.08em]">
-              Daily
+              Food,
               <br />
-              Specials
+              Drinks & Screens
             </h2>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
-            {dailySpecials.map((special) => (
-              <div key={special} className="rounded-[24px] border border-white/10 bg-white p-6 text-[#05070B]">
+            {barSpecials.map((special) => (
+              <div key={special.title} className="rounded-[24px] border border-white/10 bg-white p-6 text-[#05070B]">
                 <CalendarDays className="mb-8 h-8 w-8" />
                 <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#05070B]/55">
-                  {special}
+                  {special.label}
                 </p>
                 <p className="mt-2 font-montserrat text-3xl font-black uppercase leading-[0.85] tracking-[-0.06em]">
-                  Ask What&apos;s On
+                  {special.title}
                 </p>
               </div>
             ))}
@@ -512,27 +547,27 @@ export default function LocationsPage() {
         <div className="mx-auto grid max-w-[1600px] gap-8 rounded-[28px] border border-[#05070B]/10 bg-[#101014] p-7 text-white sm:p-10 lg:grid-cols-[0.65fr_1fr]">
           <div>
             <p className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/55">
-              League play
+              Groups & watch parties
             </p>
             <h2 className="font-montserrat text-5xl font-black uppercase leading-[0.82] tracking-[-0.08em]">
-              League
+              Bring The
               <br />
-              Play
+              Crew
             </h2>
           </div>
           <div className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-start">
             <Trophy className="h-10 w-10" />
             <div>
               <p className="text-sm font-semibold leading-relaxed text-white/68">
-                Pool nights, watch parties, regular meetups, and Greenville groups can use this
-                page as the jump-off point. Swap in the final league details when they are ready.
+                Birthdays, fantasy draft nights, corporate outings, and big-game watch parties —
+                with shared apps, wings, pizza, and screens when schedules allow.
               </p>
-              <a
-                href="#contact"
+              <Link
+                href="/private-events"
                 className="mt-6 inline-flex rounded-full border-2 border-white px-5 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-[#05070B]"
               >
-                Ask about groups
-              </a>
+                Plan a private event
+              </Link>
             </div>
           </div>
         </div>
@@ -568,7 +603,7 @@ export default function LocationsPage() {
               const message = (form.elements.namedItem("message") as HTMLTextAreaElement).value;
               const subject = encodeURIComponent(`Contact from ${name}`);
               const body = encodeURIComponent(`${message}\n\n- ${name}\n${email}`);
-              window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
+              window.location.href = `mailto:${OB_SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
             }}
           >
             <input
@@ -598,8 +633,17 @@ export default function LocationsPage() {
               Send Message
             </button>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-[#05070B]/45">
-              Opens your email app - {SUPPORT_EMAIL}
+              Opens your email app — {OB_SUPPORT_EMAIL}
             </p>
+            <a
+              href={OB_GOOGLE_REVIEW_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#05070B] underline-offset-4 hover:underline"
+            >
+              Loved your visit? Leave us a Google review
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </form>
         </div>
       </section>

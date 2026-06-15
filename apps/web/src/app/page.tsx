@@ -1,7 +1,20 @@
 import dynamic from "next/dynamic";
+import type { Metadata } from "next";
 import AltHomeGoodTimes from "@/components/home-alt/AltHomeGoodTimes";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import AltHomeHero from "@/components/home-alt/AltHomeHero";
+import { OB_DEFAULT_DESCRIPTION, OB_SITE_URL } from "@/lib/localSeo";
+
+export const metadata: Metadata = {
+  title: "Sports Bar & Family Restaurant in Greenville, SC",
+  description: OB_DEFAULT_DESCRIPTION,
+  alternates: { canonical: OB_SITE_URL },
+  openGraph: {
+    title: "The Owner's Box Bar & Grill | Sports Bar & Family Restaurant in Greenville, SC",
+    description: OB_DEFAULT_DESCRIPTION,
+    url: OB_SITE_URL,
+  },
+};
 
 const AltHomeStackedCards = dynamic(
   () => import("@/components/home-alt/AltHomeStackedCards"),
