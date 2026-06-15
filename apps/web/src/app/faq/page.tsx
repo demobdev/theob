@@ -1,9 +1,10 @@
-import Header from "@/components/Header";
-import Footer from "@/components/home/Footer";
 import Link from "next/link";
+import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
+import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
 
 export const metadata = {
   title: "FAQ | The Owner's Box",
+  description: "Hours, ordering, location, private events, and common questions about The Owner's Box.",
 };
 
 const faqs = [
@@ -17,7 +18,7 @@ const faqs = [
   },
   {
     q: "Can I order online?",
-    a: "Browse the full menu on our website. For takeout, use Order Takeout in the header — it opens our Heartland online ordering site. Delivery is available through DoorDash.",
+    a: "Browse the full menu on our website. For takeout, use Order Now in the header — it opens our Heartland online ordering site. Delivery is available through DoorDash.",
   },
   {
     q: "Do you offer delivery?",
@@ -25,7 +26,7 @@ const faqs = [
   },
   {
     q: "Are mobile apps available?",
-    a: "iOS and Android apps are coming soon. Until then, check live scores on the homepage sport filter and ticker. Full TV schedules launch with the apps.",
+    a: "iOS and Android apps are coming soon. Until then, order online through Heartland and check our site for hours, menu, and visit info.",
   },
   {
     q: "What is curbside pickup?",
@@ -37,11 +38,11 @@ const faqs = [
   },
   {
     q: "How do I see what games are on?",
-    a: "Use the homepage sport filter and scrolling ticker for today's live scores and start times. Full TV schedules and screen assignments launch with our mobile apps.",
+    a: "Wall-to-wall screens and NFL Sunday Ticket at the bar. Ask the team when you arrive or mention your matchup when booking a private event.",
   },
   {
     q: "Do you host private events?",
-    a: "Yes — groups and watch parties. Visit our Private Events page or contact us through the Visit Us page form.",
+    a: "Yes — groups and watch parties. Visit our Private Events page or contact us through the form on our Locations page.",
   },
   {
     q: "Is there a dress code?",
@@ -53,45 +54,51 @@ const faqs = [
   },
   {
     q: "How do I contact the restaurant?",
-    a: "Use the contact form on our Visit Us page, email support@ownersboxgvl.com, or call (864) 555-0123 during business hours.",
+    a: "Use the contact form on our Locations page, email support@ownersboxgvl.com, or call during business hours.",
   },
 ];
 
 export default function FaqPage() {
   return (
-    <main className="bg-[#0A0A0A] min-h-screen">
-      <Header />
-      <section className="container mx-auto px-4 py-24 max-w-2xl">
-        <span className="text-[#D4AF37] font-bold uppercase tracking-[0.3em] text-sm mb-4 block">
-          Help Center
-        </span>
-        <h1 className="text-5xl font-black text-white uppercase tracking-tighter mb-12">
-          FAQ
-        </h1>
-        <div className="space-y-6">
-          {faqs.map((item) => (
-            <details
-              key={item.q}
-              className="premium-card p-6 border-white/10 group"
-            >
-              <summary className="text-white font-black uppercase tracking-tight text-sm cursor-pointer list-none flex justify-between gap-4">
-                {item.q}
-                <span className="text-[#D4AF37] group-open:rotate-45 transition-transform">+</span>
-              </summary>
-              <p className="text-gray-400 text-sm font-medium leading-relaxed mt-4">
-                {item.a}
-              </p>
-            </details>
-          ))}
+    <main className="ob-theme-root ob-force-light min-h-screen bg-white text-[#05070B]">
+      <AltHomeHeader />
+
+      <section className="ob-canvas bg-white px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-[900px]">
+          <p className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-[#05070B]/55">
+            Help center
+          </p>
+          <h1 className="font-montserrat text-5xl font-black uppercase leading-[0.82] tracking-[-0.08em] sm:text-7xl">
+            FAQ
+          </h1>
+
+          <div className="mt-10 space-y-4">
+            {faqs.map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-[24px] border-2 border-[#05070B]/10 bg-white p-5 shadow-[0_12px_0_rgba(5,7,11,0.04)] sm:p-6"
+              >
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-sm font-black uppercase tracking-tight text-[#05070B]">
+                  {item.q}
+                  <span className="shrink-0 text-[#D4AF37] transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-4 text-sm font-semibold leading-relaxed text-[#05070B]/70">{item.a}</p>
+              </details>
+            ))}
+          </div>
+
+          <p className="mt-12 text-sm font-semibold text-[#05070B]/60">
+            Still stuck?{" "}
+            <Link href="/locations#contact" className="font-black text-[#05070B] underline-offset-4 hover:underline">
+              Contact us
+            </Link>
+          </p>
         </div>
-        <p className="text-gray-500 text-sm mt-12">
-          Still stuck?{" "}
-          <Link href="/locations#contact" className="text-[#D4AF37] font-bold hover:underline">
-            Contact us
-          </Link>
-        </p>
       </section>
-      <Footer />
+
+      <AltHomeFooter />
     </main>
   );
 }

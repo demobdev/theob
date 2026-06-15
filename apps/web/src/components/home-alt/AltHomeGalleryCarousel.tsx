@@ -1,10 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-
-/** ~95s per full loop at typical desktop widths (matches prior marquee-extra-slow feel). */
-const AUTO_SCROLL_PX_PER_SEC = 58;
 
 const galleryImages = [
   {
@@ -74,44 +71,22 @@ const galleryImages = [
   },
 ];
 
-function normalizeOffset(offset: number, loopWidth: number): number {
-  if (loopWidth <= 0) return offset;
-  let next = offset % loopWidth;
-  if (next < 0) next += loopWidth;
-  return next;
-}
-
 export default function AltHomeGalleryCarousel() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const loopWidthRef = useRef(0);
-  const offsetRef = useRef(0);
-  const isDraggingRef = useRef(false);
-  const dragStartXRef = useRef(0);
-  const dragStartOffsetRef = useRef(0);
-  const rafRef = useRef<number | null>(null);
-  const lastFrameRef = useRef<number | null>(null);
-
+  const sectionRef = useRef<HTMLElement>(null);
   const [revealed, setRevealed] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const carouselImages = [...galleryImages, ...galleryImages];
+  const shouldAnimate = revealed && isVisible && !isPaused && !prefersReducedMotion;
 
-  const measureLoopWidth = useCallback(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    loopWidthRef.current = track.scrollWidth / 2;
-  }, []);
-
-  const paintOffset = useCallback(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    const loopWidth = loopWidthRef.current;
-    if (loopWidth > 0) {
-      offsetRef.current = normalizeOffset(offsetRef.current, loopWidth);
-    }
-
-    track.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`;
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncPreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    syncPreference();
+    mediaQuery.addEventListener("change", syncPreference);
+    return () => mediaQuery.removeEventListener("change", syncPreference);
   }, []);
 
   useEffect(() => {
@@ -121,89 +96,32 @@ export default function AltHomeGalleryCarousel() {
       return;
     }
 
-    const onScroll = () => {
-      const { top } = sentinel.getBoundingClientRect();
-      setRevealed(top <= window.innerHeight * 0.55);
-    };
+    const revealObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        setRevealed(entry.isIntersecting);
+      },
+      { rootMargin: "-45% 0px 0px 0px", threshold: 0 },
+    );
 
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
+    revealObserver.observe(sentinel);
+    return () => revealObserver.disconnect();
   }, []);
 
   useEffect(() => {
     if (!revealed) return;
 
-    const track = trackRef.current;
-    if (!track) return;
+    const section = sectionRef.current;
+    if (!section) return;
 
-    measureLoopWidth();
-    paintOffset();
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry?.isIntersecting ?? false),
+      { rootMargin: "120px 0px", threshold: 0.05 },
+    );
 
-    const resizeObserver = new ResizeObserver(() => {
-      measureLoopWidth();
-      paintOffset();
-    });
-    resizeObserver.observe(track);
-
-    const tick = (time: number) => {
-      const loopWidth = loopWidthRef.current;
-      if (!isDraggingRef.current && loopWidth > 0) {
-        const last = lastFrameRef.current ?? time;
-        const elapsed = time - last;
-        offsetRef.current += (AUTO_SCROLL_PX_PER_SEC * elapsed) / 1000;
-        paintOffset();
-      }
-      lastFrameRef.current = time;
-      rafRef.current = requestAnimationFrame(tick);
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
-
-    return () => {
-      resizeObserver.disconnect();
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, [revealed, measureLoopWidth, paintOffset]);
-
-  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
-
-    isDraggingRef.current = true;
-    setIsDragging(true);
-    dragStartXRef.current = event.clientX;
-    dragStartOffsetRef.current = offsetRef.current;
-    lastFrameRef.current = null;
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-
-  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingRef.current) return;
-
-    const deltaX = dragStartXRef.current - event.clientX;
-    offsetRef.current = dragStartOffsetRef.current + deltaX;
-    paintOffset();
-  };
-
-  const endDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingRef.current) return;
-
-    isDraggingRef.current = false;
-    setIsDragging(false);
-    lastFrameRef.current = null;
-
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-
-    paintOffset();
-  };
+    visibilityObserver.observe(section);
+    return () => visibilityObserver.disconnect();
+  }, [revealed]);
 
   if (!revealed) {
     return (
@@ -215,23 +133,25 @@ export default function AltHomeGalleryCarousel() {
   }
 
   return (
-    <section className="ob-canvas relative z-0 overflow-hidden bg-white py-12 pt-28 text-[#05070B] sm:pt-24 md:pt-20">
+    <section
+      ref={sectionRef}
+      className="ob-canvas relative z-0 overflow-hidden bg-white py-12 pt-28 text-[#05070B] sm:pt-24 md:pt-20"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       <div className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-white to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-white to-transparent" />
 
         <div
-          ref={trackRef}
           role="region"
-          aria-label="Photo gallery. Click and drag horizontally to browse."
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-          className={`flex w-max touch-pan-y select-none items-center gap-5 px-5 ${
-            isDragging ? "cursor-grabbing" : "cursor-grab"
+          aria-label="Photo gallery. Hover to pause scrolling."
+          className={`flex w-max items-center gap-5 px-5 ${
+            revealed && !prefersReducedMotion ? "animate-marquee-extra-slow" : ""
           }`}
-          style={{ willChange: "transform" }}
+          style={{
+            animationPlayState: shouldAnimate ? "running" : "paused",
+          }}
         >
           {carouselImages.map((image, index) => (
             <div
@@ -247,11 +167,8 @@ export default function AltHomeGalleryCarousel() {
                 alt={image.alt}
                 fill
                 draggable={false}
-                className={`pointer-events-none object-cover ${
-                  isDragging ? "" : "transition-transform duration-700 hover:scale-105"
-                }`}
+                className="pointer-events-none object-cover transition-transform duration-700 hover:scale-105"
                 sizes="(max-width: 768px) 200px, (max-width: 1536px) 260px, 320px"
-                onLoad={measureLoopWidth}
               />
             </div>
           ))}

@@ -33,7 +33,7 @@ export default function AppPromoBanner() {
                         Launching Soon
                       </p>
                     </div>
-                    <div className="w-12 h-12 md:w-14 md:h-14 relative">
+                    <div className="relative h-12 w-12 md:h-14 md:w-14 shrink-0 p-1">
                       <Image src="/loading-icon.png" fill className="object-contain" alt="OB Logo" />
                     </div>
                   </div>

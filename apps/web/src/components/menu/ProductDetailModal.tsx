@@ -87,13 +87,13 @@ export default function ProductDetailModal({
                       }}
                     />
                   ) : (
-                    <div className="flex items-center justify-center h-full w-full p-12">
+                    <div className="flex h-full w-full items-center justify-center p-10">
                       <Image
                         src="/loading-icon.png"
-                        width={120}
-                        height={120}
+                        width={96}
+                        height={96}
                         alt=""
-                        className="opacity-40"
+                        className="max-h-full max-w-full object-contain opacity-40"
                       />
                     </div>
                   )}

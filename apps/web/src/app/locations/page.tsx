@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
@@ -190,6 +190,8 @@ function buildDirectionsUrl(userLocation: [number, number] | null): string {
 }
 
 export default function LocationsPage() {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [mapVisible, setMapVisible] = useState(false);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [distanceLabel, setDistanceLabel] = useState<string | null>(null);
@@ -198,6 +200,24 @@ export default function LocationsPage() {
 
   useEffect(() => {
     document.documentElement.classList.remove("ob-dark-mode");
+  }, []);
+
+  useEffect(() => {
+    const mapContainer = mapContainerRef.current;
+    if (!mapContainer) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setMapVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "160px 0px", threshold: 0.01 },
+    );
+
+    observer.observe(mapContainer);
+    return () => observer.disconnect();
   }, []);
 
   const requestLocation = useCallback(() => {
@@ -240,7 +260,7 @@ export default function LocationsPage() {
   }, []);
 
   return (
-    <main className="ob-force-light min-h-screen bg-white text-[#05070B]">
+    <main className="ob-theme-root ob-force-light min-h-screen bg-white text-[#05070B]">
       <AltHomeHeader />
 
       <section className="bg-white px-4 pb-12 text-[#05070B] sm:px-6">
@@ -430,8 +450,17 @@ export default function LocationsPage() {
             )}
           </div>
 
-          <div className="min-h-[520px] overflow-hidden rounded-[28px] border border-[#05070B]/10">
-            <LocationMap location={OB_LOCATION} userLocation={userLocation} zoom={OB_MAP_ZOOM} />
+          <div
+            ref={mapContainerRef}
+            className="min-h-[520px] overflow-hidden rounded-[28px] border border-[#05070B]/10"
+          >
+            {mapVisible ? (
+              <LocationMap location={OB_LOCATION} userLocation={userLocation} zoom={OB_MAP_ZOOM} />
+            ) : (
+              <div className="flex h-full min-h-[520px] w-full items-center justify-center rounded-2xl bg-[#121212] text-xs font-bold uppercase tracking-widest text-gray-500">
+                Map loads when in view
+              </div>
+            )}
           </div>
         </div>
       </section>

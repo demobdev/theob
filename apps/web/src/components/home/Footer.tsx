@@ -22,7 +22,7 @@ const footerNav = {
   visit: [
     { name: "Visit Us", href: "/locations" },
     { name: "Private Events", href: "/private-events" },
-    { name: "About the Box", href: "/about" },
+    { name: "About the Box", href: "/our-story" },
     { name: "FAQ", href: "/faq" },
     { name: "Contact Us", href: "/locations#contact" },
   ]

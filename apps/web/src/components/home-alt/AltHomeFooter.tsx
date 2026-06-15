@@ -6,17 +6,17 @@ const footerColumns = [
   [
     { label: "Locations", href: "/locations" },
     { label: "Book a Party", href: "/private-events" },
-    { label: "Careers", href: "/contact" },
+    { label: "Our Story", href: "/our-story" },
   ],
   [
     { label: "Menu", href: "/menu" },
-    { label: "Live Games", href: "/games" },
-    { label: "Events", href: "/events" },
+    { label: "Private Events", href: "/private-events" },
+    { label: "Visit Us", href: "/locations" },
   ],
   [
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms & Conditions", href: "/terms" },
-    { label: "Feedback", href: "/contact" },
+    { label: "Feedback", href: "/locations#contact" },
   ],
 ];
 

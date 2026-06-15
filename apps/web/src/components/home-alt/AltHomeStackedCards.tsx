@@ -56,19 +56,8 @@ function StackCardImageColumn({
 }) {
   return (
     <div className={`${cardImageColumnClass} ${bodyClass}`}>
-      <div className="relative h-full w-full md:hidden">
-        <Image
-          src={image}
-          alt=""
-          fill
-          className="object-cover"
-          style={{ objectPosition: imagePosition }}
-          sizes="(max-width: 768px) 100vw, 780px"
-        />
-      </div>
-
-      <div className="hidden h-full w-full flex-col md:flex">
-        <div className="relative min-h-0 flex-1 overflow-hidden">
+      <div className="relative h-full w-full md:flex md:flex-col">
+        <div className="relative aspect-square w-full overflow-hidden md:aspect-auto md:min-h-0 md:flex-1">
           <Image
             src={image}
             alt=""
@@ -80,7 +69,7 @@ function StackCardImageColumn({
         </div>
         {peekImage ? (
           <div
-            className={`relative ${STACK_SCROLL.peekStripHeight} shrink-0 overflow-hidden border-t border-[#D4AF37]/25 bg-[#101014]`}
+            className={`relative ${STACK_SCROLL.peekStripHeight} hidden shrink-0 overflow-hidden border-t border-[#D4AF37]/25 bg-[#101014] md:block`}
           >
             <Image
               src={peekImage}
@@ -106,8 +95,8 @@ const cards = [
     eyebrow: "Game day energy",
     title: "Rack Up The Fun",
     text: "Fourteen HD screens, cold drinks, and a room built for the matchup.",
-    href: "/games",
-    cta: "See What's On",
+    href: "/locations",
+    cta: "Visit Us",
     image: "/images/atmosphere/wide-view-from-right.jpg",
     imagePosition: "center 30%",
     peekImage: "/images/atmosphere/big-wall-left-1.jpg",
@@ -360,7 +349,6 @@ function GoodEatsCard({
                 : undefined
             }
             sizes="(max-width: 768px) 100vw, 780px"
-            priority={isLast}
           />
         </div>
 
@@ -610,7 +598,7 @@ export default function AltHomeStackedCards() {
                         />
                       </div>
                     )}
-                    {!card.eventImage && (
+                    {!card.eventImage && card.marquee && (
                       <div className="shrink-0">
                         <MarqueeLine words={card.marquee} />
                       </div>

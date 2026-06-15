@@ -28,7 +28,7 @@ export default function AltHomeShopCollection() {
               Shop Now — Soon
             </button>
             <Link
-              href="/contact"
+              href="/locations#contact"
               className="inline-flex rounded-full border-2 border-[#05070B] bg-white px-5 py-2 text-[10px] font-black uppercase tracking-widest text-[#05070B] shadow-[3px_3px_0_#05070B] transition-transform hover:-translate-y-0.5"
             >
               Join The List

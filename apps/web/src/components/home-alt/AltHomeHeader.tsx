@@ -2,20 +2,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import AltThemeToggle from "./AltThemeToggle";
+import AltHomeMobileMenu from "./AltHomeMobileMenu";
 import { getHeartlandOrderUrl } from "@/lib/orderLinks";
 import { OB_ADDRESS } from "@/lib/storeLocation";
 
 const navLinks = [
-  { label: "Events", href: "/events" },
+  { label: "Events", href: "/private-events" },
   { label: "Book a Party", href: "/private-events" },
   { label: "Locations", href: "/locations" },
 ];
 
 const utilityLinks = [
-  { label: "Careers", href: "/contact" },
-  { label: "Shop", href: "#shop" },
-  { label: "Our Story", href: "/about" },
-  { label: "Feedback", href: "/contact" },
+  { label: "Careers", href: "/locations#contact" },
+  { label: "Shop", href: "/#shop" },
+  { label: "Our Story", href: "/our-story" },
+  { label: "Feedback", href: "/locations#contact" },
 ];
 
 const socialLinks = [
@@ -56,27 +57,36 @@ export default function AltHomeHeader() {
       </div>
 
       <div className="ob-nav-surface bg-white text-[#05070B]">
-        <div className="mx-auto grid max-w-[1600px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 xl:px-8">
-          <nav className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 text-[9px] font-black uppercase tracking-tight sm:gap-x-7 sm:text-xs">
-            {navLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="transition-opacity hover:opacity-60">
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-4 py-3 sm:px-6 xl:px-8">
+          <div className="flex min-w-0 items-center gap-2 md:flex-1">
+            <AltHomeMobileMenu
+              navLinks={navLinks}
+              utilityLinks={utilityLinks}
+              phoneLabel={OB_ADDRESS.phone}
+              phoneHref={phoneHref}
+              orderUrl={orderUrl}
+            />
+            <nav className="hidden items-center gap-x-7 text-xs font-black uppercase tracking-tight md:flex">
+              {navLinks.map((link) => (
+                <Link key={link.label} href={link.href} className="transition-opacity hover:opacity-60">
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
-          <Link href="/" className="flex items-center justify-center gap-2">
+          <Link href="/" className="flex shrink-0 items-center justify-center gap-2 px-2">
             <Image src="/ob-icon.png" alt="" width={34} height={34} className="h-8 w-8 object-contain" />
             <span className="hidden font-montserrat text-lg font-black uppercase leading-none tracking-tight sm:block">
               The Owner&apos;s Box
             </span>
           </Link>
 
-          <div className="flex items-center justify-end gap-2 sm:gap-3">
+          <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
             <AltThemeToggle />
             <a
               href={phoneHref}
-              className="hidden rounded-full border-2 border-[#05070B]/15 px-3 py-2 text-[8px] font-black uppercase tracking-widest text-[#05070B] transition-colors hover:border-[#05070B] sm:inline-flex sm:text-[9px]"
+              className="hidden rounded-full border-2 border-[#05070B]/15 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-[#05070B] transition-colors hover:border-[#05070B] lg:inline-flex"
             >
               {OB_ADDRESS.phone}
             </a>
@@ -84,7 +94,7 @@ export default function AltHomeHeader() {
               href={orderUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full border-2 border-[#05070B] bg-[#05070B] px-3 py-2 text-[8px] font-black uppercase tracking-widest text-white transition-transform hover:scale-[1.02] sm:px-4 sm:text-[9px]"
+              className="hidden rounded-full border-2 border-[#05070B] bg-[#05070B] px-4 py-2 text-[9px] font-black uppercase tracking-widest text-white transition-transform hover:scale-[1.02] sm:inline-flex"
             >
               Order Now
             </a>

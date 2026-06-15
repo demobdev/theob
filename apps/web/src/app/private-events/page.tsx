@@ -28,7 +28,7 @@ const eventFeatures = [
 
 export default function PrivateEventsPage() {
   return (
-    <main className="ob-theme-root min-h-screen bg-white text-[#05070B]">
+    <main className="ob-theme-root ob-force-light min-h-screen bg-white text-[#05070B]">
       <AltHomeHeader />
 
       <section className="bg-white px-4 pb-12 text-[#05070B] sm:px-6">

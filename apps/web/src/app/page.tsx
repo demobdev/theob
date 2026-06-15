@@ -1,11 +1,32 @@
-import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
-import AltHomeGalleryCarousel from "@/components/home-alt/AltHomeGalleryCarousel";
+import dynamic from "next/dynamic";
 import AltHomeGoodTimes from "@/components/home-alt/AltHomeGoodTimes";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import AltHomeHero from "@/components/home-alt/AltHomeHero";
-import AltHomeShopCollection from "@/components/home-alt/AltHomeShopCollection";
-import AltHomeStackedCards from "@/components/home-alt/AltHomeStackedCards";
-import AltHomeStorySection from "@/components/home-alt/AltHomeStorySection";
+
+const AltHomeStackedCards = dynamic(
+  () => import("@/components/home-alt/AltHomeStackedCards"),
+  { loading: () => <div aria-hidden="true" className="ob-canvas min-h-[40vh] bg-white" /> },
+);
+
+const AltHomeGalleryCarousel = dynamic(
+  () => import("@/components/home-alt/AltHomeGalleryCarousel"),
+  { loading: () => <div aria-hidden="true" className="ob-canvas min-h-[24vh] bg-white" /> },
+);
+
+const AltHomeStorySection = dynamic(
+  () => import("@/components/home-alt/AltHomeStorySection"),
+  { loading: () => <div aria-hidden="true" className="ob-canvas min-h-[32vh] bg-white" /> },
+);
+
+const AltHomeShopCollection = dynamic(
+  () => import("@/components/home-alt/AltHomeShopCollection"),
+  { loading: () => <div aria-hidden="true" className="ob-canvas min-h-[24vh] bg-white" /> },
+);
+
+const AltHomeFooter = dynamic(
+  () => import("@/components/home-alt/AltHomeFooter"),
+  { loading: () => <div aria-hidden="true" className="min-h-[20vh] bg-white" /> },
+);
 
 export default function Home() {
   return (

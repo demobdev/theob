@@ -119,7 +119,7 @@ export default function MenuPage() {
   })).filter(cat => cat.items.length > 0);
 
   return (
-    <main className="ob-theme-root min-h-screen bg-white text-[#05070B]">
+    <main className="ob-theme-root ob-force-light min-h-screen bg-white text-[#05070B]">
       <AltHomeHeader />
 
       <section className="bg-white px-4 pb-10 text-[#05070B] sm:px-6">
@@ -242,7 +242,7 @@ export default function MenuPage() {
                         fill
                         className="object-cover"
                         alt=""
-                        sizes="100vw"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 80vw, 1200px"
                       />
                       <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-transparent" />
                       <div className="relative z-10 flex w-full items-end gap-6 p-6 md:p-8">

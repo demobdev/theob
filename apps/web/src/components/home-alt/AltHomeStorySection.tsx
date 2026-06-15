@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function AltHomeStorySection() {
   return (
-    <section className="ob-canvas relative overflow-hidden bg-white px-4 py-20 text-[#05070B] sm:px-6">
+    <section id="our-story" className="ob-canvas relative overflow-hidden bg-white px-4 py-20 text-[#05070B] sm:px-6">
       <div className="absolute inset-x-0 top-0 flex whitespace-nowrap border-y border-[#05070B]/10 bg-white py-2">
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex animate-marquee items-center">
@@ -58,7 +58,7 @@ export default function AltHomeStorySection() {
             table, and make it a Greenville ritual.
           </p>
           <Link
-            href="/about"
+            href="/our-story"
             className="mt-8 inline-flex rounded-full border-2 border-[#05070B] px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-colors hover:bg-[#05070B] hover:text-white"
           >
             Our Story

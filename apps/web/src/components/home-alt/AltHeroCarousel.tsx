@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { getHeartlandOrderUrl } from "@/lib/orderLinks";
 
@@ -45,7 +44,7 @@ const heroSlides: HeroSlide[] = [
       "Cold glasses, fresh pours, and Greenville nights at the bar — pull up, stay awhile, and sip something great.",
     ctaHref: orderUrl,
     ctaLabel: "View Menu",
-  image: "/images/drinks/horizontal-lemon-cocktail.jpg",
+    image: "/images/drinks/horizontal-lemon-cocktail.jpg",
     imageAlt: "Craft lemon cocktail at The Owner's Box bar",
     objectPosition: "center 40%",
     badge: "Cold Drinks",
@@ -67,8 +66,8 @@ const heroSlides: HeroSlide[] = [
     label: "Basketball Watch Party",
     heading: "Knicks In 5!",
     subheading: "Bring the crew for basketball, wings, pizza, and game-day sound when the matchup is on.",
-    ctaHref: "/games",
-    ctaLabel: "See games",
+    ctaHref: "/locations",
+    ctaLabel: "Visit us",
     image: "/images/sports/knicks-finals-watch.png",
     imageAlt: "New York Knicks championship celebration",
     objectPosition: "center",
@@ -109,9 +108,12 @@ export default function AltHeroCarousel() {
     setActiveIndex((nextIndex + heroSlides.length) % heroSlides.length);
   }, []);
 
-  const goToSlide = useCallback((index: number) => {
-    pauseAndGo(index);
-  }, [pauseAndGo]);
+  const goToSlide = useCallback(
+    (index: number) => {
+      pauseAndGo(index);
+    },
+    [pauseAndGo],
+  );
 
   const goNext = useCallback(() => {
     pauseAndGo(activeIndex + 1);
@@ -145,43 +147,46 @@ export default function AltHeroCarousel() {
         if (!manualControl) setIsPaused(false);
       }}
     >
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeSlide.id}
-          initial={{ opacity: 0, scale: 1.025 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.985 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="pointer-events-none absolute inset-0"
-        >
-          {activeSlide.image ? (
-            <Image
-              src={activeSlide.image}
-              alt={activeSlide.imageAlt ?? ""}
-              fill
-              priority={activeSlide.id === "bar"}
-              className="object-cover"
-              style={{ objectPosition: activeSlide.objectPosition ?? "center" }}
-              sizes="(max-width: 768px) 100vw, 1600px"
-            />
-          ) : (
-            <div className={`absolute inset-0 ${activeSlide.backgroundClassName ?? "bg-[#101014]"}`}>
-              <div className="absolute left-[8%] top-[14%] h-44 w-44 rounded-full border-[18px] border-[#D4AF37]/30" />
-              <div className="absolute right-[10%] top-[18%] h-40 w-40 rounded-full border-[16px] border-white/10" />
-              <div className="absolute bottom-[12%] right-[16%] rounded-[28px] border border-[#D4AF37]/25 bg-black/25 px-8 py-6 backdrop-blur">
-                <p className="font-montserrat text-5xl font-black uppercase leading-none tracking-[-0.08em] text-[#F2EAD4]">
-                  NYK
-                </p>
-                <p className="mt-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#D4AF37]">
-                  Watch Party
-                </p>
+      {heroSlides.map((slide, index) => {
+        const isActive = index === activeIndex;
+
+        return (
+          <div
+            key={slide.id}
+            aria-hidden={!isActive}
+            className={`pointer-events-none absolute inset-0 transition-opacity duration-700 ease-out ${
+              isActive ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {slide.image ? (
+              <Image
+                src={slide.image}
+                alt={slide.imageAlt ?? ""}
+                fill
+                priority={index === 0}
+                className="object-cover"
+                style={{ objectPosition: slide.objectPosition ?? "center" }}
+                sizes="(max-width: 768px) 100vw, (max-width: 1440px) 92vw, 1600px"
+              />
+            ) : (
+              <div className={`absolute inset-0 ${slide.backgroundClassName ?? "bg-[#101014]"}`}>
+                <div className="absolute left-[8%] top-[14%] h-44 w-44 rounded-full border-[18px] border-[#D4AF37]/30" />
+                <div className="absolute right-[10%] top-[18%] h-40 w-40 rounded-full border-[16px] border-white/10" />
+                <div className="absolute bottom-[12%] right-[16%] rounded-[28px] border border-[#D4AF37]/25 bg-black/25 px-8 py-6 backdrop-blur">
+                  <p className="font-montserrat text-5xl font-black uppercase leading-none tracking-[-0.08em] text-[#F2EAD4]">
+                    NYK
+                  </p>
+                  <p className="mt-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#D4AF37]">
+                    Watch Party
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#071B2F]/75 via-[#071B2F]/20 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#05070B]/80 to-transparent" />
-        </motion.div>
-      </AnimatePresence>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#071B2F]/75 via-[#071B2F]/20 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#05070B]/80 to-transparent" />
+          </div>
+        );
+      })}
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 p-5 pb-24 sm:p-10 sm:pb-28">
         <div className="max-w-5xl pr-4 sm:max-w-[min(100%,42rem)]">
@@ -189,26 +194,21 @@ export default function AltHeroCarousel() {
             {activeSlide.badge && <span className="h-2 w-2 rounded-full bg-white" />}
             {activeSlide.label}
           </p>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${activeSlide.id}-copy`}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.45, ease: "easeOut" }}
-            >
-              <h1 className="font-montserrat text-[clamp(3.4rem,10.5vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.08em] text-[#F2EAD4]">
-                {splitHeading(activeSlide.heading).map((line) => (
-                  <span key={line} className="block">
-                    {line}
-                  </span>
-                ))}
-              </h1>
-              <p className="mt-5 max-w-xl text-sm font-semibold leading-relaxed text-white sm:text-base">
-                {activeSlide.subheading}
-              </p>
-            </motion.div>
-          </AnimatePresence>
+          <div
+            key={activeSlide.id}
+            className="transition-all duration-500 ease-out motion-reduce:transition-none"
+          >
+            <h1 className="font-montserrat text-[clamp(3.4rem,10.5vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.08em] text-[#F2EAD4]">
+              {splitHeading(activeSlide.heading).map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
+            </h1>
+            <p className="mt-5 max-w-xl text-sm font-semibold leading-relaxed text-white sm:text-base">
+              {activeSlide.subheading}
+            </p>
+          </div>
         </div>
 
         <button
