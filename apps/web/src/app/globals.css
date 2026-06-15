@@ -196,8 +196,12 @@
   }
 
   html.ob-dark-mode .ob-theme-root,
-  html.ob-dark-mode .ob-canvas,
   html.ob-dark-mode .ob-nav-surface {
+    background: #05070b !important;
+    color: #f2ead4 !important;
+  }
+
+  html.ob-dark-mode .ob-canvas {
     background: #05070b !important;
     color: #f2ead4 !important;
   }
@@ -206,6 +210,20 @@
     background: #101014 !important;
     color: #f2ead4 !important;
     border-color: rgba(212, 175, 55, 0.45) !important;
+  }
+
+  html.ob-dark-mode .ob-surface-light {
+    background: #ffffff !important;
+    color: #05070b !important;
+    border-color: rgba(5, 7, 11, 0.08) !important;
+  }
+
+  html.ob-dark-mode:has(.ob-force-light),
+  html.ob-dark-mode:has(.ob-force-light) body,
+  html.ob-dark-mode .ob-force-light,
+  html.ob-dark-mode .ob-force-light .ob-canvas {
+    background: #ffffff !important;
+    color: #05070b !important;
   }
 
   html.ob-dark-mode .ob-menu-modal-backdrop {

@@ -22,6 +22,7 @@ export default function AltThemeToggle() {
     applyTheme(false);
     clearLegacyThemeStorage();
     setIsDark(false);
+    document.documentElement.classList.remove("ob-dark-mode");
   }, []);
 
   const toggleTheme = () => {

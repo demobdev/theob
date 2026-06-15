@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
@@ -43,12 +43,14 @@ const featureTiles = [
   {
     title: "Chalk Up",
     text: "Pool, game-day screens, and a room built for regulars.",
-    image: "/images/hero-bg.png",
+    image: "/images/atmosphere/cinematic-dtl-1.jpg",
+    imagePosition: "center 28%",
   },
   {
     title: "Happy Hour",
     text: "Cold drinks, easy hangs, and Greenville nights out.",
-    image: "/sports-feature.jpg",
+    image: "/images/couple-at-bar.png.jpg",
+    imagePosition: "center 35%",
   },
   {
     title: "Good Eats",
@@ -58,15 +60,81 @@ const featureTiles = [
 ];
 
 const galleryImages = [
-  "/sports-feature.jpg",
-  "/images/hero-bg.png",
+  "/images/couple-at-bar.png.jpg",
+  "/images/drinks/horizontal-lemon-cocktail.jpg",
   "/images/food/official/featured-pizza.png",
-  "/images/food/official/IMGL6785.jpg",
-  "/images/food/jumbo_wings.png",
-  "/images/food/crab_dip.png",
+  "/images/food/official/lamb-gyro.jpg",
+  "/images/food/official/bang-bang-shrimp.jpg",
+  "/images/atmosphere/big-wall-left-1.jpg",
+  "/images/food/official/purple-floral-cocktail.jpg",
+  "/images/atmosphere/wide-view-from-right.jpg",
+  "/images/drinks/cocktail-on-bar-1.jpg",
 ];
 
+const galleryImageAlts: Record<string, string> = {
+  "/images/couple-at-bar.png.jpg": "Couple at the bar",
+  "/images/drinks/horizontal-lemon-cocktail.jpg": "Lemon cocktail",
+  "/images/food/official/featured-pizza.png": "Featured pizza",
+  "/images/food/official/lamb-gyro.jpg": "Lamb gyro with fries",
+  "/images/food/official/bang-bang-shrimp.jpg": "Bang bang shrimp",
+  "/images/atmosphere/big-wall-left-1.jpg": "Sports bar wall of screens",
+  "/images/food/official/purple-floral-cocktail.jpg": "Floral cocktail",
+  "/images/atmosphere/wide-view-from-right.jpg": "Wide dining room view",
+  "/images/drinks/cocktail-on-bar-1.jpg": "Cocktail on the bar",
+};
+
 const dailySpecials = ["Monday", "Tuesday", "Wednesday"];
+
+function FeatureImageTile({
+  src,
+  title,
+  imagePosition = "center",
+  className = "",
+}: {
+  src: string;
+  title: string;
+  imagePosition?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`relative min-h-[300px] overflow-hidden sm:min-h-[360px] lg:h-[400px] ${className}`}
+    >
+      <Image
+        src={src}
+        alt={title}
+        fill
+        className="object-cover"
+        style={{ objectPosition: imagePosition }}
+        sizes="(max-width: 1024px) 100vw, 800px"
+      />
+      <div className="absolute inset-0 bg-black/15" />
+    </div>
+  );
+}
+
+function FeatureCopyTile({
+  title,
+  text,
+  className = "",
+}: {
+  title: string;
+  text: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`flex min-h-[300px] flex-col items-center justify-center bg-[#101014] p-8 text-center text-white sm:min-h-[360px] lg:h-[400px] ${className}`}
+    >
+      <h3 className="font-montserrat text-4xl font-black uppercase leading-[0.85] tracking-[-0.06em] sm:text-5xl">
+        {title}
+      </h3>
+      <p className="mx-auto mt-5 max-w-xs text-xs font-semibold leading-relaxed text-white/62">
+        {text}
+      </p>
+    </div>
+  );
+}
 
 function geoErrorMessage(code: number): string {
   switch (code) {
@@ -79,6 +147,37 @@ function geoErrorMessage(code: number): string {
     default:
       return "Unable to retrieve your location.";
   }
+}
+
+function LocationsGalleryMarquee({ images }: { images: string[] }) {
+  const [isPaused, setIsPaused] = useState(false);
+  const carouselImages = [...images, ...images];
+
+  return (
+    <section className="ob-canvas overflow-hidden bg-white pb-16">
+      <div
+        className={`flex w-max gap-4 px-4 ${isPaused ? "" : "animate-marquee-slow"}`}
+      >
+        {carouselImages.map((src, index) => (
+          <button
+            type="button"
+            key={`${src}-${index}`}
+            onClick={() => setIsPaused((paused) => !paused)}
+            aria-label={isPaused ? "Resume gallery scroll" : "Pause gallery scroll"}
+            className="relative h-40 w-40 shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-[#05070B]/10 bg-white sm:h-56 sm:w-56"
+          >
+            <Image
+              src={src}
+              alt={galleryImageAlts[src] ?? "Gallery photo"}
+              fill
+              className="object-cover transition-transform duration-500 hover:scale-105"
+              sizes="224px"
+            />
+          </button>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function buildDirectionsUrl(userLocation: [number, number] | null): string {
@@ -96,6 +195,10 @@ export default function LocationsPage() {
   const [distanceLabel, setDistanceLabel] = useState<string | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
   const orderUrl = getHeartlandOrderUrl();
+
+  useEffect(() => {
+    document.documentElement.classList.remove("ob-dark-mode");
+  }, []);
 
   const requestLocation = useCallback(() => {
     if (typeof window === "undefined" || !("geolocation" in navigator)) {
@@ -137,7 +240,7 @@ export default function LocationsPage() {
   }, []);
 
   return (
-    <main className="ob-theme-root min-h-screen bg-white text-[#05070B]">
+    <main className="ob-force-light min-h-screen bg-white text-[#05070B]">
       <AltHomeHeader />
 
       <section className="bg-white px-4 pb-12 text-[#05070B] sm:px-6">
@@ -201,33 +304,36 @@ export default function LocationsPage() {
         </div>
       </section>
 
-      <section className="ob-canvas bg-white px-4 pb-16 text-[#05070B] sm:px-6">
-        <div className="mx-auto grid max-w-[1600px] overflow-hidden rounded-[28px] border border-[#05070B]/10 lg:grid-cols-2">
-          {featureTiles.map((tile, index) => (
-            <div
-              key={tile.title}
-              className={`grid min-h-[360px] ${index === 2 ? "lg:col-span-2 lg:grid-cols-2" : ""}`}
-            >
-              <div className={`relative min-h-[280px] ${index % 2 === 1 ? "lg:order-2" : ""}`}>
-                <Image
-                  src={tile.image}
-                  alt={tile.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 800px"
-                />
-                <div className="absolute inset-0 bg-black/20" />
-              </div>
-              <div className="flex flex-col justify-center bg-white p-8 text-center">
-                <h3 className="font-montserrat text-4xl font-black uppercase leading-[0.85] tracking-[-0.06em]">
-                  {tile.title}
-                </h3>
-                <p className="mx-auto mt-5 max-w-xs text-xs font-semibold leading-relaxed text-[#05070B]/62">
-                  {tile.text}
-                </p>
-              </div>
-            </div>
-          ))}
+      <section className="ob-canvas bg-white px-4 pb-20 text-[#05070B] sm:px-6">
+        <div className="mx-auto grid max-w-[1600px] overflow-hidden rounded-[28px] border border-[#D4AF37]/35 bg-[#101014] shadow-[0_28px_90px_rgba(0,0,0,0.18)] lg:grid-cols-2">
+          <div className="grid">
+            <FeatureImageTile
+              src={featureTiles[0]!.image}
+              title={featureTiles[0]!.title}
+              imagePosition={featureTiles[0]!.imagePosition}
+            />
+            <FeatureCopyTile title={featureTiles[0]!.title} text={featureTiles[0]!.text} />
+          </div>
+
+          <div className="grid">
+            <FeatureCopyTile title={featureTiles[1]!.title} text={featureTiles[1]!.text} />
+            <FeatureImageTile
+              src={featureTiles[1]!.image}
+              title={featureTiles[1]!.title}
+              imagePosition={featureTiles[1]!.imagePosition}
+            />
+          </div>
+
+          <div className="grid lg:col-span-2 lg:grid-cols-2">
+            <FeatureImageTile
+              src={featureTiles[2]!.image}
+              title={featureTiles[2]!.title}
+            />
+            <FeatureCopyTile
+              title={featureTiles[2]!.title}
+              text={featureTiles[2]!.text}
+            />
+          </div>
         </div>
       </section>
 
@@ -403,18 +509,7 @@ export default function LocationsPage() {
         </div>
       </section>
 
-      <section className="ob-canvas overflow-hidden bg-white pb-16">
-        <div className="flex w-max animate-marquee-slow gap-4 px-4">
-          {[...galleryImages, ...galleryImages].map((src, index) => (
-            <div
-              key={`${src}-${index}`}
-              className="relative h-40 w-40 shrink-0 overflow-hidden rounded-2xl border border-[#05070B]/10 bg-white sm:h-56 sm:w-56"
-            >
-              <Image src={src} alt="" fill className="object-cover" sizes="224px" />
-            </div>
-          ))}
-        </div>
-      </section>
+      <LocationsGalleryMarquee images={galleryImages} />
 
       <section id="contact" className="ob-canvas scroll-mt-28 bg-white px-4 pb-20 text-[#05070B] sm:px-6">
         <div className="mx-auto grid max-w-[1600px] gap-8 rounded-[28px] border border-[#05070B]/10 bg-white p-7 text-[#05070B] sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">

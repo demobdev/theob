@@ -2,6 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import AltThemeToggle from "./AltThemeToggle";
+import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import { OB_ADDRESS } from "@/lib/storeLocation";
 
 const navLinks = [
   { label: "Events", href: "/events" },
@@ -23,6 +25,9 @@ const socialLinks = [
 ];
 
 export default function AltHomeHeader() {
+  const orderUrl = getHeartlandOrderUrl();
+  const phoneHref = `tel:${OB_ADDRESS.phone.replace(/\D/g, "")}`;
+
   return (
     <header className="relative z-30 bg-[#071B2F] text-[#F3EBD8]">
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em]">
@@ -67,14 +72,22 @@ export default function AltHomeHeader() {
             </span>
           </Link>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex items-center justify-end gap-2 sm:gap-3">
             <AltThemeToggle />
-            <Link
-              href="/locations"
+            <a
+              href={phoneHref}
+              className="hidden rounded-full border-2 border-[#05070B]/15 px-3 py-2 text-[8px] font-black uppercase tracking-widest text-[#05070B] transition-colors hover:border-[#05070B] sm:inline-flex sm:text-[9px]"
+            >
+              {OB_ADDRESS.phone}
+            </a>
+            <a
+              href={orderUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-full border-2 border-[#05070B] bg-[#05070B] px-3 py-2 text-[8px] font-black uppercase tracking-widest text-white transition-transform hover:scale-[1.02] sm:px-4 sm:text-[9px]"
             >
-              Woodruff Rd
-            </Link>
+              Order Now
+            </a>
           </div>
         </div>
       </div>

@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { getHeartlandOrderUrl } from "@/lib/orderLinks";
 
 export default function AltHomeGoodTimes() {
@@ -22,8 +21,8 @@ export default function AltHomeGoodTimes() {
 
         <div className="max-w-xl">
           <p className="mb-6 text-sm font-semibold leading-relaxed text-[#05070B]/75">
-            Pull up for scratch-made favorites, cold drinks, and the game on every screen. The
-            homepage stays minimal here, but the energy is still wall-to-wall Owner&apos;s Box.
+            Scratch-made pizza, jumbo wings, cold pours, and every game on the screens — pull up
+            for dine-in, takeout, or the watch party your crew keeps coming back for.
           </p>
           <a
             href={orderUrl}
@@ -39,20 +38,20 @@ export default function AltHomeGoodTimes() {
       <div className="mt-12 grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
         <div className="relative min-h-[360px] overflow-hidden rounded-[24px] bg-[#171713]">
           <Image
-            src="/images/hero-bg.png"
-            alt="The Owner's Box atmosphere"
+            src="/images/atmosphere/cinematic-dtl-1.jpg"
+            alt="Down-the-line view of The Owner's Box bar and dining room"
             fill
-            className="object-cover"
+            className="object-cover object-center"
             sizes="(max-width: 768px) 100vw, 520px"
           />
-          <div className="absolute inset-0 bg-black/25" />
+          <div className="absolute inset-0 bg-black/20" />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="relative min-h-[260px] overflow-hidden rounded-[24px] bg-[#171713]">
             <Image
               src="/images/food/official/featured-pizza.png"
-              alt="Owner's Box pizza"
+              alt="Featured pizza at The Owner's Box"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 320px"
@@ -63,26 +62,18 @@ export default function AltHomeGoodTimes() {
             </p>
           </div>
 
-          <div className="flex min-h-[260px] flex-col justify-between rounded-[24px] bg-[#05070B] p-7 text-white">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/65">
-              Minimal sports
+          <div className="relative min-h-[260px] overflow-hidden rounded-[24px] bg-[#171713]">
+            <Image
+              src="/images/drinks/vertical-coffe-martini.jpg"
+              alt="Espresso martini at the bar"
+              fill
+              className="object-cover object-center"
+              sizes="(max-width: 768px) 100vw, 320px"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+            <p className="absolute bottom-5 left-5 font-montserrat text-3xl font-black uppercase leading-none text-[#F2EAD4]">
+              Cold Drinks
             </p>
-            <div>
-              <h3 className="font-montserrat text-4xl font-black uppercase leading-[0.9] tracking-[-0.05em]">
-                14 HD
-                <br />
-                Screens
-              </h3>
-              <p className="mt-4 text-xs font-semibold leading-relaxed text-white/60">
-                Big games are still part of the story, just not the whole homepage.
-              </p>
-            </div>
-            <Link
-              href="/games"
-              className="w-fit rounded-full border border-white/40 px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-colors hover:bg-white hover:text-[#05070B]"
-            >
-              Game Day
-            </Link>
           </div>
         </div>
       </div>

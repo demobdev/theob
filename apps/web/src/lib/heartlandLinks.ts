@@ -1,10 +1,10 @@
-/** Heartland Retail ordering — subdomain is account-specific (Hector may update). */
+/** Heartland POS online ordering — override via NEXT_PUBLIC_HEARTLAND_ORDER_URL. */
 export const HEARTLAND_SUBDOMAIN =
-  process.env.NEXT_PUBLIC_HEARTLAND_SUBDOMAIN ?? "theownersbox";
+  process.env.NEXT_PUBLIC_HEARTLAND_SUBDOMAIN ?? "ownersbox";
 
 export const HEARTLAND_ORDER_URL =
   process.env.NEXT_PUBLIC_HEARTLAND_ORDER_URL ??
-  `https://${HEARTLAND_SUBDOMAIN}.retail.heartland.us`;
+  "https://ownersbox.hrpos.heartland.us";
 
 export const HEARTLAND_API_URL =
   process.env.NEXT_PUBLIC_HEARTLAND_API_URL ??
