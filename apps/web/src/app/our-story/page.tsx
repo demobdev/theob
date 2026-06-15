@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
-import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import { getOrderPagePath } from "@/lib/orderLinks";
 
 export const metadata = {
   title: "Our Story | Family-Friendly Sports Bar in Greenville SC",
@@ -12,7 +12,7 @@ export const metadata = {
 };
 
 export default function OurStoryPage() {
-  const orderUrl = getHeartlandOrderUrl();
+  const orderUrl = getOrderPagePath();
 
   return (
     <main className="ob-theme-root ob-force-light min-h-screen bg-white text-[#05070B]">

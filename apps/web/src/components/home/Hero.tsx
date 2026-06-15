@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
-import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import { getOrderPagePath } from "@/lib/orderLinks";
 
 const Hero = () => {
-  const orderUrl = getHeartlandOrderUrl();
+  const orderUrl = getOrderPagePath();
 
   return (
     <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden noise-overlay pt-20">

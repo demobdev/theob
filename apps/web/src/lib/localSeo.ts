@@ -1,7 +1,11 @@
+import { sanitizePublicUrl } from "@/lib/envUrl";
+
 /** Local SEO + social URLs — keep in sync with Google Business Profile. */
 
-export const OB_SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://ownersboxgvl.com";
+export const OB_SITE_URL = sanitizePublicUrl(
+  process.env.NEXT_PUBLIC_SITE_URL,
+  "https://ownersboxgvl.com",
+);
 
 export const OB_SOCIAL = {
   facebook: "https://www.facebook.com/people/The-Owners-Box/61572349191177/",

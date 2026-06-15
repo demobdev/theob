@@ -1,8 +1,8 @@
 import Image from "next/image";
-import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import { getOrderPagePath } from "@/lib/orderLinks";
 
 export default function AltHomeGoodTimes() {
-  const orderUrl = getHeartlandOrderUrl();
+  const orderUrl = getOrderPagePath();
 
   return (
     <section id="good-times" className="ob-canvas scroll-mt-4 bg-white px-4 py-14 text-[#05070B] sm:px-6">

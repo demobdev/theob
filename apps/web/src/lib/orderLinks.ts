@@ -1,13 +1,19 @@
 import { HEARTLAND_ORDER_URL } from "@/lib/heartlandLinks";
 
-/** Heartland online ordering — override via NEXT_PUBLIC_HEARTLAND_ORDER_URL in .env.local */
+/** Internal path — server redirect avoids malformed client env URLs. */
+export const ORDER_PAGE_PATH = "/order";
 
+/** Heartland online ordering destination (used by /order redirect). */
 export function getHeartlandOrderUrl(): string {
   return HEARTLAND_ORDER_URL;
 }
 
-/** DoorDash store page — set NEXT_PUBLIC_DOORDASH_STORE_URL in .env.local */
+/** Use for all in-site “Order” buttons and links. */
+export function getOrderPagePath(): string {
+  return ORDER_PAGE_PATH;
+}
 
+/** DoorDash store page — set NEXT_PUBLIC_DOORDASH_STORE_URL in .env.local */
 export function getDoorDashStoreUrl(): string {
   return process.env.NEXT_PUBLIC_DOORDASH_STORE_URL ?? "#";
 }

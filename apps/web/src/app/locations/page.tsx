@@ -27,7 +27,7 @@ import {
   haversineMiles,
   formatDistanceAndDrive,
 } from "@/lib/storeLocation";
-import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import { getOrderPagePath } from "@/lib/orderLinks";
 import { OB_GOOGLE_REVIEW_URL, OB_SUPPORT_EMAIL } from "@/lib/localSeo";
 import DoorDashButton from "@/components/common/DoorDashButton";
 
@@ -212,7 +212,7 @@ export default function LocationsPage() {
   const [geoError, setGeoError] = useState<string | null>(null);
   const [distanceLabel, setDistanceLabel] = useState<string | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
-  const orderUrl = getHeartlandOrderUrl();
+  const orderUrl = getOrderPagePath();
 
   useEffect(() => {
     document.documentElement.classList.remove("ob-dark-mode");

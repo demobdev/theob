@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
-import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import { getOrderPagePath } from "@/lib/orderLinks";
 
-const orderUrl = getHeartlandOrderUrl();
+const orderUrl = getOrderPagePath();
 
 type HeroSlide = {
   id: string;

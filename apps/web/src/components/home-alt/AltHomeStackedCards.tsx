@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MonitorPlay, Users, UtensilsCrossed } from "lucide-react";
-import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import { getOrderPagePath } from "@/lib/orderLinks";
 import {
   STACK_SCROLL,
   stackStickyTop,
@@ -492,7 +492,7 @@ function EventInfoPanel({
 }
 
 export default function AltHomeStackedCards() {
-  const orderUrl = getHeartlandOrderUrl();
+  const orderUrl = getOrderPagePath();
 
   return (
     <section className="ob-canvas relative z-30 bg-white px-4 pt-16 text-[#05070B] sm:px-6">

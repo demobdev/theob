@@ -1,4 +1,4 @@
-import { HEARTLAND_ORDER_URL } from "@/lib/heartlandLinks";
+import { getOrderPagePath } from "@/lib/orderLinks";
 import { cn } from "@/lib/utils";
 
 type HeartlandOrderLinkProps = {
@@ -12,7 +12,7 @@ export default function HeartlandOrderLink({
 }: HeartlandOrderLinkProps) {
   return (
     <a
-      href={HEARTLAND_ORDER_URL}
+      href={getOrderPagePath()}
       target="_blank"
       rel="noopener noreferrer"
       className={cn(className)}

@@ -9,7 +9,7 @@ import { UserNav } from "./common/UserNav";
 import { usePathname } from "next/navigation";
 import { Fragment } from "react";
 import { cn } from "@/lib/utils";
-import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import { getOrderPagePath } from "@/lib/orderLinks";
 import { OB_ADDRESS } from "@/lib/storeLocation";
 import { Avatar, AvatarFallback, AvatarImage } from "./common/avatar";
 import { ExternalLink } from "lucide-react";
@@ -33,7 +33,7 @@ export default function Header() {
   const { signOut } = useClerk();
   const pathname = usePathname();
   const isMenuPage = pathname === "/menu";
-  const orderUrl = getHeartlandOrderUrl();
+  const orderUrl = getOrderPagePath();
 
   return (
     <>

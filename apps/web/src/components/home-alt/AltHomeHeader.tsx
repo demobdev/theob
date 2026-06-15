@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Facebook, Instagram } from "lucide-react";
 import AltThemeToggle from "./AltThemeToggle";
 import AltHomeMobileMenu from "./AltHomeMobileMenu";
-import { getHeartlandOrderUrl } from "@/lib/orderLinks";
+import { getOrderPagePath } from "@/lib/orderLinks";
 import { OB_ADDRESS } from "@/lib/storeLocation";
 import { OB_SOCIAL } from "@/lib/localSeo";
 
@@ -26,7 +26,7 @@ const socialLinks = [
 ];
 
 export default function AltHomeHeader() {
-  const orderUrl = getHeartlandOrderUrl();
+  const orderUrl = getOrderPagePath();
   const phoneHref = `tel:${OB_ADDRESS.phone.replace(/\D/g, "")}`;
 
   return (
