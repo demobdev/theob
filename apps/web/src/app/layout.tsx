@@ -6,6 +6,7 @@ import ConvexClientProvider from "./ConvexClientProvider";
 import PostHogAuthSync from "@/components/PostHogAuthSync";
 import ConvexProfileSync from "@/components/ConvexProfileSync";
 import LocalBusinessJsonLd from "@/components/seo/LocalBusinessJsonLd";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { OB_DEFAULT_DESCRIPTION, OB_SITE_URL, OB_SOCIAL } from "@/lib/localSeo";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -68,6 +69,7 @@ export default function RootLayout({
         <link rel="me" href={OB_SOCIAL.facebook} />
       </head>
       <body className={cn(inter.className, montserrat.className, lato.className)}>
+        <GoogleAnalytics />
         <LocalBusinessJsonLd />
         <ConvexClientProvider>
           <PostHogAuthSync />
