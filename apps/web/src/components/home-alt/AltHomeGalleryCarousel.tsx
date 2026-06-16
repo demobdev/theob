@@ -28,6 +28,11 @@ const galleryImages = [
     shape: "tall" as const,
   },
   {
+    src: "/images/atmosphere/ob-front.png",
+    alt: "The Owner's Box storefront at night",
+    shape: "square" as const,
+  },
+  {
     src: "/images/atmosphere/dtl-1.jpg",
     alt: "Down-the-line bar view",
     shape: "tall" as const,
