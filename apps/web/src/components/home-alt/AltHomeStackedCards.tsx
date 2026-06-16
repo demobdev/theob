@@ -53,6 +53,7 @@ function StackCardImageColumn({
   peekImage,
   peekImages,
   peekImagePosition = "center",
+  peekImageCover = false,
   bodyClass,
 }: {
   image: string;
@@ -60,6 +61,7 @@ function StackCardImageColumn({
   peekImage?: string;
   peekImages?: string[];
   peekImagePosition?: string;
+  peekImageCover?: boolean;
   bodyClass: string;
 }) {
   const showPeekStrip = peekImages?.length || peekImage;
@@ -101,14 +103,14 @@ function StackCardImageColumn({
                 alt=""
                 fill
                 className={
-                  peekImage.endsWith(".png")
-                    ? "object-contain p-3 sm:p-4"
-                    : "object-cover"
+                  peekImageCover || !peekImage.endsWith(".png")
+                    ? "object-cover"
+                    : "object-contain p-3 sm:p-4"
                 }
                 style={
-                  peekImage.endsWith(".png")
-                    ? undefined
-                    : { objectPosition: peekImagePosition }
+                  peekImageCover || !peekImage.endsWith(".png")
+                    ? { objectPosition: peekImagePosition }
+                    : undefined
                 }
                 sizes="(max-width: 768px) 100vw, 780px"
               />
@@ -141,13 +143,11 @@ const cards = [
     text: "Bring the crew for birthdays, watch parties, fantasy draft nights, and Greenville nights out.",
     href: "/private-events",
     cta: "Book A Party",
-    image: "/images/food/bar-guest-friends.jpg",
-    imagePosition: "center 35%",
-    peekImages: [
-      "/images/food/buffalo-wings.png",
-      "/images/food/garlic-parm-wings.png",
-      "/images/food/lemon-pepper-wings-2.png",
-    ],
+    image: "/images/atmosphere/friends-and-family.jpg",
+    imagePosition: "center 22%",
+    peekImage: "/images/atmosphere/ob-front.png",
+    peekImagePosition: "center 40%",
+    peekImageCover: true,
     strip: "bg-white text-[#05070B]",
     body: "bg-[#071B2F] text-[#F2EAD4]",
     eventImage: "/images/atmosphere/dtl-1.jpg",
@@ -625,6 +625,9 @@ export default function AltHomeStackedCards() {
                     }
                     peekImage={"peekImage" in card ? card.peekImage : undefined}
                     peekImages={"peekImages" in card ? card.peekImages : undefined}
+                    peekImageCover={
+                      "peekImageCover" in card ? Boolean(card.peekImageCover) : false
+                    }
                     peekImagePosition={
                       "peekImagePosition" in card && card.peekImagePosition
                         ? card.peekImagePosition

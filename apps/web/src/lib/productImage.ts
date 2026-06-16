@@ -45,8 +45,10 @@ const MENU_IMAGE_KEYS = new Set([
 ]);
 
 /** Real photography overrides for menu slugs (checked before default .png paths). */
-const REAL_IMAGE_OVERRIDES: Record<string, string> = {
+export const REAL_IMAGE_OVERRIDES: Record<string, string> = {
   crab_dip: "/images/food/official/crab-dip.png",
+  crab_cake: "/images/food/official/crab-dip.png",
+  crabcake_sandwich: "/images/food/official/crab-dip.png",
   jumbo_wings: "/images/food/buffalo-wings.png",
   wings: "/images/food/buffalo-wings.png",
   boneless_wings: "/images/food/garlic-parm-wings.png",
@@ -54,12 +56,34 @@ const REAL_IMAGE_OVERRIDES: Record<string, string> = {
   spicy_bang_bang: "/images/food/official/bang-bang-shrimp-3.png",
   bang_bang_shrimp: "/images/food/official/bang-bang-shrimp-3.png",
   fried_shrimp: "/images/food/official/bang-bang-shrimp.jpg",
+  crispy_calamari: "/images/food/official/bang-bang-shrimp-3.png",
+  queso_chorizo: "/images/food/official/crab-dip.png",
+  short_rib_nachos: "/images/food/official/bang-bang-shrimp-3.png",
   philly: "/images/food/official/philly-cheesesteak-1.png",
+  bar_chicken: "/images/food/official/philly-cheesesteak-1.png",
+  chicago_dog: "/images/food/official/philly-cheesesteak-1.png",
   neapolitan_pizza: "/images/food/official/classic-neopolitan.png",
   cheese_pizza: "/images/food/official/featured-pizza.png",
   meat_lover_pizza: "/images/food/official/featured-pizza.png",
-  supreme_pizza: "/images/food/official/featured-pizza.png",
+  supreme_pizza: "/images/food/official/buffalo-pizza.jpg",
+  chicken_alfredo_pizza: "/images/food/official/featured-pizza.png",
+  ham_pineapple: "/images/food/official/buffalo-pizza.jpg",
   buffalo_pizza: "/images/food/official/buffalo-pizza.jpg",
+  rib_eye: "/images/food/official/lamb-gyro.jpg",
+  picanha_steak: "/images/food/official/lamb-gyro.jpg",
+  ny_strip: "/images/food/official/lamb-gyro.jpg",
+  coho_salmon: "/images/food/official/lamb-gyro.jpg",
+  caesar_salad: "/images/food/official/hand-fry-dipped.jpg",
+  chopped_salad: "/images/food/official/hand-fry-dipped.jpg",
+  goat_cheese_salad: "/images/food/official/hand-fry-dipped.jpg",
+  short_rib_hash: "/images/food/official/scratch-made.png",
+  chicken_waffles: "/images/food/official/scratch-made.png",
+  steak_and_eggs: "/images/food/official/scratch-made.png",
+  egg_breakfast: "/images/food/official/scratch-made.png",
+  pancakes: "/images/food/official/scratch-made.png",
+  breakfast_skillet: "/images/food/official/scratch-made.png",
+  beer: "/images/food/official/beer-classic.jpg",
+  cocktail: "/images/food/espresso-martini-2.jpg",
 };
 
 const DRINK_LIKE = new Set([

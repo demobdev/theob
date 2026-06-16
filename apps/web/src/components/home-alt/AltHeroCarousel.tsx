@@ -89,13 +89,13 @@ const heroSlides: HeroSlide[] = [
   {
     id: "woodruff",
     label: "Greenville, SC",
-    heading: "Woodruff Road Needed This",
+    heading: "Make This Your Spot",
     subheading:
-      "A real neighborhood sports bar with food worth ordering, drinks worth staying for, and a seat that feels like it might become yours.",
+      "Wall-to-wall screens, scratch-made food, and a dining room built for the crew — pull up, grab a seat, and stay awhile.",
     ctaHref: "/locations",
     ctaLabel: "Visit Us",
     image: "/images/atmosphere/wide-view-from-right.jpg",
-    imageAlt: "The Owner's Box dining room on Woodruff Road",
+    imageAlt: "The Owner's Box dining room and bar",
     objectPosition: "center 30%",
     badge: "Your Neighborhood Bar",
   },
@@ -120,7 +120,7 @@ function splitHeading(heading: string): string[] {
   if (heading === "Pizza Worth Staying For") return ["Pizza Worth", "Staying For"];
   if (heading === "Your Game On The Wall") return ["Your Game", "On The Wall"];
   if (heading === "Puck Drop Energy") return ["Puck Drop", "Energy"];
-  if (heading === "Woodruff Road Needed This") return ["Woodruff Road", "Needed This"];
+  if (heading === "Make This Your Spot") return ["Make This", "Your Spot"];
   if (heading === "Your Crew, Your Bar") return ["Your Crew,", "Your Bar"];
   return [heading];
 }

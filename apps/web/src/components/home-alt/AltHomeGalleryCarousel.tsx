@@ -38,6 +38,21 @@ const galleryImages = [
     shape: "square" as const,
   },
   {
+    src: "/images/food/buffalo-wings.png",
+    alt: "Classic buffalo wings",
+    shape: "square" as const,
+  },
+  {
+    src: "/images/food/garlic-parm-wings.png",
+    alt: "Garlic parmesan wings",
+    shape: "square" as const,
+  },
+  {
+    src: "/images/food/lemon-pepper-wings-2.png",
+    alt: "Lemon pepper wings",
+    shape: "square" as const,
+  },
+  {
     src: "/images/food/official/beer-classic.jpg",
     alt: "Cold beer and a shot at the bar",
     shape: "square" as const,
