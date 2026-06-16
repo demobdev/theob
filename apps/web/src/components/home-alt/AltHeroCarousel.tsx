@@ -23,14 +23,15 @@ type HeroSlide = {
 
 const firstHeroSlide: HeroSlide = {
   id: "bar",
-  label: "Greenville's Game Day Bar",
+  label: "Pull Up & Stay Awhile",
   heading: "Nothing But Good Times",
-  subheading: "People at the bar, sports on the screens, and the full Owner's Box energy.",
+  subheading:
+    "Walk in for one round. Stay for the laughter, the lineup, and a room that turns ordinary nights into the ones you talk about.",
   ctaHref: orderUrl,
   ctaLabel: "Order Now",
-  image: "/sports-feature.jpg",
-  imageAlt: "Guests at The Owner's Box bar",
-  objectPosition: "center",
+  image: "/images/atmosphere/IMGL6884.jpg",
+  imageAlt: "The Owner's Box bar interior with wall-to-wall screens",
+  objectPosition: "center 45%",
   badge: "Now Open",
 };
 
@@ -85,6 +86,19 @@ const heroSlides: HeroSlide[] = [
     objectPosition: "center",
     badge: "Hockey Ready",
   },
+  {
+    id: "woodruff",
+    label: "Greenville, SC",
+    heading: "Woodruff Road Needed This",
+    subheading:
+      "A real neighborhood sports bar with food worth ordering, drinks worth staying for, and a seat that feels like it might become yours.",
+    ctaHref: "/locations",
+    ctaLabel: "Visit Us",
+    image: "/images/atmosphere/wide-view-from-right.jpg",
+    imageAlt: "The Owner's Box dining room on Woodruff Road",
+    objectPosition: "center 30%",
+    badge: "Your Neighborhood Bar",
+  },
 ];
 
 function splitHeading(heading: string): string[] {
@@ -93,6 +107,7 @@ function splitHeading(heading: string): string[] {
   if (heading === "Pizza Worth Staying For") return ["Pizza Worth", "Staying For"];
   if (heading === "Your Game On The Wall") return ["Your Game", "On The Wall"];
   if (heading === "Puck Drop Energy") return ["Puck Drop", "Energy"];
+  if (heading === "Woodruff Road Needed This") return ["Woodruff Road", "Needed This"];
   return [heading];
 }
 
@@ -221,7 +236,7 @@ export default function AltHeroCarousel() {
         </button>
       </div>
 
-      <div className="pointer-events-auto absolute bottom-24 right-5 z-30 flex flex-col items-end gap-2 sm:bottom-auto sm:right-8 sm:top-8">
+      <div className="pointer-events-auto absolute bottom-24 right-5 z-10 flex flex-col items-end gap-2 sm:bottom-auto sm:right-8 sm:top-8">
         <p className="rounded-full border border-[#D4AF37]/35 bg-[#071B2F]/90 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-[#F2EAD4] sm:text-[10px]">
           {activeIndex + 1} / {heroSlides.length}
         </p>
