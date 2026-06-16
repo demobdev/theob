@@ -94,9 +94,9 @@ const heroSlides: HeroSlide[] = [
       "Wall-to-wall screens, scratch-made food, and a dining room built for the crew — pull up, grab a seat, and stay awhile.",
     ctaHref: "/locations",
     ctaLabel: "Visit Us",
-    image: "/images/atmosphere/wide-view-from-right.jpg",
-    imageAlt: "The Owner's Box dining room and bar",
-    objectPosition: "center 30%",
+    image: "/images/atmosphere/ob-front.png",
+    imageAlt: "The Owner's Box storefront on Woodruff Road at night",
+    objectPosition: "center 42%",
     badge: "Your Neighborhood Bar",
   },
   {
