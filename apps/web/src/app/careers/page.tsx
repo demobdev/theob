@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
@@ -66,6 +67,17 @@ export default function CareersPage() {
               Email {OB_SUPPORT_EMAIL}
               <Mail className="h-3.5 w-3.5" />
             </a>
+          </div>
+
+          <div className="relative mt-12 min-h-[320px] overflow-hidden rounded-[28px] border-2 border-[#05070B]/10 sm:min-h-[420px]">
+            <Image
+              src="/images/food/official/staff.jpg"
+              alt="The Owner's Box staff welcoming guests"
+              fill
+              className="object-cover"
+              style={{ objectPosition: "center 35%" }}
+              sizes="(max-width: 900px) 100vw, 900px"
+            />
           </div>
 
           <div className="mt-12 grid gap-4 sm:grid-cols-3">

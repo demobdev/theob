@@ -35,11 +35,12 @@ export default function PrivateEventsPage() {
         <div className="mx-auto max-w-[1600px] overflow-hidden rounded-b-[28px] bg-white pb-10">
           <div className="relative min-h-[460px] overflow-hidden rounded-[24px] border-2 border-[#05070B]/10 sm:min-h-[620px]">
             <Image
-              src="/sports-feature.jpg"
-              alt="The Owner's Box bar set up for private events"
+              src="/images/food/official/late-night-fun.jpg"
+              alt="Friends celebrating at The Owner's Box bar"
               fill
               priority
               className="object-cover"
+              style={{ objectPosition: "center 40%" }}
               sizes="(max-width: 768px) 100vw, 1600px"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent" />
@@ -66,10 +67,11 @@ export default function PrivateEventsPage() {
         <div className="mx-auto grid max-w-[1600px] gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="relative min-h-[460px] overflow-hidden rounded-[28px] border border-white/10 bg-[#05070B] text-white">
             <Image
-              src="/images/hero-bg.png"
-              alt="The Owner's Box event atmosphere"
+              src="/images/atmosphere/cinematic-dtl-1.jpg"
+              alt="The Owner's Box bar and dining room for private events"
               fill
               className="object-cover"
+              style={{ objectPosition: "center 28%" }}
               sizes="(max-width: 1024px) 100vw, 680px"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

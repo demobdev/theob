@@ -33,7 +33,7 @@ export default function GamesPage() {
           </div>
           <div className="col-span-8 md:col-span-9 grid grid-cols-3">
             {[
-              { src: "/images/menu/jumbo_wings.png", alt: "Game day wings" },
+              { src: "/images/food/buffalo-wings.png", alt: "Game day wings" },
               { src: "/hero.png", alt: "The Owner's Box bar" },
               { src: "/images/food/beer.png", alt: "Cold drinks" },
             ].map((photo) => (

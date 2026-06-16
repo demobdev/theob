@@ -64,8 +64,8 @@ export default function AltHomeGoodTimes() {
 
           <div className="relative min-h-[260px] overflow-hidden rounded-[24px] bg-[#171713]">
             <Image
-              src="/images/drinks/vertical-coffe-martini.jpg"
-              alt="Espresso martini at the bar"
+              src="/images/food/official/beer-classic.jpg"
+              alt="Cold beer and a shot at the bar"
               fill
               className="object-cover object-center"
               sizes="(max-width: 768px) 100vw, 320px"

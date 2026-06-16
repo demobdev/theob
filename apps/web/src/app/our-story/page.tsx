@@ -53,13 +53,25 @@ export default function OurStoryPage() {
       <section className="ob-canvas bg-white px-4 py-16 text-[#05070B] sm:px-6">
         <div className="mx-auto grid max-w-[1600px] gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <div className="relative min-h-[420px] overflow-hidden rounded-[28px] border-2 border-[#D4AF37]/35 bg-[#171713] shadow-2xl">
-            <Image
-              src="/images/atmosphere/big-wall-left-1.jpg"
-              alt="Wall-to-wall sports screens at The Owner's Box"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 680px"
-            />
+            <div className="absolute left-0 top-0 h-[64%] w-[68%] overflow-hidden rounded-[24px] border-2 border-[#D4AF37]/25">
+              <Image
+                src="/images/atmosphere/big-wall-left-1.jpg"
+                alt="Wall-to-wall sports screens at The Owner's Box"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 70vw, 460px"
+              />
+            </div>
+            <div className="absolute bottom-0 right-0 h-[46%] w-[58%] overflow-hidden rounded-[20px] border-2 border-[#D4AF37]/25">
+              <Image
+                src="/images/food/bar-guest-friends.jpg"
+                alt="Guests enjoying The Owner's Box bar"
+                fill
+                className="object-cover"
+                style={{ objectPosition: "center 35%" }}
+                sizes="(max-width: 1024px) 60vw, 400px"
+              />
+            </div>
           </div>
 
           <div className="max-w-2xl space-y-6 text-sm font-semibold leading-relaxed text-[#05070B]/72 sm:text-base">

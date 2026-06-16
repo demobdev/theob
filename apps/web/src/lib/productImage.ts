@@ -44,6 +44,24 @@ const MENU_IMAGE_KEYS = new Set([
   "bottled_sprite",
 ]);
 
+/** Real photography overrides for menu slugs (checked before default .png paths). */
+const REAL_IMAGE_OVERRIDES: Record<string, string> = {
+  crab_dip: "/images/food/official/crab-dip.png",
+  jumbo_wings: "/images/food/buffalo-wings.png",
+  wings: "/images/food/buffalo-wings.png",
+  boneless_wings: "/images/food/garlic-parm-wings.png",
+  cauliflower_wings: "/images/food/lemon-pepper-wings-2.png",
+  spicy_bang_bang: "/images/food/official/bang-bang-shrimp-3.png",
+  bang_bang_shrimp: "/images/food/official/bang-bang-shrimp-3.png",
+  fried_shrimp: "/images/food/official/bang-bang-shrimp.jpg",
+  philly: "/images/food/official/philly-cheesesteak-1.png",
+  neapolitan_pizza: "/images/food/official/classic-neopolitan.png",
+  cheese_pizza: "/images/food/official/featured-pizza.png",
+  meat_lover_pizza: "/images/food/official/featured-pizza.png",
+  supreme_pizza: "/images/food/official/featured-pizza.png",
+  buffalo_pizza: "/images/food/official/buffalo-pizza.jpg",
+};
+
 const DRINK_LIKE = new Set([
   "beer",
   "soda",
@@ -85,6 +103,11 @@ export function resolveProductImageSrc(
     "bud-light": "bud_light",
   };
   const resolved = aliases[key] ?? key;
+
+  if (REAL_IMAGE_OVERRIDES[resolved]) {
+    return REAL_IMAGE_OVERRIDES[resolved];
+  }
+
   if (MENU_IMAGE_KEYS.has(resolved) || aliases[key]) {
     return `/images/food/${resolved}.png`;
   }

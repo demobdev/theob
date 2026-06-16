@@ -36,7 +36,7 @@ export default function AltHomeStorySection() {
             </div>
             <div className="absolute bottom-0 right-0 h-[46%] w-[58%] overflow-hidden rounded-[28px] border-2 border-[#D4AF37]/35 bg-[#171713] shadow-2xl">
               <Image
-                src="/images/atmosphere/IMG_3603.jpg"
+                src="/images/food/bar-guest-friends.jpg"
                 alt="Guests enjoying game day at The Owner's Box"
                 fill
                 className="object-cover"

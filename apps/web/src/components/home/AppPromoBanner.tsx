@@ -68,7 +68,7 @@ export default function AppPromoBanner() {
               <div className="absolute -bottom-20 -right-12 lg:-right-20 w-72 h-44 rounded-2xl overflow-hidden shadow-2xl border border-[#D4AF37]/20 hidden md:block rotate-3 hover:rotate-0 transition-all duration-500 group z-20 cursor-default">
                 <div className="absolute inset-0 z-0">
                   <Image
-                    src="/images/food/jumbo_wings.png"
+                    src="/images/food/buffalo-wings.png"
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-700"
                     alt="Game day wings"

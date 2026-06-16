@@ -45,9 +45,9 @@ const heroSlides: HeroSlide[] = [
       "Cold glasses, fresh pours, and Greenville nights at the bar — pull up, stay awhile, and sip something great.",
     ctaHref: orderUrl,
     ctaLabel: "View Menu",
-    image: "/images/drinks/horizontal-lemon-cocktail.jpg",
-    imageAlt: "Craft lemon cocktail at The Owner's Box bar",
-    objectPosition: "center 40%",
+    image: "/images/food/esspresso-martini.JPG",
+    imageAlt: "Espresso martini at The Owner's Box bar",
+    objectPosition: "center 45%",
     badge: "Cold Drinks",
   },
   {
@@ -99,6 +99,19 @@ const heroSlides: HeroSlide[] = [
     objectPosition: "center 30%",
     badge: "Your Neighborhood Bar",
   },
+  {
+    id: "late-night",
+    label: "Late Night Hangs",
+    heading: "Your Crew, Your Bar",
+    subheading:
+      "Selfies, shots, and the kind of night that turns strangers into regulars — pull up when the game ends and the room is still buzzing.",
+    ctaHref: "/private-events",
+    ctaLabel: "Book A Party",
+    image: "/images/food/official/late-night-fun.jpg",
+    imageAlt: "Friends enjoying drinks at The Owner's Box bar",
+    objectPosition: "center 40%",
+    badge: "Late Night Fun",
+  },
 ];
 
 function splitHeading(heading: string): string[] {
@@ -108,6 +121,7 @@ function splitHeading(heading: string): string[] {
   if (heading === "Your Game On The Wall") return ["Your Game", "On The Wall"];
   if (heading === "Puck Drop Energy") return ["Puck Drop", "Energy"];
   if (heading === "Woodruff Road Needed This") return ["Woodruff Road", "Needed This"];
+  if (heading === "Your Crew, Your Bar") return ["Your Crew,", "Your Bar"];
   return [heading];
 }
 

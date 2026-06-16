@@ -13,9 +13,19 @@ const galleryImages = [
     shape: "square" as const,
   },
   {
+    src: "/images/food/official/crab-dip.png",
+    alt: "Crab dip with grilled pita chips",
+    shape: "square" as const,
+  },
+  {
     src: "/images/food/official/lamb-gyro.jpg",
     alt: "Lamb gyro with fries",
     shape: "square" as const,
+  },
+  {
+    src: "/images/food/official/hand-fry-dipped.jpg",
+    alt: "Guest dipping a fry with gyro and fries at The Owner's Box",
+    shape: "tall" as const,
   },
   {
     src: "/images/atmosphere/dtl-1.jpg",
@@ -28,14 +38,29 @@ const galleryImages = [
     shape: "square" as const,
   },
   {
-    src: "/images/drinks/vertical-coffe-martini.jpg",
+    src: "/images/food/official/beer-classic.jpg",
+    alt: "Cold beer and a shot at the bar",
+    shape: "square" as const,
+  },
+  {
+    src: "/images/food/espresso-martini-2.jpg",
     alt: "Espresso martini at the bar",
     shape: "tall" as const,
   },
   {
-    src: "/images/atmosphere/friends-and-family.jpg",
-    alt: "Friends and family at the bar",
+    src: "/images/food/official/late-night-fun.jpg",
+    alt: "Friends enjoying a late night at the bar",
     shape: "square" as const,
+  },
+  {
+    src: "/images/food/bar-guest-friends.jpg",
+    alt: "Guests smiling at The Owner's Box bar",
+    shape: "square" as const,
+  },
+  {
+    src: "/images/food/official/staff.jpg",
+    alt: "The Owner's Box staff welcoming guests",
+    shape: "tall" as const,
   },
   {
     src: "/images/atmosphere/cinematic-dtl-1.jpg",
@@ -61,11 +86,6 @@ const galleryImages = [
     src: "/images/atmosphere/black-and-white-1.jpg",
     alt: "The Owner's Box interior atmosphere",
     shape: "tall" as const,
-  },
-  {
-    src: "/images/drinks/horizontal-lemon-cocktail.jpg",
-    alt: "Lemon cocktail on the bar",
-    shape: "square" as const,
   },
   {
     src: "/images/atmosphere/wide-view-from-right.jpg",

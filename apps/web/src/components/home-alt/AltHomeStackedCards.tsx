@@ -51,15 +51,19 @@ function StackCardImageColumn({
   image,
   imagePosition = "center",
   peekImage,
+  peekImages,
   peekImagePosition = "center",
   bodyClass,
 }: {
   image: string;
   imagePosition?: string;
   peekImage?: string;
+  peekImages?: string[];
   peekImagePosition?: string;
   bodyClass: string;
 }) {
+  const showPeekStrip = peekImages?.length || peekImage;
+
   return (
     <div className={`${cardImageColumnClass} ${bodyClass}`}>
       <div className="relative h-full w-full md:flex md:flex-col">
@@ -73,22 +77,42 @@ function StackCardImageColumn({
             sizes="(max-width: 768px) 100vw, 780px"
           />
         </div>
-        {peekImage ? (
+        {showPeekStrip ? (
           <div
             className={`relative ${STACK_SCROLL.peekStripHeight} hidden shrink-0 overflow-hidden border-t border-[#D4AF37]/25 bg-[#101014] md:block`}
           >
-            <Image
-              src={peekImage}
-              alt=""
-              fill
-              className={
-                peekImage.endsWith(".png")
-                  ? "object-contain p-3 sm:p-4"
-                  : "object-cover"
-              }
-              style={peekImage.endsWith(".png") ? undefined : { objectPosition: peekImagePosition }}
-              sizes="(max-width: 768px) 100vw, 780px"
-            />
+            {peekImages?.length ? (
+              <div className="grid h-full grid-cols-3">
+                {peekImages.map((src) => (
+                  <div key={src} className="relative h-full min-h-0">
+                    <Image
+                      src={src}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 33vw, 260px"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : peekImage ? (
+              <Image
+                src={peekImage}
+                alt=""
+                fill
+                className={
+                  peekImage.endsWith(".png")
+                    ? "object-contain p-3 sm:p-4"
+                    : "object-cover"
+                }
+                style={
+                  peekImage.endsWith(".png")
+                    ? undefined
+                    : { objectPosition: peekImagePosition }
+                }
+                sizes="(max-width: 768px) 100vw, 780px"
+              />
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -117,10 +141,13 @@ const cards = [
     text: "Bring the crew for birthdays, watch parties, fantasy draft nights, and Greenville nights out.",
     href: "/private-events",
     cta: "Book A Party",
-    image: "/images/atmosphere/friends-and-family.jpg",
-    imagePosition: "center 22%",
-    peekImage: "/images/food/jumbo_wings.png",
-    peekImagePosition: "center 55%",
+    image: "/images/food/bar-guest-friends.jpg",
+    imagePosition: "center 35%",
+    peekImages: [
+      "/images/food/buffalo-wings.png",
+      "/images/food/garlic-parm-wings.png",
+      "/images/food/lemon-pepper-wings-2.png",
+    ],
     strip: "bg-white text-[#05070B]",
     body: "bg-[#071B2F] text-[#F2EAD4]",
     eventImage: "/images/atmosphere/dtl-1.jpg",
@@ -166,22 +193,22 @@ const cards = [
         src: "/images/food/official/bang-bang-shrimp-3.png",
         alt: "Bang Bang Shrimp appetizer",
         label: "Bang Bang",
+        thumbPosition: "center 55%",
         heroObjectFit: "contain" as const,
-        thumbObjectFit: "contain" as const,
       },
       {
         src: "/images/food/official/philly-cheesesteak-1.png",
         alt: "Philly cheesesteak with fries",
         label: "Cheesesteak",
+        thumbPosition: "center 42%",
         heroObjectFit: "contain" as const,
-        thumbObjectFit: "contain" as const,
       },
       {
         src: "/images/food/official/scratch-made.png",
         alt: "Scratch-made pizza prep",
         label: "Scratch-Made",
+        thumbPosition: "center 38%",
         heroObjectFit: "contain" as const,
-        thumbObjectFit: "contain" as const,
       },
     ],
   },
@@ -280,10 +307,12 @@ function FoodImageStack({
                 src={image.src}
                 alt={image.alt}
                 fill
-                className={`transition-transform duration-700 group-hover:scale-105 ${
-                  image.thumbObjectFit === "contain" ? "object-contain p-1.5 sm:p-2" : "object-cover"
-                }`}
-                style={foodImageStyle(image)}
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                style={
+                  image.thumbPosition
+                    ? { objectPosition: image.thumbPosition }
+                    : undefined
+                }
                 sizes="(max-width: 640px) 42vw, 180px"
               />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#171713] to-transparent p-2 sm:p-3">
@@ -595,6 +624,7 @@ export default function AltHomeStackedCards() {
                       "imagePosition" in card && card.imagePosition ? card.imagePosition : "center"
                     }
                     peekImage={"peekImage" in card ? card.peekImage : undefined}
+                    peekImages={"peekImages" in card ? card.peekImages : undefined}
                     peekImagePosition={
                       "peekImagePosition" in card && card.peekImagePosition
                         ? card.peekImagePosition
