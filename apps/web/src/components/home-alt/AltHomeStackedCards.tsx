@@ -624,7 +624,6 @@ export default function AltHomeStackedCards() {
                       "imagePosition" in card && card.imagePosition ? card.imagePosition : "center"
                     }
                     peekImage={"peekImage" in card ? card.peekImage : undefined}
-                    peekImages={"peekImages" in card ? card.peekImages : undefined}
                     peekImageCover={
                       "peekImageCover" in card ? Boolean(card.peekImageCover) : false
                     }
