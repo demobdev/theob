@@ -188,7 +188,7 @@ export default function AltHeroCarousel() {
         );
       })}
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 p-5 pb-24 sm:p-10 sm:pb-28">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 top-[48%] z-10 flex flex-col justify-end p-5 pb-14 sm:top-[46%] sm:p-10 sm:pb-20">
         <div className="max-w-5xl pr-4 sm:max-w-[min(100%,42rem)]">
           <p className="mb-4 flex w-fit items-center gap-2 rounded-full border border-[#D4AF37]/35 bg-[#071B2F] px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-[#F2EAD4]">
             {activeSlide.badge && <span className="h-2 w-2 rounded-full bg-white" />}
@@ -198,7 +198,7 @@ export default function AltHeroCarousel() {
             key={activeSlide.id}
             className="transition-all duration-500 ease-out motion-reduce:transition-none"
           >
-            <h1 className="font-montserrat text-[clamp(3.4rem,10.5vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.08em] text-[#F2EAD4]">
+            <h1 className="font-montserrat text-[clamp(2.75rem,9vw,10rem)] font-black uppercase leading-[0.82] tracking-[-0.08em] text-[#F2EAD4]">
               {splitHeading(activeSlide.heading).map((line) => (
                 <span key={line} className="block">
                   {line}
@@ -221,7 +221,11 @@ export default function AltHeroCarousel() {
         </button>
       </div>
 
-      <div className="pointer-events-auto absolute right-5 top-5 z-30 flex items-center gap-2 sm:right-8 sm:top-8">
+      <div className="pointer-events-auto absolute bottom-24 right-5 z-30 flex flex-col items-end gap-2 sm:bottom-auto sm:right-8 sm:top-8">
+        <p className="rounded-full border border-[#D4AF37]/35 bg-[#071B2F]/90 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-[#F2EAD4] sm:text-[10px]">
+          {activeIndex + 1} / {heroSlides.length}
+        </p>
+        <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={goPrev}
@@ -250,6 +254,7 @@ export default function AltHeroCarousel() {
         >
           <ChevronRight className="h-4 w-4" />
         </button>
+        </div>
       </div>
     </div>
   );

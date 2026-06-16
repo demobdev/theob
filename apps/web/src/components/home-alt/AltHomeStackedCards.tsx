@@ -20,7 +20,9 @@ function cardShellClass(index: number, isLast: boolean, body: string): string {
         ? `${STACK_SCROLL.middleCardHeightParty} ${STACK_SCROLL.cardOverlapMargin}`
         : `${STACK_SCROLL.middleCardHeight} ${STACK_SCROLL.cardOverlapMargin}`;
 
-  return `sticky overflow-hidden rounded-[28px] border-2 border-[#D4AF37]/45 shadow-[0_30px_90px_rgba(0,0,0,0.35)] ${body} ${heightClass}`;
+  const overflowClass = isLast ? "overflow-visible" : "overflow-hidden";
+
+  return `sticky isolate ${overflowClass} rounded-[28px] border-2 border-[#D4AF37]/45 shadow-[0_30px_90px_rgba(0,0,0,0.35)] ${body} ${heightClass}`;
 }
 
 function cardGridClass(isLast: boolean, body: string, hasEventPanel?: boolean): string {
@@ -29,6 +31,10 @@ function cardGridClass(isLast: boolean, body: string, hasEventPanel?: boolean): 
     : hasEventPanel
       ? STACK_SCROLL.innerGridMdMinHeightParty
       : STACK_SCROLL.innerGridMdMinHeightMiddle;
+
+  if (isLast) {
+    return `relative z-0 grid h-auto grid-cols-1 md:grid-cols-[0.95fr_1.05fr] md:grid-rows-none ${innerMin} ${body}`;
+  }
 
   return `relative z-0 grid h-auto grid-cols-1 md:h-[calc(100%-40px)] md:grid-cols-[0.95fr_1.05fr] md:grid-rows-none ${innerMin} ${body}`;
 }
@@ -93,7 +99,7 @@ function StackCardImageColumn({
 const cards = [
   {
     eyebrow: "Game day energy",
-    title: "Rack Up The Fun",
+    title: "Catch Every Play",
     text: "Fourteen HD screens, cold drinks, and a room built for the matchup.",
     href: "/locations",
     cta: "Visit Us",
@@ -181,7 +187,11 @@ function MarqueeLine({ words, compact = false }: { words: string[]; compact?: bo
   const items = [...words, ...words, ...words, ...words];
 
   return (
-    <div className={`overflow-hidden border-y border-current/20 ${compact ? "py-2" : "py-3"}`}>
+    <div
+      className={`relative isolate overflow-hidden border-y border-current/20 bg-inherit ${
+        compact ? "py-2" : "py-3"
+      }`}
+    >
       <div className="flex w-max animate-marquee items-center whitespace-nowrap">
         {items.map((word, index) => (
           <div key={`${word}-${index}`} className="flex items-center gap-5 px-5">
@@ -353,7 +363,7 @@ function GoodEatsCard({
         </div>
 
         <div
-          className={`flex min-w-0 flex-col justify-between gap-3 p-4 max-md:pb-8 sm:gap-4 sm:p-6 md:min-h-0 md:gap-4 md:overflow-hidden md:p-10 ${card.body}`}
+          className={`flex min-w-0 flex-col justify-between gap-3 p-4 max-md:pb-8 sm:gap-4 sm:p-6 md:min-h-0 md:gap-4 md:overflow-visible md:p-10 ${card.body}`}
         >
           <div className="shrink-0">
             <p className="mb-2 text-[9px] font-black uppercase tracking-[0.3em] opacity-70 sm:mb-3 sm:text-[10px]">
@@ -510,15 +520,15 @@ export default function AltHomeStackedCards() {
                 Restaurant + Sports Bar
               </p>
               <h2 className="font-montserrat text-5xl font-black uppercase leading-[0.82] tracking-[-0.08em] sm:text-7xl">
-                Scroll The
+                The Full
                 <br />
-                Lineup
+                Experience
               </h2>
             </div>
           </div>
           <p className="max-w-md text-sm font-semibold leading-relaxed text-[#05070B]/65">
-            The cards clip, stack, and slide into the next moment as you scroll — game day,
-            private events, and good eats in one lineup.
+            Game-day energy, private events, and scratch-made favorites — your Woodruff Road spot
+            for the crew.
           </p>
         </div>
 

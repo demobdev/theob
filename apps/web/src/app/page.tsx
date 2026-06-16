@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import AltHomeGoodTimes from "@/components/home-alt/AltHomeGoodTimes";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import AltHomeHero from "@/components/home-alt/AltHomeHero";
+import AltHomeShopCollection from "@/components/home-alt/AltHomeShopCollection";
 import { OB_DEFAULT_DESCRIPTION, OB_SITE_URL } from "@/lib/localSeo";
 
 export const metadata: Metadata = {
@@ -29,11 +30,6 @@ const AltHomeGalleryCarousel = dynamic(
 const AltHomeStorySection = dynamic(
   () => import("@/components/home-alt/AltHomeStorySection"),
   { loading: () => <div aria-hidden="true" className="ob-canvas min-h-[32vh] bg-white" /> },
-);
-
-const AltHomeShopCollection = dynamic(
-  () => import("@/components/home-alt/AltHomeShopCollection"),
-  { loading: () => <div aria-hidden="true" className="ob-canvas min-h-[24vh] bg-white" /> },
 );
 
 const AltHomeFooter = dynamic(

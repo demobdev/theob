@@ -43,3 +43,5 @@ yarn-error.log*
 
 # Sentry auth token for local source map upload
 apps/native/sentry.properties
+.vercel
+.env*.local
