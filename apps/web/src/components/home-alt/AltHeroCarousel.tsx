@@ -63,28 +63,30 @@ const heroSlides: HeroSlide[] = [
     badge: "Good Eats",
   },
   {
-    id: "basketball",
-    label: "Basketball Watch Party",
-    heading: "Your Game On The Wall",
-    subheading: "Bring the crew for basketball, wings, pizza, and game-day sound when the matchup is on.",
+    id: "baseball",
+    label: "Baseball Watch Party",
+    heading: "Catch Every Inning",
+    subheading:
+      "MLB season is here — when you and your crew want somewhere worth watching, fourteen screens, sound that matches the moment, and a seat that beats the couch.",
     ctaHref: "/private-events",
     ctaLabel: "Book a party",
-    image: "/images/sports/knicks-finals-watch.png",
-    imageAlt: "Guests watching basketball at The Owner's Box",
-    objectPosition: "center",
-    badge: "NBA Nights",
+    image: "/images/atmosphere/big-wall-left-1.jpg",
+    imageAlt: "Guests watching baseball on wall-to-wall screens at The Owner's Box",
+    objectPosition: "center 35%",
+    badge: "MLB Season",
   },
   {
-    id: "hockey",
-    label: "Hockey Watch Party",
-    heading: "Puck Drop Energy",
-    subheading: "Hockey nights, cold drinks, and a room ready for every shift.",
+    id: "soccer",
+    label: "Soccer Watch Party",
+    heading: "Match Day At The Box",
+    subheading:
+      "World Cup summers, weekend MLS, and big international nights — when the match is on and friends are free, grab a seat and put your game on the wall.",
     ctaHref: "/private-events",
     ctaLabel: "Book a party",
-    image: "/images/sports/stanley-cup-watch.png",
-    imageAlt: "Hockey on the screens at The Owner's Box",
-    objectPosition: "center",
-    badge: "Hockey Ready",
+    image: "/images/atmosphere/wide-view-from-right.jpg",
+    imageAlt: "The Owner's Box dining room ready for a soccer watch party",
+    objectPosition: "center 30%",
+    badge: "Match Day",
   },
   {
     id: "woodruff",
@@ -118,8 +120,8 @@ function splitHeading(heading: string): string[] {
   if (heading === "Nothing But Good Times") return ["Nothing But", "Good Times"];
   if (heading === "Delicious Cocktails") return ["Delicious", "Cocktails"];
   if (heading === "Pizza Worth Staying For") return ["Pizza Worth", "Staying For"];
-  if (heading === "Your Game On The Wall") return ["Your Game", "On The Wall"];
-  if (heading === "Puck Drop Energy") return ["Puck Drop", "Energy"];
+  if (heading === "Catch Every Inning") return ["Catch Every", "Inning"];
+  if (heading === "Match Day At The Box") return ["Match Day", "At The Box"];
   if (heading === "Make This Your Spot") return ["Make This", "Your Spot"];
   if (heading === "Your Crew, Your Bar") return ["Your Crew,", "Your Bar"];
   return [heading];
@@ -250,7 +252,7 @@ export default function AltHeroCarousel() {
         </button>
       </div>
 
-      <div className="pointer-events-auto absolute bottom-24 right-5 z-10 flex flex-col items-end gap-2 sm:bottom-auto sm:right-8 sm:top-8">
+      <div className="pointer-events-auto absolute top-5 right-5 z-10 flex flex-col items-end gap-2 sm:top-8 sm:right-8">
         <p className="rounded-full border border-[#D4AF37]/35 bg-[#071B2F]/90 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-[#F2EAD4] sm:text-[10px]">
           {activeIndex + 1} / {heroSlides.length}
         </p>

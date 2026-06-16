@@ -23,11 +23,6 @@ const galleryImages = [
     shape: "square" as const,
   },
   {
-    src: "/images/food/official/hand-fry-dipped.jpg",
-    alt: "Guest dipping a fry with gyro and fries at The Owner's Box",
-    shape: "tall" as const,
-  },
-  {
     src: "/images/atmosphere/ob-front.png",
     alt: "The Owner's Box storefront at night",
     shape: "square" as const,
@@ -76,6 +71,11 @@ const galleryImages = [
     src: "/images/food/bar-guest-friends.jpg",
     alt: "Guests smiling at The Owner's Box bar",
     shape: "square" as const,
+  },
+  {
+    src: "/images/food/official/hand-fry-dipped.jpg",
+    alt: "Guest dipping a fry with gyro and fries at The Owner's Box",
+    shape: "tall" as const,
   },
   {
     src: "/images/food/official/staff.jpg",

@@ -59,9 +59,10 @@ export default function AltHomeStorySection() {
               Game Day
             </h2>
             <p className="mt-7 text-sm font-semibold leading-relaxed text-[#05070B]/70 sm:text-base">
-              The Owner&apos;s Box is the easy answer for friends, families, regulars, and fans who
-              want the food to hit as hard as the matchup. Pull up for scratch-made eats, stay for the
-              screens, and make it a Greenville ritual.
+              When the game&apos;s on and your crew wants a spot worth showing up for, this is the
+              room — fourteen HD screens, sound that matches the moment, and friends who actually
+              watch together. NFL, NBA, hockey, soccer: grab a seat, pick your wall, and make it a
+              good night out.
             </p>
             <Link
               href="/our-story"
