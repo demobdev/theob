@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MonitorPlay, Users, UtensilsCrossed } from "lucide-react";
@@ -163,21 +163,25 @@ const cards = [
         label: "Featured Pizza",
       },
       {
-        src: "/images/food/official/bang-bang-shrimp.jpg",
+        src: "/images/food/official/bang-bang-shrimp-3.png",
         alt: "Bang Bang Shrimp appetizer",
         label: "Bang Bang",
+        heroObjectFit: "contain" as const,
+        thumbObjectFit: "contain" as const,
       },
       {
-        src: "/images/food/official/philly-cheesesteak.jpg",
-        alt: "Philly cheesesteak",
+        src: "/images/food/official/philly-cheesesteak-1.png",
+        alt: "Philly cheesesteak with fries",
         label: "Cheesesteak",
+        heroObjectFit: "contain" as const,
+        thumbObjectFit: "contain" as const,
       },
       {
-        src: "/images/food/official/pizza-ingredients-flat-lay.jpg",
+        src: "/images/food/official/scratch-made.png",
         alt: "Scratch-made pizza prep",
         label: "Scratch-Made",
-        thumbPosition: "center 45%",
         heroObjectFit: "contain" as const,
+        thumbObjectFit: "contain" as const,
       },
     ],
   },
@@ -210,6 +214,21 @@ function MarqueeLine({ words, compact = false }: { words: string[]; compact?: bo
   );
 }
 
+function foodImageStyle(image: {
+  thumbPosition?: string;
+  imageRotate?: number;
+}): CSSProperties | undefined {
+  const rotate = image.imageRotate;
+  if (rotate === undefined && !image.thumbPosition) return undefined;
+
+  return {
+    ...(image.thumbPosition ? { objectPosition: image.thumbPosition } : {}),
+    ...(rotate !== undefined
+      ? { transform: `rotate(${rotate}deg) scale(1.42)` }
+      : {}),
+  };
+}
+
 function FoodImageStack({
   images,
   selectedIndex,
@@ -221,6 +240,8 @@ function FoodImageStack({
     alt: string;
     label: string;
     thumbPosition?: string;
+    thumbObjectFit?: "contain" | "cover";
+    imageRotate?: number;
   }>;
   selectedIndex: number;
   onSelect: (index: number) => void;
@@ -259,8 +280,10 @@ function FoodImageStack({
                 src={image.src}
                 alt={image.alt}
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                style={{ objectPosition: image.thumbPosition ?? "center" }}
+                className={`transition-transform duration-700 group-hover:scale-105 ${
+                  image.thumbObjectFit === "contain" ? "object-contain p-1.5 sm:p-2" : "object-cover"
+                }`}
+                style={foodImageStyle(image)}
                 sizes="(max-width: 640px) 42vw, 180px"
               />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#171713] to-transparent p-2 sm:p-3">
@@ -316,7 +339,9 @@ function GoodEatsCard({
       alt: string;
       label: string;
       thumbPosition?: string;
+      thumbObjectFit?: "contain" | "cover";
       heroObjectFit?: "contain" | "cover";
+      imageRotate?: number;
     }>;
   };
   index: number;
@@ -354,8 +379,8 @@ function GoodEatsCard({
               heroFit === "contain" ? "object-contain p-4 sm:p-8" : "object-cover"
             }`}
             style={
-              heroFit === "cover" && activeFood?.thumbPosition
-                ? { objectPosition: activeFood.thumbPosition }
+              activeFood?.imageRotate !== undefined || activeFood?.thumbPosition
+                ? foodImageStyle(activeFood ?? {})
                 : undefined
             }
             sizes="(max-width: 768px) 100vw, 780px"

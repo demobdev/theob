@@ -8,7 +8,7 @@ const AUTO_SCROLL_PX_PER_SEC = 58;
 
 const galleryImages = [
   {
-    src: "/images/food/official/bang-bang-shrimp.jpg",
+    src: "/images/food/official/bang-bang-shrimp-3.png",
     alt: "Bang Bang Shrimp appetizer",
     shape: "square" as const,
   },
