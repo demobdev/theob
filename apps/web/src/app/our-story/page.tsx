@@ -7,7 +7,7 @@ import { getOrderPagePath } from "@/lib/orderLinks";
 export const metadata = {
   title: "Our Story | Family-Friendly Sports Bar in Greenville SC",
   description:
-    "The Owners Box Bar & Grill on Woodruff Road — Greenville's upscale game-day sports bar with scratch-made food, big screens, and room for the whole crew.",
+    "The story of Don, Denis, and Vik — three lifelong friends from Mauldin who built The Owner's Box Bar & Grill to be Greenville's premier sports lounge.",
   alternates: { canonical: "/our-story" },
 };
 
@@ -42,8 +42,7 @@ export default function OurStoryPage() {
                 Story
               </h1>
               <p className="mt-5 max-w-xl text-sm font-semibold leading-relaxed text-white/78 sm:text-base">
-                The easy answer for friends, families, regulars, and fans who want the food to hit
-                as hard as the matchup.
+                Born from a 20-year friendship that started at Mauldin Middle School, built for sports fans, families, and regulars in Greenville.
               </p>
             </div>
           </div>
