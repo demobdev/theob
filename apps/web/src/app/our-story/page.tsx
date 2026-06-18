@@ -55,8 +55,8 @@ export default function OurStoryPage() {
           <div className="relative min-h-[420px]">
             <div className="absolute left-0 top-0 h-[64%] w-[68%] overflow-hidden rounded-[24px] border-2 border-[#D4AF37]/25 shadow-lg">
               <Image
-                src="/images/atmosphere/big-wall-left-1.jpg"
-                alt="Wall-to-wall sports screens at The Owner's Box"
+                src="/images/atmosphere/ob-front.png"
+                alt="The Owner's Box storefront on Woodruff Road"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 70vw, 460px"
@@ -64,11 +64,11 @@ export default function OurStoryPage() {
             </div>
             <div className="absolute bottom-0 right-0 h-[46%] w-[58%] overflow-hidden rounded-[20px] border-2 border-[#D4AF37]/25 shadow-xl">
               <Image
-                src="/images/atmosphere/bar-guest-friends.jpg"
-                alt="Guests enjoying The Owner's Box bar"
+                src="/don-vik-denny.jpg"
+                alt="Owners Don Bailey, Denny Nepton, and Vik Tanksale"
                 fill
                 className="object-cover"
-                style={{ objectPosition: "center 35%" }}
+                style={{ objectPosition: "center 20%" }}
                 sizes="(max-width: 1024px) 60vw, 400px"
               />
             </div>
@@ -76,19 +76,15 @@ export default function OurStoryPage() {
 
           <div className="max-w-2xl space-y-6 text-sm font-semibold leading-relaxed text-[#05070B]/72 sm:text-base">
             <p>
-              <strong className="text-[#05070B]">The Owner&apos;s Box Bar & Grill</strong> was founded by
-              Don Bailey, Denny Nepton, and Vik Tanksale to be Greenville&apos;s premier upscale sports lounge.
-              They built the Box for regulars — sports fans, families, and food lovers who want scratch-made meals
-              done right, and a seat where every matchup actually matters.
+              <strong className="text-[#05070B]">The Owner&apos;s Box Bar & Grill</strong> was born from a friendship that spans over two decades.
+              Don Bailey, Denny Nepton, and Vik Tanksale first met walking the hallways of Mauldin Middle School, later graduating together as lifelong friends from Mauldin High.
             </p>
             <p>
-              With wall-to-wall screens, NFL Sunday Ticket, premium audio, and a kitchen that never cuts
-              corners, they set out to redefine the neighborhood sports bar experience. From lunch and Sunday brunch to late-night drinks,
-              it is a room built for community and sharing.
+              Through college, careers, and the busy rhythms of life, their bond remained unchanged—anchored by a shared love for sports, great food, and their local community.
+              For years, they talked about creating the ultimate neighborhood hangout: a place where the wings are always crispy, the draft beer is ice-cold, and every game is treated like a championship matchup.
             </p>
             <p>
-              Browse the menu on our site, order takeout, or pull up to the bar on Woodruff Road to experience
-              the difference.
+              In 2026, that dream became a reality on Woodruff Road. Built for sports fans, families, and regulars alike, it represents the intersection of their lifelong friendship and their passion for authentic Greenville hospitality. Pull up a seat at the bar, and you&apos;re not just visiting a restaurant—you&apos;re stepping into the culmination of a Mauldin-born dream.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-4">
@@ -135,17 +131,17 @@ export default function OurStoryPage() {
               {
                 name: "Don Bailey",
                 role: "Co-Owner / Founder",
-                bio: "Don is passionate about creating a high-quality community space where Greenville sports fans can gather, relax, and enjoy premium hospitality.",
+                bio: "A proud Mauldin High alumnus, Don's vision for The Owner's Box was to create the ultimate game-day living room for Greenville sports fans—combining high-end screens with the welcoming energy of a local neighborhood clubhouse.",
               },
               {
                 name: "Denny Nepton",
                 role: "Co-Owner / Founder",
-                bio: "Denny oversees the customer experience and operations, ensuring that every visit to the Box feels welcoming and every game is clear on the wall.",
+                bio: "Denny's journey from Mauldin Middle to co-owner of the Box is fueled by his commitment to service. He manages guest relations and logistics, ensuring every visitor feels like a regular from day one.",
               },
               {
                 name: "Vik Tanksale",
                 role: "Co-Owner / Founder",
-                bio: "Vik leads the culinary vision and standards, keeping the kitchen focused on fresh ingredients, scratch-made pizzas, and the best wings in town.",
+                bio: "Vik leads the culinary standards and kitchen operations. Drawing on a shared lifetime of sports watch parties, he ensures that scratch-made pizzas, gourmet burgers, and the best wings in Greenville are served hot every day.",
               },
             ].map((owner, idx) => (
               <div
