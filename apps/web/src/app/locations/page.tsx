@@ -45,7 +45,7 @@ const OB_LOCATION: [number, number] = [OB_COORDS.lat, OB_COORDS.lng];
 const featureTiles = [
   {
     title: "Game Day",
-    text: "Fourteen HD screens, cold drinks, and a room built for regulars.",
+    text: "Cold drinks and a room built for regulars.",
     image: "/images/atmosphere/cinematic-dtl-1.jpg",
     imagePosition: "center 28%",
   },

@@ -126,7 +126,7 @@ const cards = [
   {
     eyebrow: "Game day energy",
     title: "Catch Every Play",
-    text: "Fourteen HD screens, cold drinks, and a room built for the matchup.",
+    text: "Cold drinks and a room built for the matchup.",
     href: "/locations",
     cta: "Visit Us",
     image: "/images/atmosphere/wide-view-from-right.jpg",
@@ -174,7 +174,7 @@ const cards = [
     title: "Good Eats All Night",
     text: "Pizza, wings, shareables, and bar favorites that keep the table full.",
     href: "/menu",
-    cta: "View Menu",
+    cta: "Order Takeout",
     orderOnline: true,
     strip: "bg-white text-[#05070B]",
     body: "bg-[#171713] text-[#F2EAD4]",
@@ -581,8 +581,7 @@ export default function AltHomeStackedCards() {
             </div>
           </div>
           <p className="max-w-md text-sm font-semibold leading-relaxed text-[#05070B]/65">
-            Game-day energy, private events, and scratch-made favorites — your Woodruff Road spot
-            for the crew.
+            Game-day energy, private events, and scratch-made favorites on Woodruff Road.
           </p>
         </div>
 

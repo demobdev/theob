@@ -61,7 +61,7 @@ export default function GamesPage() {
                 Never Wonder What&apos;s On
               </h1>
               <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.25em] mt-2">
-                Game Day Hub · 14 HD Screens
+                Game Day Hub · Wall-to-Wall Sports
               </p>
             </div>
           </div>
@@ -109,7 +109,7 @@ export default function GamesPage() {
           <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
             <div className="flex items-center gap-3 px-4 sm:px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white">
               <Tv className="h-4 w-4 text-[#D4AF37]" />
-              <span className="text-xs font-black uppercase tracking-widest">14 HD Screens</span>
+              <span className="text-xs font-black uppercase tracking-widest">Wall-to-Wall Sports</span>
             </div>
             <div className="flex items-center gap-3 px-4 sm:px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white">
               <MapPin className="h-4 w-4 text-[#D4AF37]" />

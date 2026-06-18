@@ -68,7 +68,7 @@ export const menuData: MenuCategory[] = [
   },
   {
     id: "brunch",
-    title: "Weekend Brunch (Sat & Sun 9AM - 2PM)",
+    title: "Sunday Brunch (10 AM - 2 PM)",
     items: [
       { id: "brn-1", name: "Short Rib Hash", description: "Braised short rib, roasted potatoes, peppers, onions, sunny egg", imageKey: "short_rib_hash" },
       { id: "brn-2", name: "Crispy Chicken & Waffles", description: "Buttermilk fried chicken, Belgian waffle, maple hot sauce", imageKey: "chicken_waffles" },

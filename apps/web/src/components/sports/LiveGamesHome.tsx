@@ -238,8 +238,8 @@ export default function LiveGamesHome({ sport, onSportChange }: LiveGamesHomePro
             </h2>
             <p className="text-gray-500 text-sm font-medium mt-3 max-w-xl">
               {showLiveSection
-                ? "Live scores on our 14 HD screens — plus what's coming up next."
-                : "Tonight's matchups on our 14 HD screens. Pick a sport to focus the board."}
+                ? "Live scores on the board, plus what's coming up next."
+                : "Tonight's matchups on the board. Pick a sport to focus the wall."}
             </p>
           </div>
 

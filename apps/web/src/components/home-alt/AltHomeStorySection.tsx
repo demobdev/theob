@@ -60,9 +60,7 @@ export default function AltHomeStorySection() {
             </h2>
             <p className="mt-7 text-sm font-semibold leading-relaxed text-[#05070B]/70 sm:text-base">
               When the game&apos;s on and your crew wants a spot worth showing up for, this is the
-              room — fourteen HD screens, sound that matches the moment, and friends who actually
-              watch together. NFL, NBA, hockey, soccer: grab a seat, pick your wall, and make it a
-              good night out.
+              room. Grab a seat, pick your wall, and make it a good night out.
             </p>
             <Link
               href="/our-story"

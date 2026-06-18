@@ -17,7 +17,7 @@ const FooterHero = () => {
             <span className="gold-text-gradient">We&apos;re Just Waiting on You.</span>
           </h2>
           <p className="text-gray-400 text-lg sm:text-xl font-medium max-w-2xl mx-auto mb-12">
-            Pull up for the game on 14 HD screens. Order takeout through our site or get delivery on DoorDash.
+            Pull up for the game. Order takeout through our site or get delivery on DoorDash.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center">

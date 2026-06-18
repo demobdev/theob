@@ -10,7 +10,7 @@ export const metadata = {
 const faqs = [
   {
     q: "What are your hours?",
-    a: "Sun – Thu: 11AM – 11PM. Fri – Sat: 11AM – 1AM. Kitchen hours may vary on holidays — call ahead or visit our location page.",
+    a: "Mon · Wed · Fri: 4 PM – Midnight. Thu · Sat: 11:30 AM – Midnight. Sun: 10 AM – Midnight. Sunday brunch runs 10 AM – 2 PM. Kitchen hours may vary on holidays — call ahead or visit our location page.",
   },
   {
     q: "Where are you located?",

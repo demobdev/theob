@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
+import UpcomingEventsStrip from "@/components/events/UpcomingEventsStrip";
 import { CalendarDays, Mail, Tv, Users, UtensilsCrossed } from "lucide-react";
 
 export const metadata = {
@@ -98,6 +99,8 @@ export default function PrivateEventsPage() {
                 ))}
               </div>
             </div>
+
+            <UpcomingEventsStrip />
 
             <div className="grid gap-6 md:grid-cols-2">
               <div className="rounded-[28px] border border-white/10 bg-white p-7 text-[#05070B]">

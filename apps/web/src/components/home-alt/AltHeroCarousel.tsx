@@ -19,14 +19,15 @@ type HeroSlide = {
   objectPosition?: string;
   badge?: string;
   backgroundClassName?: string;
+  /** When true the image is a self-contained banner — no overlay text or gradients are rendered. */
+  bannerOnly?: boolean;
 };
 
 const firstHeroSlide: HeroSlide = {
   id: "bar",
   label: "Pull Up & Stay Awhile",
   heading: "Nothing But Good Times",
-  subheading:
-    "Walk in for one round. Stay for the laughter, the lineup, and a room that turns ordinary nights into the ones you talk about.",
+  subheading: "Walk in for one round. Stay for the kind of night you talk about tomorrow.",
   ctaHref: orderUrl,
   ctaLabel: "Order Now",
   image: "/images/atmosphere/IMGL6884.jpg",
@@ -38,13 +39,25 @@ const firstHeroSlide: HeroSlide = {
 const heroSlides: HeroSlide[] = [
   firstHeroSlide,
   {
+    id: "world-cup",
+    label: "This Friday · June 19 · 3 PM ET",
+    heading: "World Cup Watch Party",
+    subheading: "USA vs Australia on every screen. Pull up early, grab a seat, and rep the red, white & blue with the crew.",
+    ctaHref: "/private-events",
+    ctaLabel: "Book A Spot",
+    image: "/images/world-cup-watch-party.JPEG",
+    imageAlt: "World Cup Watch Party — USA vs Australia at The Owner's Box",
+    objectPosition: "center 40%",
+    badge: "⚽ FIFA World Cup",
+    bannerOnly: true,
+  },
+  {
     id: "cocktails",
     label: "Craft Cocktails",
     heading: "Delicious Cocktails",
-    subheading:
-      "Cold glasses, fresh pours, and Greenville nights at the bar — pull up, stay awhile, and sip something great.",
+    subheading: "Fresh pours and cold glasses at the bar.",
     ctaHref: orderUrl,
-    ctaLabel: "View Menu",
+    ctaLabel: "Order Takeout",
     image: "/images/food/esspresso-martini.JPG",
     imageAlt: "Espresso martini at The Owner's Box bar",
     objectPosition: "center 45%",
@@ -54,9 +67,9 @@ const heroSlides: HeroSlide[] = [
     id: "pizza",
     label: "Scratch-Made Pizza",
     heading: "Pizza Worth Staying For",
-    subheading: "Craft pizza, jumbo wings, and bar favorites — made fresh for dine-in or takeout.",
+    subheading: "Craft pizza, jumbo wings, and bar favorites made fresh.",
     ctaHref: orderUrl,
-    ctaLabel: "View Menu",
+    ctaLabel: "Order Takeout",
     image: "/images/food/official/featured-pizza.png",
     imageAlt: "Featured pizza at The Owner's Box",
     objectPosition: "center 22%",
@@ -66,8 +79,7 @@ const heroSlides: HeroSlide[] = [
     id: "baseball",
     label: "Baseball Watch Party",
     heading: "Catch Every Inning",
-    subheading:
-      "MLB season is here — when you and your crew want somewhere worth watching, fourteen screens, sound that matches the moment, and a seat that beats the couch.",
+    subheading: "Grab a seat, pick your wall, and watch every inning with the crew.",
     ctaHref: "/private-events",
     ctaLabel: "Book a party",
     image: "/images/atmosphere/big-wall-left-1.jpg",
@@ -79,8 +91,7 @@ const heroSlides: HeroSlide[] = [
     id: "soccer",
     label: "Soccer Watch Party",
     heading: "Match Day At The Box",
-    subheading:
-      "World Cup summers, weekend MLS, and big international nights — when the match is on and friends are free, grab a seat and put your game on the wall.",
+    subheading: "World Cup summers, MLS weekends, and international nights with your crew.",
     ctaHref: "/private-events",
     ctaLabel: "Book a party",
     image: "/images/atmosphere/wide-view-from-right.jpg",
@@ -92,8 +103,7 @@ const heroSlides: HeroSlide[] = [
     id: "woodruff",
     label: "Greenville, SC",
     heading: "Make This Your Spot",
-    subheading:
-      "Wall-to-wall screens, scratch-made food, and a dining room built for the crew — pull up, grab a seat, and stay awhile.",
+    subheading: "Your neighborhood spot on Woodruff Road for food, drinks, and game day.",
     ctaHref: "/locations",
     ctaLabel: "Visit Us",
     image: "/images/atmosphere/ob-front.png",
@@ -105,8 +115,7 @@ const heroSlides: HeroSlide[] = [
     id: "late-night",
     label: "Late Night Hangs",
     heading: "Your Crew, Your Bar",
-    subheading:
-      "Selfies, shots, and the kind of night that turns strangers into regulars — pull up when the game ends and the room is still buzzing.",
+    subheading: "When the game ends and the room is still buzzing.",
     ctaHref: "/private-events",
     ctaLabel: "Book A Party",
     image: "/images/food/official/late-night-fun.jpg",
@@ -121,6 +130,7 @@ function splitHeading(heading: string): string[] {
   if (heading === "Delicious Cocktails") return ["Delicious", "Cocktails"];
   if (heading === "Pizza Worth Staying For") return ["Pizza Worth", "Staying For"];
   if (heading === "Catch Every Inning") return ["Catch Every", "Inning"];
+  if (heading === "World Cup Watch Party") return ["World Cup", "Watch Party"];
   if (heading === "Match Day At The Box") return ["Match Day", "At The Box"];
   if (heading === "Make This Your Spot") return ["Make This", "Your Spot"];
   if (heading === "Your Crew, Your Bar") return ["Your Crew,", "Your Bar"];
@@ -213,14 +223,19 @@ export default function AltHeroCarousel() {
                 </div>
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#071B2F]/75 via-[#071B2F]/20 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#05070B]/80 to-transparent" />
+            {!slide.bannerOnly && (
+              <>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#071B2F]/75 via-[#071B2F]/20 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#05070B]/80 to-transparent" />
+              </>
+            )}
           </div>
         );
       })}
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 top-[48%] z-10 flex flex-col justify-end p-5 pb-14 sm:top-[46%] sm:p-10 sm:pb-20">
-        <div className="max-w-5xl pr-4 sm:max-w-[min(100%,42rem)]">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 top-[28%] z-10 flex flex-col justify-end p-5 pb-14 sm:top-[24%] sm:p-10 sm:pb-20 lg:top-[22%]">
+        {!activeSlide.bannerOnly && (
+        <div className="max-w-5xl pr-16 sm:max-w-[min(100%,42rem)] sm:pr-4">
           <p className="mb-4 flex w-fit items-center gap-2 rounded-full border border-[#D4AF37]/35 bg-[#071B2F] px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-[#F2EAD4]">
             {activeSlide.badge && <span className="h-2 w-2 rounded-full bg-white" />}
             {activeSlide.label}
@@ -229,18 +244,29 @@ export default function AltHeroCarousel() {
             key={activeSlide.id}
             className="transition-all duration-500 ease-out motion-reduce:transition-none"
           >
-            <h1 className="font-montserrat text-[clamp(2.75rem,9vw,10rem)] font-black uppercase leading-[0.82] tracking-[-0.08em] text-[#F2EAD4]">
+            <h1 className="font-montserrat text-[clamp(2.5rem,7.5vw,6.5rem)] font-black uppercase leading-[0.84] tracking-[-0.08em] text-[#F2EAD4] xl:text-[clamp(2.75rem,6vw,7rem)]">
               {splitHeading(activeSlide.heading).map((line) => (
                 <span key={line} className="block">
                   {line}
                 </span>
               ))}
             </h1>
-            <p className="mt-5 max-w-xl text-sm font-semibold leading-relaxed text-white sm:text-base">
+            <p className="mt-4 max-w-md text-sm font-semibold leading-relaxed text-white sm:mt-5 sm:max-w-xl sm:text-base">
               {activeSlide.subheading}
             </p>
+            {activeSlide.ctaHref === orderUrl ? (
+              <a
+                href={orderUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pointer-events-auto mt-5 inline-flex rounded-full border-2 border-[#D4AF37] bg-[#D4AF37] px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-[#05070B] shadow-lg transition-transform hover:scale-[1.02] sm:mt-6"
+              >
+                {activeSlide.ctaLabel}
+              </a>
+            ) : null}
           </div>
         </div>
+        )}
 
         <button
           type="button"

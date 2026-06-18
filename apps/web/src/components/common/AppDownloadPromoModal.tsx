@@ -121,7 +121,7 @@ export default function AppDownloadPromoModal() {
                     id="open-announcement-description"
                     className="mt-4 text-base font-medium leading-relaxed text-gray-300"
                   >
-                    Wings, craft pizza, cold drinks, and 14 HD screens. Pull up to 1757 Woodruff Rd, order takeout online, or get delivery on DoorDash.
+                    Wings, craft pizza, and cold drinks on Woodruff Road. Order takeout online or get delivery on DoorDash.
                   </Dialog.Description>
 
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">

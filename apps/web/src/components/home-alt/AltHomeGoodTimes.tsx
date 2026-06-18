@@ -21,8 +21,8 @@ export default function AltHomeGoodTimes() {
 
         <div className="max-w-xl">
           <p className="mb-6 text-sm font-semibold leading-relaxed text-[#05070B]/75">
-            Scratch-made pizza, jumbo wings, cold pours, and sports on the screens — pull up
-            for dine-in, takeout, or the watch party your crew keeps coming back for.
+            Scratch-made pizza, jumbo wings, and cold pours for dine-in, takeout, or your next
+            watch party.
           </p>
           <a
             href={orderUrl}

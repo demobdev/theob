@@ -42,7 +42,7 @@ const Footer = () => {
           <div className="space-y-8">
             <Logo />
             <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-xs">
-              Now open on Woodruff Road. Scratch-made food, cold drinks, and game day on 14 HD screens.
+              Now open on Woodruff Road. Scratch-made food, cold drinks, and game-day energy.
             </p>
             <div className="flex gap-4">
               {socialLinks.map(({ icon: Icon, href, label }) => (
