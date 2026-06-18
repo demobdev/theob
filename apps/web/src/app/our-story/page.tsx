@@ -65,7 +65,7 @@ export default function OurStoryPage() {
             <div className="absolute bottom-0 right-0 h-[46%] w-[58%] overflow-hidden rounded-[20px] border-2 border-[#D4AF37]/25 shadow-xl">
               <Image
                 src="/don-vik-denny.jpg"
-                alt="Owners Don Bailey, Denny Nepton, and Vik Tanksale"
+                alt="Owners Don Bailey, Denis Nepton, and Vik Tanksale"
                 fill
                 className="object-cover"
                 style={{ objectPosition: "center 20%" }}
@@ -77,7 +77,7 @@ export default function OurStoryPage() {
           <div className="max-w-2xl space-y-6 text-sm font-semibold leading-relaxed text-[#05070B]/72 sm:text-base">
             <p>
               <strong className="text-[#05070B]">The Owner&apos;s Box Bar & Grill</strong> was born from a friendship that spans over two decades.
-              Don Bailey, Denny Nepton, and Vik Tanksale first met walking the hallways of Mauldin Middle School, later graduating together as lifelong friends from Mauldin High.
+              Don Bailey, Denis Nepton, and Vik Tanksale first met walking the hallways of Mauldin Middle School, later graduating together as lifelong friends from Mauldin High.
             </p>
             <p>
               Through college, careers, and the busy rhythms of life, their bond remained unchanged—anchored by a shared love for sports, great food, and their local community.
@@ -109,65 +109,6 @@ export default function OurStoryPage() {
                 Order Now
               </a>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Owners/Founders Section */}
-      <section className="bg-[#0A0D14] px-4 py-20 text-white sm:px-6">
-        <div className="mx-auto max-w-[1600px]">
-          <div className="mb-16 text-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#D4AF37] mb-3">
-              The Team Behind the Box
-            </p>
-            <h2 className="font-montserrat text-4xl font-black uppercase tracking-tight sm:text-5xl text-white">
-              Meet The Owners
-            </h2>
-            <div className="mx-auto mt-4 h-1 w-20 bg-[#D4AF37]" />
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-3">
-            {[
-              {
-                name: "Don Bailey",
-                role: "Co-Owner / Founder",
-                bio: "A proud Mauldin High alumnus, Don's vision for The Owner's Box was to create the ultimate game-day living room for Greenville sports fans—combining high-end screens with the welcoming energy of a local neighborhood clubhouse.",
-              },
-              {
-                name: "Denny Nepton",
-                role: "Co-Owner / Founder",
-                bio: "Denny's journey from Mauldin Middle to co-owner of the Box is fueled by his commitment to service. He manages guest relations and logistics, ensuring every visitor feels like a regular from day one.",
-              },
-              {
-                name: "Vik Tanksale",
-                role: "Co-Owner / Founder",
-                bio: "Vik leads the culinary standards and kitchen operations. Drawing on a shared lifetime of sports watch parties, he ensures that scratch-made pizzas, gourmet burgers, and the best wings in Greenville are served hot every day.",
-              },
-            ].map((owner, idx) => (
-              <div
-                key={idx}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#121620] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#D4AF37]/50 hover:shadow-2xl"
-              >
-                <div>
-                  <div className="relative mb-6 aspect-[4/5] overflow-hidden rounded-2xl border border-white/5 bg-neutral-900/50 flex items-center justify-center">
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-center p-4">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-[#D4AF37]">
-                        Photo Pending
-                      </span>
-                    </div>
-                  </div>
-                  <h3 className="font-montserrat text-2xl font-bold uppercase tracking-tight text-white group-hover:text-[#D4AF37] transition-colors">
-                    {owner.name}
-                  </h3>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37]/80 mt-1">
-                    {owner.role}
-                  </p>
-                  <p className="mt-4 text-sm leading-relaxed text-gray-300">
-                    {owner.bio}
-                  </p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
