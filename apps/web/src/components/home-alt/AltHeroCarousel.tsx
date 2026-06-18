@@ -39,19 +39,6 @@ const firstHeroSlide: HeroSlide = {
 const heroSlides: HeroSlide[] = [
   firstHeroSlide,
   {
-    id: "world-cup",
-    label: "This Friday · June 19 · 3 PM ET",
-    heading: "World Cup Watch Party",
-    subheading: "USA vs Australia on every screen. Pull up early, grab a seat, and rep the red, white & blue with the crew.",
-    ctaHref: "/private-events",
-    ctaLabel: "Book A Spot",
-    image: "/images/world-cup-watch-party.JPEG",
-    imageAlt: "World Cup Watch Party — USA vs Australia at The Owner's Box",
-    objectPosition: "left center",
-    badge: "⚽ FIFA World Cup",
-    bannerOnly: true,
-  },
-  {
     id: "cocktails",
     label: "Craft Cocktails",
     heading: "Delicious Cocktails",

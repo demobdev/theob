@@ -24,6 +24,7 @@ export const UPCOMING_EVENTS: UpcomingEvent[] = [
     time: "3:00 PM",
     tag: "⚽ World Cup",
     image: "/images/world-cup-watch-party.JPEG",
+    published: false,
   },
   {
     id: "mlb-sunday-brunch",
