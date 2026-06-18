@@ -15,7 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export const MENU_IMAGE_URL = "/images/menu_new.png";
-export const MENU_PDF_URL = "/menu_new.pdf";
+export const MENU_PDF_URL = "/menu.pdf";
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 4;
