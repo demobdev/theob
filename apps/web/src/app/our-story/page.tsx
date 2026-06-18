@@ -42,7 +42,7 @@ export default function OurStoryPage() {
                 Story
               </h1>
               <p className="mt-5 max-w-xl text-sm font-semibold leading-relaxed text-white/78 sm:text-base">
-                Born from a 20-year friendship that started at Mauldin Middle School, built for sports fans, families, and regulars in Greenville.
+                Built by three lifelong friends who grew up together in Mauldin.
               </p>
             </div>
           </div>
