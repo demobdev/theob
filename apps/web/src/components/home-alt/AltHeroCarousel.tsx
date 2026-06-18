@@ -58,7 +58,7 @@ const heroSlides: HeroSlide[] = [
     subheading: "Fresh pours and cold glasses at the bar.",
     ctaHref: orderUrl,
     ctaLabel: "Order Takeout",
-    image: "/images/food/esspresso-martini.JPG",
+    image: "/images/drinks/esspresso-martini.JPG",
     imageAlt: "Espresso martini at The Owner's Box bar",
     objectPosition: "center 45%",
     badge: "Cold Drinks",

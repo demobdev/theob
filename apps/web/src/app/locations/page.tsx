@@ -64,7 +64,7 @@ const featureTiles = [
 
 const galleryImages = [
   "/images/couple-at-bar.png.jpg",
-  "/images/food/esspresso-martini.JPG",
+  "/images/drinks/esspresso-martini.JPG",
   "/images/food/official/featured-pizza.png",
   "/images/food/official/lamb-gyro.jpg",
   "/images/food/official/bang-bang-shrimp-3.png",
@@ -75,7 +75,7 @@ const galleryImages = [
   "/images/atmosphere/ob-front.png",
   "/images/food/official/crab-dip.png",
   "/images/food/official/beer-classic.jpg",
-  "/images/food/espresso-martini-2.jpg",
+  "/images/drinks/espresso-martini-2.jpg",
   "/images/food/official/late-night-fun.jpg",
   "/images/food/bar-guest-friends.jpg",
   "/images/food/official/staff.jpg",
@@ -87,7 +87,7 @@ const galleryImages = [
 
 const galleryImageAlts: Record<string, string> = {
   "/images/couple-at-bar.png.jpg": "Couple at the bar",
-  "/images/food/esspresso-martini.JPG": "Espresso martini",
+  "/images/drinks/esspresso-martini.JPG": "Espresso martini",
   "/images/food/official/featured-pizza.png": "Featured pizza",
   "/images/food/official/lamb-gyro.jpg": "Lamb gyro with fries",
   "/images/food/official/hand-fry-dipped.jpg": "Gyro, fries, and a dip at the bar",
@@ -99,7 +99,7 @@ const galleryImageAlts: Record<string, string> = {
   "/images/atmosphere/ob-front.png": "The Owner's Box storefront at night",
   "/images/food/official/crab-dip.png": "Crab dip with pita chips",
   "/images/food/official/beer-classic.jpg": "Cold beer and a shot at the bar",
-  "/images/food/espresso-martini-2.jpg": "Espresso martini at the bar",
+  "/images/drinks/espresso-martini-2.jpg": "Espresso martini at the bar",
   "/images/food/official/late-night-fun.jpg": "Friends enjoying a late night at the bar",
   "/images/food/bar-guest-friends.jpg": "Guests smiling at the bar",
   "/images/food/official/staff.jpg": "The Owner's Box staff",

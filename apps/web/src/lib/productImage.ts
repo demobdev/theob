@@ -83,7 +83,7 @@ export const REAL_IMAGE_OVERRIDES: Record<string, string> = {
   pancakes: "/images/food/official/scratch-made.png",
   breakfast_skillet: "/images/food/official/scratch-made.png",
   beer: "/images/food/official/beer-classic.jpg",
-  cocktail: "/images/food/espresso-martini-2.jpg",
+  cocktail: "/images/drinks/espresso-martini-2.jpg",
 };
 
 const DRINK_LIKE = new Set([

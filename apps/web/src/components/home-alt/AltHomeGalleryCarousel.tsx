@@ -58,7 +58,7 @@ const galleryImages = [
     shape: "square" as const,
   },
   {
-    src: "/images/food/espresso-martini-2.jpg",
+    src: "/images/drinks/espresso-martini-2.jpg",
     alt: "Espresso martini at the bar",
     shape: "tall" as const,
   },
