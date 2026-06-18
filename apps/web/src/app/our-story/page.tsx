@@ -52,8 +52,8 @@ export default function OurStoryPage() {
 
       <section className="ob-canvas bg-white px-4 py-16 text-[#05070B] sm:px-6">
         <div className="mx-auto grid max-w-[1600px] gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          <div className="relative min-h-[420px] overflow-hidden rounded-[28px] border-2 border-[#D4AF37]/35 bg-[#171713] shadow-2xl">
-            <div className="absolute left-0 top-0 h-[64%] w-[68%] overflow-hidden rounded-[24px] border-2 border-[#D4AF37]/25">
+          <div className="relative min-h-[420px]">
+            <div className="absolute left-0 top-0 h-[64%] w-[68%] overflow-hidden rounded-[24px] border-2 border-[#D4AF37]/25 shadow-lg">
               <Image
                 src="/images/atmosphere/big-wall-left-1.jpg"
                 alt="Wall-to-wall sports screens at The Owner's Box"
@@ -62,7 +62,7 @@ export default function OurStoryPage() {
                 sizes="(max-width: 1024px) 70vw, 460px"
               />
             </div>
-            <div className="absolute bottom-0 right-0 h-[46%] w-[58%] overflow-hidden rounded-[20px] border-2 border-[#D4AF37]/25">
+            <div className="absolute bottom-0 right-0 h-[46%] w-[58%] overflow-hidden rounded-[20px] border-2 border-[#D4AF37]/25 shadow-xl">
               <Image
                 src="/images/atmosphere/bar-guest-friends.jpg"
                 alt="Guests enjoying The Owner's Box bar"
@@ -76,19 +76,19 @@ export default function OurStoryPage() {
 
           <div className="max-w-2xl space-y-6 text-sm font-semibold leading-relaxed text-[#05070B]/72 sm:text-base">
             <p>
-              <strong className="text-[#05070B]">The Owner&apos;s Box Bar & Grill</strong> is
-              Greenville&apos;s home for big games, cold drinks, and scratch-made food done right.
-              We built the Box for regulars — people who want great wings, craft pizza, and a seat
-              where the matchup actually matters.
+              <strong className="text-[#05070B]">The Owner&apos;s Box Bar & Grill</strong> was founded by
+              Don Bailey, Denny Nepton, and Vik Tanksale to be Greenville&apos;s premier upscale sports lounge.
+              They built the Box for regulars — sports fans, families, and food lovers who want scratch-made meals
+              done right, and a seat where every matchup actually matters.
             </p>
             <p>
-              Wall-to-wall screens, NFL Sunday Ticket, and a kitchen that doesn&apos;t cut
-              corners. Whether you&apos;re in for lunch, brunch, or a late-night finish, you get
-              real hospitality and a menu built for sharing.
+              With wall-to-wall screens, NFL Sunday Ticket, premium audio, and a kitchen that never cuts
+              corners, they set out to redefine the neighborhood sports bar experience. From lunch and Sunday brunch to late-night drinks,
+              it is a room built for community and sharing.
             </p>
             <p>
-              Browse the menu on our site, order takeout through Heartland, or get delivery on
-              DoorDash. One location on Woodruff Road — pull up for the full experience.
+              Browse the menu on our site, order takeout, or pull up to the bar on Woodruff Road to experience
+              the difference.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-4">
@@ -113,6 +113,65 @@ export default function OurStoryPage() {
                 Order Now
               </a>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Owners/Founders Section */}
+      <section className="bg-[#0A0D14] px-4 py-20 text-white sm:px-6">
+        <div className="mx-auto max-w-[1600px]">
+          <div className="mb-16 text-center">
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#D4AF37] mb-3">
+              The Team Behind the Box
+            </p>
+            <h2 className="font-montserrat text-4xl font-black uppercase tracking-tight sm:text-5xl text-white">
+              Meet The Owners
+            </h2>
+            <div className="mx-auto mt-4 h-1 w-20 bg-[#D4AF37]" />
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {[
+              {
+                name: "Don Bailey",
+                role: "Co-Owner / Founder",
+                bio: "Don is passionate about creating a high-quality community space where Greenville sports fans can gather, relax, and enjoy premium hospitality.",
+              },
+              {
+                name: "Denny Nepton",
+                role: "Co-Owner / Founder",
+                bio: "Denny oversees the customer experience and operations, ensuring that every visit to the Box feels welcoming and every game is clear on the wall.",
+              },
+              {
+                name: "Vik Tanksale",
+                role: "Co-Owner / Founder",
+                bio: "Vik leads the culinary vision and standards, keeping the kitchen focused on fresh ingredients, scratch-made pizzas, and the best wings in town.",
+              },
+            ].map((owner, idx) => (
+              <div
+                key={idx}
+                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#121620] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#D4AF37]/50 hover:shadow-2xl"
+              >
+                <div>
+                  <div className="relative mb-6 aspect-[4/5] overflow-hidden rounded-2xl border border-white/5 bg-neutral-900/50 flex items-center justify-center">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-center p-4">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-[#D4AF37]">
+                        Photo Pending
+                      </span>
+                    </div>
+                  </div>
+                  <h3 className="font-montserrat text-2xl font-bold uppercase tracking-tight text-white group-hover:text-[#D4AF37] transition-colors">
+                    {owner.name}
+                  </h3>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37]/80 mt-1">
+                    {owner.role}
+                  </p>
+                  <p className="mt-4 text-sm leading-relaxed text-gray-300">
+                    {owner.bio}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
