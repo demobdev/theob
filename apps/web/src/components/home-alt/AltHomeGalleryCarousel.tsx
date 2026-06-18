@@ -68,7 +68,7 @@ const galleryImages = [
     shape: "square" as const,
   },
   {
-    src: "/images/food/bar-guest-friends.jpg",
+    src: "/images/atmosphere/bar-guest-friends.jpg",
     alt: "Guests smiling at The Owner's Box bar",
     shape: "square" as const,
   },

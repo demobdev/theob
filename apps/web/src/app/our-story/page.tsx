@@ -64,7 +64,7 @@ export default function OurStoryPage() {
             </div>
             <div className="absolute bottom-0 right-0 h-[46%] w-[58%] overflow-hidden rounded-[20px] border-2 border-[#D4AF37]/25">
               <Image
-                src="/images/food/bar-guest-friends.jpg"
+                src="/images/atmosphere/bar-guest-friends.jpg"
                 alt="Guests enjoying The Owner's Box bar"
                 fill
                 className="object-cover"
