@@ -47,7 +47,7 @@ const heroSlides: HeroSlide[] = [
     ctaLabel: "Book A Spot",
     image: "/images/world-cup-watch-party.JPEG",
     imageAlt: "World Cup Watch Party — USA vs Australia at The Owner's Box",
-    objectPosition: "center 40%",
+    objectPosition: "left center",
     badge: "⚽ FIFA World Cup",
     bannerOnly: true,
   },
@@ -182,7 +182,7 @@ export default function AltHeroCarousel() {
 
   return (
     <div
-      className="relative min-h-[420px] overflow-hidden rounded-[24px] border-2 border-[#171713]/10 bg-[#101014] sm:min-h-[560px] md:min-h-[70vh] lg:min-h-[78vh] xl:min-h-[82vh] 2xl:min-h-[860px]"
+      className="relative min-h-[420px] overflow-hidden bg-[#101014] sm:min-h-[560px] md:min-h-[70vh] lg:min-h-[78vh] xl:min-h-[82vh] 2xl:min-h-[860px]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => {
         if (!manualControl) setIsPaused(false);
