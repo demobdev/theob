@@ -48,17 +48,20 @@ const featureTiles = [
     text: "Cold drinks and a room built for regulars.",
     image: "/images/atmosphere/cinematic-dtl-1.jpg",
     imagePosition: "center 28%",
+    bgTexture: "/images/textures/baseball-stitch-surface.png",
   },
   {
     title: "Cold Drinks",
     text: "Craft cocktails, beer, and wine for dine-in — easy hangs and Greenville nights out.",
     image: "/images/couple-at-bar.png.jpg",
     imagePosition: "center 35%",
+    bgTexture: "/images/textures/cold-drinks-surface.png",
   },
   {
     title: "Good Eats",
     text: "Pizza, wings, shareables, and bar favorites.",
     image: "/images/food/official/featured-pizza.png",
+    bgTexture: "/images/textures/fork-and-knife-big.png",
   },
 ];
 
@@ -153,17 +156,24 @@ function FeatureImageTile({
 function FeatureCopyTile({
   title,
   text,
+  bgTexture,
   className = "",
 }: {
   title: string;
   text: string;
+  bgTexture?: string;
   className?: string;
 }) {
   return (
     <div
       className={`relative flex min-h-[300px] flex-col items-center justify-center bg-[#101014] p-8 text-center text-white sm:min-h-[360px] lg:h-[400px] ${className}`}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[url('/images/textures/noise.svg')] opacity-40 mix-blend-overlay"></div>
+      {bgTexture && (
+        <div
+          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: `url('${bgTexture}')` }}
+        ></div>
+      )}
       <div className="relative z-10 flex flex-col items-center">
         <h3 className="font-montserrat text-4xl font-black uppercase leading-[0.85] tracking-[-0.06em] sm:text-5xl">
           {title}
@@ -368,11 +378,11 @@ export default function LocationsPage() {
               title={featureTiles[0]!.title}
               imagePosition={featureTiles[0]!.imagePosition}
             />
-            <FeatureCopyTile title={featureTiles[0]!.title} text={featureTiles[0]!.text} />
+            <FeatureCopyTile title={featureTiles[0]!.title} text={featureTiles[0]!.text} bgTexture={featureTiles[0]!.bgTexture} />
           </div>
 
           <div className="grid">
-            <FeatureCopyTile title={featureTiles[1]!.title} text={featureTiles[1]!.text} />
+            <FeatureCopyTile title={featureTiles[1]!.title} text={featureTiles[1]!.text} bgTexture={featureTiles[1]!.bgTexture} />
             <FeatureImageTile
               src={featureTiles[1]!.image}
               title={featureTiles[1]!.title}
@@ -388,6 +398,7 @@ export default function LocationsPage() {
             <FeatureCopyTile
               title={featureTiles[2]!.title}
               text={featureTiles[2]!.text}
+              bgTexture={featureTiles[2]!.bgTexture}
             />
           </div>
         </div>
