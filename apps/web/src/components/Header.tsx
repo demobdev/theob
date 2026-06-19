@@ -16,7 +16,7 @@ import { ExternalLink } from "lucide-react";
 import DoorDashButton from "./common/DoorDashButton";
 
 const navigation = [
-  { name: "Menu", href: "/menu" },
+  { name: "Menu", href: "/#" },
   { name: "Live Games", href: "/games" },
   { name: "Visit Us", href: "/locations" },
 ];
@@ -51,7 +51,7 @@ export default function Header() {
 
           <div className="hidden sm:flex gap-3 items-center flex-wrap justify-end">
             {!isMenuPage && (
-              <Link href="/menu" className="hover:opacity-70 transition-opacity italic">
+              <Link href="/#" className="hover:opacity-70 transition-opacity italic">
                 View Menu
               </Link>
             )}
@@ -127,7 +127,7 @@ export default function Header() {
                   {user ? (
                     <div className="flex items-center gap-3">
                       {!isMenuPage && (
-                        <Link href="/menu">
+                        <Link href="/#">
                           <button className="bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] px-5 py-3 rounded-xl hover:bg-white/10 transition-all">
                             View Menu
                           </button>
@@ -152,7 +152,7 @@ export default function Header() {
                         Sign In
                       </Link>
                       {!isMenuPage && (
-                        <Link href="/menu">
+                        <Link href="/#">
                           <button className="bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] px-5 py-3 rounded-xl hover:bg-white/10 transition-all">
                             View Menu
                           </button>
@@ -234,7 +234,7 @@ export default function Header() {
                       Sign Out
                     </DisclosureButton>
                   )}
-                  <Link href="/menu">
+                  <Link href="/#">
                     <DisclosureButton className="w-full py-5 text-center text-white font-black uppercase tracking-widest rounded-2xl border border-white/10 hover:border-[#D4AF37]/30 transition-all">
                       View Menu
                     </DisclosureButton>

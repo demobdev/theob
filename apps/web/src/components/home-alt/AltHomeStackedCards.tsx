@@ -20,7 +20,7 @@ function cardShellClass(index: number, isLast: boolean, body: string): string {
         ? `${STACK_SCROLL.middleCardHeightParty} ${STACK_SCROLL.cardOverlapMargin}`
         : `${STACK_SCROLL.middleCardHeight} ${STACK_SCROLL.cardOverlapMargin}`;
 
-  const overflowClass = isLast ? "overflow-visible" : "overflow-hidden";
+  const overflowClass = "overflow-hidden";
 
   return `sticky isolate ${overflowClass} rounded-[28px] border-2 border-[#D4AF37]/45 shadow-[0_30px_90px_rgba(0,0,0,0.35)] ${body} ${heightClass}`;
 }

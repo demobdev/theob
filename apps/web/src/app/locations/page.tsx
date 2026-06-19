@@ -53,7 +53,7 @@ const featureTiles = [
     title: "Cold Drinks",
     text: "Craft cocktails, beer, and wine for dine-in — easy hangs and Greenville nights out.",
     image: "/images/couple-at-bar.png.jpg",
-    imagePosition: "center 62%",
+    imagePosition: "center 35%",
   },
   {
     title: "Good Eats",
@@ -64,7 +64,7 @@ const featureTiles = [
 
 const galleryImages = [
   "/images/couple-at-bar.png.jpg",
-  "/images/drinks/esspresso-martini.JPG",
+  "/images/drinks/espresso-martini-2.jpg",
   "/images/food/official/featured-pizza.png",
   "/images/food/official/lamb-gyro.jpg",
   "/images/food/official/bang-bang-shrimp-3.png",
@@ -87,7 +87,7 @@ const galleryImages = [
 
 const galleryImageAlts: Record<string, string> = {
   "/images/couple-at-bar.png.jpg": "Couple at the bar",
-  "/images/drinks/esspresso-martini.JPG": "Espresso martini",
+  "/images/drinks/espresso-martini-2.jpg": "Espresso martini",
   "/images/food/official/featured-pizza.png": "Featured pizza",
   "/images/food/official/lamb-gyro.jpg": "Lamb gyro with fries",
   "/images/food/official/hand-fry-dipped.jpg": "Gyro, fries, and a dip at the bar",
@@ -162,14 +162,17 @@ function FeatureCopyTile({
 }) {
   return (
     <div
-      className={`flex min-h-[300px] flex-col items-center justify-center bg-[#101014] p-8 text-center text-white sm:min-h-[360px] lg:h-[400px] ${className}`}
+      className={`relative flex min-h-[300px] flex-col items-center justify-center bg-[#101014] p-8 text-center text-white sm:min-h-[360px] lg:h-[400px] ${className}`}
     >
-      <h3 className="font-montserrat text-4xl font-black uppercase leading-[0.85] tracking-[-0.06em] sm:text-5xl">
-        {title}
-      </h3>
-      <p className="mx-auto mt-5 max-w-xs text-xs font-semibold leading-relaxed text-white/62">
-        {text}
-      </p>
+      <div className="pointer-events-none absolute inset-0 bg-[url('/images/textures/noise.svg')] opacity-40 mix-blend-overlay"></div>
+      <div className="relative z-10 flex flex-col items-center">
+        <h3 className="font-montserrat text-4xl font-black uppercase leading-[0.85] tracking-[-0.06em] sm:text-5xl">
+          {title}
+        </h3>
+        <p className="mx-auto mt-5 max-w-xs text-xs font-semibold leading-relaxed text-white/62">
+          {text}
+        </p>
+      </div>
     </div>
   );
 }
@@ -188,21 +191,13 @@ function geoErrorMessage(code: number): string {
 }
 
 function LocationsGalleryMarquee({ images }: { images: string[] }) {
-  const [isPaused, setIsPaused] = useState(false);
-  const carouselImages = [...images, ...images];
-
   return (
-    <section className="ob-canvas overflow-hidden bg-white pb-16">
-      <div
-        className={`flex w-max gap-4 px-4 ${isPaused ? "" : "animate-marquee-slow"}`}
-      >
-        {carouselImages.map((src, index) => (
-          <button
-            type="button"
+    <section className="ob-canvas bg-white pb-16">
+      <div className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 no-scrollbar">
+        {images.map((src, index) => (
+          <div
             key={`${src}-${index}`}
-            onClick={() => setIsPaused((paused) => !paused)}
-            aria-label={isPaused ? "Resume gallery scroll" : "Pause gallery scroll"}
-            className="relative h-40 w-40 shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-[#05070B]/10 bg-white sm:h-56 sm:w-56"
+            className="relative h-40 w-40 shrink-0 snap-start overflow-hidden rounded-2xl border border-[#05070B]/10 bg-white sm:h-56 sm:w-56"
           >
             <Image
               src={src}
@@ -211,7 +206,7 @@ function LocationsGalleryMarquee({ images }: { images: string[] }) {
               className="object-cover transition-transform duration-500 hover:scale-105"
               sizes="224px"
             />
-          </button>
+          </div>
         ))}
       </div>
     </section>

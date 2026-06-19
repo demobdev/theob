@@ -42,12 +42,12 @@ const heroSlides: HeroSlide[] = [
     id: "cocktails",
     label: "Craft Cocktails",
     heading: "Delicious Cocktails",
-    subheading: "Fresh pours and cold glasses at the bar.",
+    subheading: "Handcrafted drinks and signature mixes at the bar.",
     ctaHref: orderUrl,
     ctaLabel: "Order Takeout",
     image: "/images/drinks/esspresso-martini.JPG",
-    imageAlt: "Espresso martini at The Owner's Box bar",
-    objectPosition: "center 45%",
+    imageAlt: "Espresso martini with espresso beans at The Owner's Box bar",
+    objectPosition: "center 50%",
     badge: "Cold Drinks",
   },
   {
@@ -95,7 +95,7 @@ const heroSlides: HeroSlide[] = [
     ctaLabel: "Visit Us",
     image: "/images/atmosphere/ob-front.png",
     imageAlt: "The Owner's Box storefront on Woodruff Road at night",
-    objectPosition: "center 42%",
+    objectPosition: "center top",
     badge: "Your Neighborhood Bar",
   },
   {
@@ -105,8 +105,8 @@ const heroSlides: HeroSlide[] = [
     subheading: "When the game ends and the room is still buzzing.",
     ctaHref: "/private-events",
     ctaLabel: "Book A Party",
-    image: "/images/food/official/late-night-fun.jpg",
-    imageAlt: "Friends enjoying drinks at The Owner's Box bar",
+    image: "/images/atmosphere/friends-and-family.jpg",
+    imageAlt: "A group of friends hanging out at The Owner's Box bar",
     objectPosition: "center 40%",
     badge: "Late Night Fun",
   },
@@ -159,13 +159,9 @@ export default function AltHeroCarousel() {
   }, []);
 
   useEffect(() => {
-    if (isPaused) return;
-
-    const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % heroSlides.length);
-    }, 6500);
-    return () => window.clearInterval(timer);
-  }, [isPaused]);
+    // Auto-advance disabled per user request
+    return () => {};
+  }, []);
 
   return (
     <div

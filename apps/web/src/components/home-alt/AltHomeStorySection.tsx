@@ -5,17 +5,18 @@ export default function AltHomeStorySection() {
   return (
     <section
       id="our-story"
-      className="ob-canvas relative z-10 overflow-hidden bg-white px-4 py-20 text-[#05070B] sm:px-6"
+      className="ob-canvas relative z-10 overflow-hidden bg-[url('/images/textures/wood_texture.png')] bg-cover bg-center px-4 py-20 text-white sm:px-6"
     >
-      <div className="mx-auto max-w-[1600px]">
-        <div className="mb-10 overflow-hidden border-y border-[#05070B]/10 bg-white py-2">
+      <div className="absolute inset-0 bg-black/60 mix-blend-multiply pointer-events-none" />
+      <div className="relative mx-auto max-w-[1600px] z-10">
+        <div className="mb-10 overflow-hidden border-y border-white/10 py-2 backdrop-blur-sm bg-black/20">
           <div className="flex w-max animate-marquee items-center whitespace-nowrap">
             {[...Array(4)].map((_, index) => (
               <div key={index} className="flex items-center">
-                <span className="px-6 font-montserrat text-5xl font-black uppercase tracking-[-0.06em] text-[#05070B] sm:text-7xl">
+                <span className="px-6 font-montserrat text-5xl font-black uppercase tracking-[-0.06em] text-white sm:text-7xl">
                   Good Times
                 </span>
-                <span className="px-6 font-montserrat text-5xl font-black uppercase tracking-[-0.06em] text-[#05070B] sm:text-7xl">
+                <span className="px-6 font-montserrat text-5xl font-black uppercase tracking-[-0.06em] text-white sm:text-7xl">
                   Good Eats
                 </span>
               </div>
@@ -50,21 +51,21 @@ export default function AltHomeStorySection() {
           </div>
 
           <div className="max-w-xl lg:justify-self-center">
-            <p className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-[#05070B]/60">
+            <p className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-[#D4AF37]">
               Since the first pour
             </p>
-            <h2 className="font-montserrat text-[clamp(3.8rem,8vw,8rem)] font-black uppercase leading-[0.78] tracking-[-0.08em]">
+            <h2 className="font-montserrat text-[clamp(3.8rem,8vw,8rem)] font-black uppercase leading-[0.78] tracking-[-0.08em] text-white">
               Built For
               <br />
               Game Day
             </h2>
-            <p className="mt-7 text-sm font-semibold leading-relaxed text-[#05070B]/70 sm:text-base">
+            <p className="mt-7 text-sm font-semibold leading-relaxed text-white/80 sm:text-base">
               When the game&apos;s on and your crew wants a spot worth showing up for, this is the
               room. Grab a seat, pick your wall, and make it a good night out.
             </p>
             <Link
               href="/our-story"
-              className="mt-8 inline-flex rounded-full border-2 border-[#05070B] px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-colors hover:bg-[#05070B] hover:text-white"
+              className="mt-8 inline-flex rounded-full border-2 border-white px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-[#05070B]"
             >
               Our Story
             </Link>
