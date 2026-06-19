@@ -99,7 +99,6 @@ const galleryImageAlts: Record<string, string> = {
   "/images/atmosphere/ob-front.png": "The Owner's Box storefront at night",
   "/images/food/official/crab-dip.png": "Crab dip with pita chips",
   "/images/food/official/beer-classic.jpg": "Cold beer and a shot at the bar",
-  "/images/drinks/espresso-martini-2.jpg": "Espresso martini at the bar",
   "/images/food/official/late-night-fun.jpg": "Friends enjoying a late night at the bar",
   "/images/atmosphere/bar-guest-friends.jpg": "Guests smiling at the bar",
   "/images/food/official/staff.jpg": "The Owner's Box staff",
