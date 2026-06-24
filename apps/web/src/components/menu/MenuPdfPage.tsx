@@ -56,7 +56,7 @@ export default function MenuPdfPage() {
         </div>
       </div>
 
-      <AltHomeGalleryCarousel />
+      <AltHomeGalleryCarousel variant="foodOnly" />
       <AltHomeFooter />
     </main>
   );

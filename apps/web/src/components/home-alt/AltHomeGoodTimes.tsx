@@ -55,7 +55,7 @@ export default function AltHomeGoodTimes() {
               src="/images/drinks/espresso-martini-2.jpg"
               alt="Espresso martini and specialty cocktails at the bar"
               fill
-              className="object-cover object-[center_40%]"
+              className="object-cover object-[center_28%]"
               sizes="(max-width: 768px) 100vw, 360px"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />

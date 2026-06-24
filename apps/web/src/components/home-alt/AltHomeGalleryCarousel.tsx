@@ -1,118 +1,160 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 
 /** ~95s per full loop at typical desktop widths (matches marquee-extra-slow feel). */
 const AUTO_SCROLL_PX_PER_SEC = 58;
 
-const galleryImages = [
+type GalleryImage = {
+  src: string;
+  alt: string;
+  shape: "square" | "tall";
+  category: "food" | "atmosphere";
+};
+
+export type AltHomeGalleryCarouselVariant = "all" | "foodOnly";
+
+type AltHomeGalleryCarouselProps = {
+  variant?: AltHomeGalleryCarouselVariant;
+};
+
+const galleryImages: GalleryImage[] = [
   {
     src: "/images/food/official/bang-bang-shrimp-3.png",
     alt: "Bang Bang Shrimp appetizer",
-    shape: "square" as const,
+    shape: "square",
+    category: "food",
   },
   {
     src: "/images/food/official/crab-dip.png",
     alt: "Crab dip with grilled pita chips",
-    shape: "square" as const,
+    shape: "square",
+    category: "food",
   },
   {
     src: "/images/food/official/lamb-gyro.jpg",
     alt: "Lamb gyro with fries",
-    shape: "square" as const,
+    shape: "square",
+    category: "food",
   },
   {
     src: "/images/atmosphere/ob-front.png",
     alt: "The Owner's Box storefront at night",
-    shape: "square" as const,
+    shape: "square",
+    category: "atmosphere",
   },
   {
     src: "/images/atmosphere/dtl-1.jpg",
     alt: "Down-the-line bar view",
-    shape: "tall" as const,
+    shape: "tall",
+    category: "atmosphere",
   },
   {
     src: "/images/food/official/buffalo-pizza.jpg",
     alt: "Buffalo chicken pizza",
-    shape: "square" as const,
+    shape: "square",
+    category: "food",
   },
   {
     src: "/images/food/buffalo-wings.png",
     alt: "Classic buffalo wings",
-    shape: "square" as const,
+    shape: "square",
+    category: "food",
   },
   {
     src: "/images/food/garlic-parm-wings.png",
     alt: "Garlic parmesan wings",
-    shape: "square" as const,
+    shape: "square",
+    category: "food",
   },
   {
     src: "/images/food/lemon-pepper-wings-2.png",
     alt: "Lemon pepper wings",
-    shape: "square" as const,
+    shape: "square",
+    category: "food",
   },
   {
     src: "/images/food/official/beer-classic.jpg",
     alt: "Cold beer and a shot at the bar",
-    shape: "square" as const,
+    shape: "square",
+    category: "food",
   },
   {
     src: "/images/drinks/espresso-martini-2.jpg",
     alt: "Espresso martini at the bar",
-    shape: "tall" as const,
+    shape: "tall",
+    category: "food",
   },
   {
     src: "/images/food/official/late-night-fun.jpg",
     alt: "Friends enjoying a late night at the bar",
-    shape: "square" as const,
+    shape: "square",
+    category: "atmosphere",
   },
   {
     src: "/images/atmosphere/bar-guest-friends.jpg",
     alt: "Guests smiling at The Owner's Box bar",
-    shape: "square" as const,
+    shape: "square",
+    category: "atmosphere",
   },
   {
     src: "/images/food/official/hand-fry-dipped.jpg",
     alt: "Guest dipping a fry with gyro and fries at The Owner's Box",
-    shape: "tall" as const,
+    shape: "tall",
+    category: "food",
   },
   {
     src: "/images/food/official/staff.jpg",
     alt: "The Owner's Box staff welcoming guests",
-    shape: "tall" as const,
+    shape: "tall",
+    category: "atmosphere",
   },
   {
     src: "/images/atmosphere/cinematic-dtl-1.jpg",
     alt: "Cinematic down-the-line interior",
-    shape: "tall" as const,
+    shape: "tall",
+    category: "atmosphere",
   },
   {
     src: "/images/food/official/featured-pizza.png",
     alt: "Featured pizza",
-    shape: "square" as const,
+    shape: "square",
+    category: "food",
   },
   {
     src: "/images/drinks/cocktail-on-bar-1.jpg",
     alt: "Craft cocktail on the bar",
-    shape: "tall" as const,
+    shape: "tall",
+    category: "food",
   },
   {
     src: "/images/atmosphere/big-wall-left-1.jpg",
     alt: "Wall-to-wall sports screens",
-    shape: "square" as const,
+    shape: "square",
+    category: "atmosphere",
   },
   {
     src: "/images/atmosphere/black-and-white-1.jpg",
     alt: "The Owner's Box interior atmosphere",
-    shape: "tall" as const,
+    shape: "tall",
+    category: "atmosphere",
   },
   {
     src: "/images/atmosphere/wide-view-from-right.jpg",
     alt: "Wide view of the dining room",
-    shape: "square" as const,
+    shape: "square",
+    category: "atmosphere",
   },
 ];
+
+function imagesForVariant(variant: AltHomeGalleryCarouselVariant): GalleryImage[] {
+  const base =
+    variant === "foodOnly"
+      ? galleryImages.filter((image) => image.category === "food")
+      : galleryImages;
+  return [...base, ...base];
+}
 
 function normalizeOffset(offset: number, loopWidth: number): number {
   if (loopWidth <= 0) return offset;
@@ -121,7 +163,9 @@ function normalizeOffset(offset: number, loopWidth: number): number {
   return next;
 }
 
-export default function AltHomeGalleryCarousel() {
+export default function AltHomeGalleryCarousel({
+  variant = "all",
+}: AltHomeGalleryCarouselProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const loopWidthRef = useRef(0);
@@ -136,7 +180,7 @@ export default function AltHomeGalleryCarousel() {
   const [isDragging, setIsDragging] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  const carouselImages = [...galleryImages, ...galleryImages];
+  const carouselImages = useMemo(() => imagesForVariant(variant), [variant]);
 
   const measureLoopWidth = useCallback(() => {
     const track = trackRef.current;
@@ -214,7 +258,7 @@ export default function AltHomeGalleryCarousel() {
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [isVisible, prefersReducedMotion, measureLoopWidth, paintOffset]);
+  }, [carouselImages.length, isVisible, prefersReducedMotion, measureLoopWidth, paintOffset]);
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
