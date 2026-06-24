@@ -3,6 +3,9 @@ import Image from "next/image";
 import { Facebook, Instagram } from "lucide-react";
 import { OB_GOOGLE_REVIEW_URL, OB_SOCIAL } from "@/lib/localSeo";
 
+const footerInputClass =
+  "w-full rounded-xl border border-[#F2EAD4]/15 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-[#F2EAD4] placeholder:text-[#F2EAD4]/40 transition-colors focus:border-[#D4AF37]/55 focus:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/20";
+
 const footerColumns = [
   [
     { label: "Locations", href: "/locations" },
@@ -60,37 +63,40 @@ export default function AltHomeFooter() {
             </div>
 
             <div className="lg:pl-10">
-              <p className="mb-4 text-[13px] font-black uppercase tracking-tight">
+              <p className="mb-4 max-w-md text-[11px] font-black uppercase leading-relaxed tracking-[0.12em] text-[#F2EAD4]/85 sm:text-[13px] sm:tracking-tight">
                 Stay updated on the latest from The Owner&apos;s Box
               </p>
-              <form className="grid gap-3" action="#">
+              <form className="flex max-w-lg flex-col gap-3" action="#">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <input
                     aria-label="First name"
+                    name="firstName"
+                    autoComplete="given-name"
                     placeholder="First name"
-                    className="rounded-md border-2 border-[#F2EAD4]/20 bg-[#071B2F] px-4 py-3 text-xs font-black uppercase tracking-widest text-[#F2EAD4] placeholder:text-[#F2EAD4]/35"
+                    className={footerInputClass}
                   />
                   <input
                     aria-label="Last name"
+                    name="lastName"
+                    autoComplete="family-name"
                     placeholder="Last name"
-                    className="rounded-md border-2 border-[#F2EAD4]/20 bg-[#071B2F] px-4 py-3 text-xs font-black uppercase tracking-widest text-[#F2EAD4] placeholder:text-[#F2EAD4]/35"
+                    className={footerInputClass}
                   />
                 </div>
-                <div className="flex">
-                  <input
-                    aria-label="Email"
-                    type="email"
-                    placeholder="Enter your email"
-                    className="min-w-0 flex-1 rounded-l-md border-2 border-r-0 border-[#F2EAD4]/20 bg-[#071B2F] px-4 py-3 text-xs font-black uppercase tracking-widest text-[#F2EAD4] placeholder:text-[#F2EAD4]/35"
-                  />
-                  <button
-                    type="submit"
-                    className="rounded-r-md border-2 border-white bg-white px-5 text-lg font-black text-[#05070B]"
-                    aria-label="Submit email signup"
-                  >
-                    -
-                  </button>
-                </div>
+                <input
+                  aria-label="Email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Enter your email"
+                  className={footerInputClass}
+                />
+                <button
+                  type="submit"
+                  className="mt-1 w-full rounded-full border-2 border-[#D4AF37] bg-[#D4AF37] px-6 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#05070B] shadow-[0_8px_24px_rgba(212,175,55,0.22)] transition-transform hover:scale-[1.02] active:scale-[0.98] sm:w-auto sm:self-start"
+                >
+                  Subscribe
+                </button>
               </form>
             </div>
           </div>

@@ -14,8 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const MENU_IMAGE_URL = "/images/menu_new.png";
-export const MENU_PDF_URL = "/menu.pdf";
+import { MENU_IMAGE_URL, MENU_PDF_URL } from "@/lib/menuAssets";
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 4;

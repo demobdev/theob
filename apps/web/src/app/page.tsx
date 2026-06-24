@@ -50,7 +50,7 @@ export default function Home() {
       <AltHomeStackedCards />
       <div
         aria-hidden="true"
-        className="relative z-20 bg-white h-[40vh] sm:h-[44vh] md:hidden"
+        className="relative z-20 bg-white h-[46vh] sm:h-[48vh] md:hidden"
       />
       <div
         aria-hidden="true"

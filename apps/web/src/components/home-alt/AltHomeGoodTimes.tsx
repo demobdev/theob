@@ -35,48 +35,49 @@ export default function AltHomeGoodTimes() {
         </div>
       </div>
 
-      <div className="mt-12 grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
-        <div className="relative min-h-[360px] overflow-hidden rounded-[24px] bg-[#171713]">
-          <Image
-            src="/images/atmosphere/cinematic-dtl-1.jpg"
-            alt="Down-the-line view of The Owner's Box bar and dining room"
-            fill
-            className="object-cover object-center"
-            sizes="(max-width: 768px) 100vw, 520px"
-          />
-          <div className="absolute inset-0 bg-black/20" />
-        </div>
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
+          <div className="relative min-h-[260px] overflow-hidden rounded-[24px] bg-[#171713] md:min-h-[320px]">
+            <Image
+              src="/images/atmosphere/cinematic-dtl-1.jpg"
+              alt="Down-the-line view of The Owner's Box bar and dining room"
+              fill
+              className="object-cover object-center"
+              sizes="(max-width: 768px) 100vw, 360px"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+            <p className="absolute bottom-5 left-5 font-montserrat text-3xl font-black uppercase leading-none text-[#F2EAD4]">
+              Full Bar
+            </p>
+          </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="relative min-h-[260px] overflow-hidden rounded-[24px] bg-[#171713]">
+          <div className="relative min-h-[260px] overflow-hidden rounded-[24px] bg-[#171713] md:min-h-[320px]">
+            <Image
+              src="/images/drinks/espresso-martini-2.jpg"
+              alt="Espresso martini and specialty cocktails at the bar"
+              fill
+              className="object-cover object-[center_40%]"
+              sizes="(max-width: 768px) 100vw, 360px"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+            <p className="absolute bottom-5 left-5 font-montserrat text-3xl font-black uppercase leading-none text-[#F2EAD4]">
+              Specialty Drinks
+            </p>
+          </div>
+
+          <div className="relative min-h-[260px] overflow-hidden rounded-[24px] bg-[#171713] md:min-h-[320px]">
             <Image
               src="/images/food/official/featured-pizza.png"
               alt="Featured pizza at The Owner's Box"
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 320px"
+              sizes="(max-width: 768px) 100vw, 360px"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent" />
             <p className="absolute bottom-5 left-5 font-montserrat text-3xl font-black uppercase leading-none text-[#F2EAD4]">
               Good Eats
             </p>
           </div>
-
-          <div className="relative min-h-[260px] overflow-hidden rounded-[24px] bg-[#171713]">
-            <Image
-              src="/images/food/official/beer-classic.jpg"
-              alt="Cold beer and a shot at the bar"
-              fill
-              className="object-cover object-center"
-              sizes="(max-width: 768px) 100vw, 320px"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-            <p className="absolute bottom-5 left-5 font-montserrat text-3xl font-black uppercase leading-none text-[#F2EAD4]">
-              Cold Drinks
-            </p>
-          </div>
         </div>
-      </div>
       </div>
     </section>
   );

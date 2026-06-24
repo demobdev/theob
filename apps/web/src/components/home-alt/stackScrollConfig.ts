@@ -7,12 +7,12 @@
  * - Card 3: sticky pin with taller min-height so Good Eats content fits.
  * - Post-stack runway: empty spacer AFTER card 3; Shop/Gallery must not enter
  *   until the user scrolls through this runway while card 3 is still pinned.
- * Last locked: 2026-06-15 — runway md 130vh + 55vh page buffer before Gallery.
+ * Last locked: 2026-06-24 — overlap 34vh (was 38vh) + responsive mobile overlap for less clip.
  *
  * STABLE SNAPSHOT (do not change unless intentionally re-tuning parallax):
  * - Section wrapper: relative z-30, cards in relative isolate container
  * - Card shell: sticky + rounded border + height from first/middle/last + overlap on 1–2
- * - Sticky tops: card0=76px, card1=92px, card2=108px
+ * - Sticky tops: card0=84px, card1=108px, card2=132px
  * - z-index: card0=10, card1=15, card2=25
  * - Grid: md:grid-cols-[0.95fr_1.05fr], strip is 40px, inner h calc(100%-40px)
  * - Post-stack runway div AFTER all cards, then #stack-gallery-sentinel (1px)
@@ -20,15 +20,19 @@
  * - page.tsx adds extra 55vh white buffer before Gallery
  */
 export const STACK_SCROLL = {
-  /** Sticky top offset per card: 76px + index * 16px */
-  stickyTopBasePx: 76,
-  stickyTopStepPx: 16,
+  /** Sticky top offset per card: 84px + index * 24px — pins lower so peek content clears the card above */
+  stickyTopBasePx: 84,
+  stickyTopStepPx: 24,
 
-  /** Cards 1–2 pull up over the previous card */
-  cardOverlapMargin: "-mb-[38vh]",
+  /**
+   * Cards 1–2 pull up over the previous card.
+   * Slightly less overlap than 38vh so lower-card text stays visible while scrolling.
+   * Mobile uses smaller overlap — tall auto-height cards were clipping event copy.
+   */
+  cardOverlapMargin: "-mb-[22vh] sm:-mb-[28vh] md:-mb-[34vh]",
 
-  /** Left-column strip height — must match overlap margin above */
-  peekStripHeight: "h-[38vh]",
+  /** Left-column strip height on desktop — must match md overlap above */
+  peekStripHeight: "h-[34vh]",
 
   /** z-index: 10 + index * 5 (+5 on last card) */
   zIndexBase: 10,

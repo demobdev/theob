@@ -14,18 +14,33 @@ export type ShopifyProduct = {
 type ShopifyConfig = {
   storeDomain: string;
   accessToken: string;
-  productHandle: string;
+  productHandles: string[];
 };
+
+/** Comma-separated handles in NEXT_PUBLIC_SHOPIFY_PRODUCT_HANDLES, or single NEXT_PUBLIC_SHOPIFY_PRODUCT_HANDLE. */
+export function getShopifyProductHandles(): string[] {
+  const list = process.env.NEXT_PUBLIC_SHOPIFY_PRODUCT_HANDLES?.trim();
+  if (list) {
+    return list
+      .split(",")
+      .map((handle) => handle.trim())
+      .filter(Boolean);
+  }
+
+  const single = process.env.NEXT_PUBLIC_SHOPIFY_PRODUCT_HANDLE?.trim();
+  if (single) return [single];
+
+  return ["the-ob-crew-tee", "the-ob-quarter-zip"];
+}
 
 export function getShopifyConfig(): ShopifyConfig | null {
   const storeDomain = process.env.SHOPIFY_STORE_DOMAIN?.trim().replace(/^https?:\/\//, "");
   const accessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN?.trim();
-  const productHandle =
-    process.env.NEXT_PUBLIC_SHOPIFY_PRODUCT_HANDLE?.trim() || "ob-crew-tee";
+  const productHandles = getShopifyProductHandles();
 
   if (!storeDomain || !accessToken) return null;
 
-  return { storeDomain, accessToken, productHandle };
+  return { storeDomain, accessToken, productHandles };
 }
 
 export function isShopifyConfigured(): boolean {
@@ -138,18 +153,29 @@ export async function getShopifyProduct(
   if (!config) return null;
 
   const data = await shopifyFetch<ProductByHandleResponse>(PRODUCT_BY_HANDLE_QUERY, {
-    handle: handle ?? config.productHandle,
+    handle: handle ?? config.productHandles[0],
   });
 
   const product = data.product;
   const variant = product?.variants.edges[0]?.node;
   if (!product || !variant) return null;
 
+  return mapShopifyProduct(product, variant);
+}
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function mapShopifyProduct(
+  product: NonNullable<ProductByHandleResponse["product"]>,
+  variant: NonNullable<ProductByHandleResponse["product"]>["variants"]["edges"][0]["node"],
+): ShopifyProduct {
   return {
     id: product.id,
     title: product.title,
     handle: product.handle,
-    description: product.description,
+    description: stripHtml(product.description),
     imageUrl: product.featuredImage?.url ?? null,
     imageAlt: product.featuredImage?.altText ?? product.title,
     priceAmount: variant.price.amount,
@@ -157,6 +183,24 @@ export async function getShopifyProduct(
     variantId: variant.id,
     availableForSale: variant.availableForSale,
   };
+}
+
+export async function getShopifyProducts(handles?: string[]): Promise<ShopifyProduct[]> {
+  const config = getShopifyConfig();
+  if (!config) return [];
+
+  const targetHandles = handles?.length ? handles : config.productHandles;
+  const results = await Promise.all(
+    targetHandles.map(async (productHandle) => {
+      try {
+        return await getShopifyProduct(productHandle);
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  return results.filter((product): product is ShopifyProduct => product !== null);
 }
 
 const CART_CREATE_MUTATION = `

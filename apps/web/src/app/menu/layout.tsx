@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Menu | Wings, Pizza & Bar Favorites in Greenville SC",
   description:
-    "Browse The Owners Box menu — scratch-made wings, pizza, steaks, seafood, sandwiches, and shareables. Dine in, takeout, or DoorDash on Woodruff Road.",
+    "View The Owner's Box full menu — scratch-made wings, pizza, bar beverages, specialty drinks, and shareables. Download the PDF or order online on Woodruff Road.",
   alternates: { canonical: "/menu" },
 };
 

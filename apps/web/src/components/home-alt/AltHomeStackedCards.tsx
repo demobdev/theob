@@ -43,7 +43,7 @@ const cardImageColumnClass =
   "relative aspect-square w-full shrink-0 overflow-hidden md:aspect-auto md:h-full md:min-h-0";
 
 /**
- * Desktop stack overlap exposes ~38vh of the previous card's left column.
+ * Desktop stack overlap exposes ~34vh of the previous card's left column.
  * Split into hero (top) + peek strip (bottom) so the visible slice is intentional.
  * Mobile keeps a single square hero — overlap strip isn't visible there.
  */
@@ -135,7 +135,7 @@ const cards = [
     peekImagePosition: "center 42%",
     strip: "bg-[#071B2F] text-[#F2EAD4]",
     body: "bg-[#101014] text-[#F2EAD4]",
-    marquee: ["Sports Bar", "Cold Drinks", "Big Screens"],
+    marquee: ["Sports Bar", "Full Bar", "Specialty Drinks", "Big Screens"],
   },
   {
     eyebrow: "Groups, parties, regulars",
@@ -437,7 +437,7 @@ function GoodEatsCard({
             selectedIndex={selectedFoodIndex ?? -1}
             onSelect={setSelectedFoodIndex}
           />
-          <div className="shrink-0">
+          <div className="shrink-0 max-md:mt-2 md:mt-0">
             <MarqueeLine words={card.marquee} />
           </div>
         </div>
@@ -492,7 +492,7 @@ function EventIntroBlock({
   };
 }) {
   return (
-    <div className="mt-6 border-t border-[#F2EAD4]/15 pt-5 sm:mt-7 sm:pt-6">
+    <div className="mt-6 scroll-mt-6 border-t border-[#F2EAD4]/15 pt-5 sm:mt-7 sm:scroll-mt-8 sm:pt-6">
       <p className="mb-2 text-[10px] font-black uppercase tracking-[0.32em] text-[#D4AF37] sm:text-[11px]">
         Private events
       </p>
@@ -656,7 +656,7 @@ export default function AltHomeStackedCards() {
                     </div>
 
                     {card.eventImage && card.eventFeatures && (
-                      <div className="w-full pt-4 sm:pt-5">
+                      <div className="w-full scroll-mt-4 pt-4 sm:scroll-mt-6 sm:pt-5 md:scroll-mt-8">
                         <EventInfoPanel
                           image={card.eventImage}
                           features={card.eventFeatures.slice(1)}
