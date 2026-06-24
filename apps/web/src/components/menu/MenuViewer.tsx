@@ -14,7 +14,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { MENU_IMAGE_URL, MENU_PDF_URL } from "@/lib/menuAssets";
+import { MENU_PDF_URL } from "@/lib/menuAssets";
+
+/** PNG used only by the interactive MenuViewer zoom UI (not the public /menu page). */
+const MENU_PREVIEW_IMAGE = "/images/menu_new.png";
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 4;
@@ -305,7 +308,7 @@ function MenuCanvas({
           }}
         >
           <Image
-            src={MENU_IMAGE_URL}
+            src={MENU_PREVIEW_IMAGE}
             alt="The Owner's Box full menu — appetizers, wings, pizza, brunch, and more"
             width={1536}
             height={1024}

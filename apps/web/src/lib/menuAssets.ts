@@ -1,8 +1,7 @@
-/** Public PDF menu (Heartland-aligned pricing). */
-export const MENU_PDF_URL = "/menu_new.pdf";
+/** Public PDF menu shown on /menu */
+export const MENU_PDF_URL = "/menu.pdf";
 
-/** PNG fallback for zoomable menu preview. */
-export const MENU_IMAGE_URL = "/images/menu_new.png";
+export const MENU_PDF_DOWNLOAD_NAME = "owners-box-menu.pdf";
 
 /** Full interactive menu — hidden from nav until product photos are ready. */
 export const INTERACTIVE_MENU_PATH = "/menu/browse";

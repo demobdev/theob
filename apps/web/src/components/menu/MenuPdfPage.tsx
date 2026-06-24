@@ -36,7 +36,7 @@ export default function MenuPdfPage() {
                 Our Menu
               </h1>
               <p className="mt-4 max-w-xl text-sm font-semibold leading-relaxed text-[#F2EAD4]/80 sm:text-base">
-                Browse the full lineup below, including bar beverages and specialty cocktails. Order online when you&apos;re ready.
+                Browse the full lineup below. Order takeout online or get delivery on DoorDash.
               </p>
             </div>
           </div>
