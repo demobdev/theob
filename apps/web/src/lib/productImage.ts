@@ -47,8 +47,8 @@ const MENU_IMAGE_KEYS = new Set([
 /** Real photography overrides for menu slugs (checked before default .png paths). */
 export const REAL_IMAGE_OVERRIDES: Record<string, string> = {
   crab_dip: "/images/food/official/crab-dip.png",
-  crab_cake: "/images/food/official/crab-dip.png",
-  crabcake_sandwich: "/images/food/official/crab-dip.png",
+  crab_cake: "/images/food/official/crab-cake.jpg",
+  crabcake_sandwich: "/images/food/official/crab-cake.jpg",
   jumbo_wings: "/images/food/buffalo-wings.png",
   wings: "/images/food/buffalo-wings.png",
   boneless_wings: "/images/food/garlic-parm-wings.png",
@@ -69,9 +69,9 @@ export const REAL_IMAGE_OVERRIDES: Record<string, string> = {
   chicken_alfredo_pizza: "/images/food/official/featured-pizza.png",
   ham_pineapple: "/images/food/official/buffalo-pizza.jpg",
   buffalo_pizza: "/images/food/official/buffalo-pizza.jpg",
-  rib_eye: "/images/food/official/lamb-gyro.jpg",
-  picanha_steak: "/images/food/official/lamb-gyro.jpg",
-  ny_strip: "/images/food/official/lamb-gyro.jpg",
+  rib_eye: "/images/food/official/ribeye-steak.jpg",
+  picanha_steak: "/images/food/official/ribeye-steak.jpg",
+  ny_strip: "/images/food/official/ribeye-steak.jpg",
   coho_salmon: "/images/food/official/lamb-gyro.jpg",
   caesar_salad: "/images/food/official/hand-fry-dipped.jpg",
   chopped_salad: "/images/food/official/hand-fry-dipped.jpg",
@@ -83,7 +83,7 @@ export const REAL_IMAGE_OVERRIDES: Record<string, string> = {
   pancakes: "/images/food/official/scratch-made.png",
   breakfast_skillet: "/images/food/official/scratch-made.png",
   beer: "/images/food/official/beer-classic.jpg",
-  cocktail: "/images/drinks/espresso-martini-2.jpg",
+  cocktail: "/images/drinks/peach-cobbler-old-fashion.jpg",
 };
 
 const DRINK_LIKE = new Set([

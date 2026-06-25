@@ -27,6 +27,12 @@ const galleryImages: GalleryImage[] = [
     category: "food",
   },
   {
+    src: "/images/food/official/crab-cake.jpg",
+    alt: "Crab cake platter with mashed potatoes and arugula",
+    shape: "square",
+    category: "food",
+  },
+  {
     src: "/images/food/official/crab-dip.png",
     alt: "Crab dip with grilled pita chips",
     shape: "square",
@@ -78,6 +84,18 @@ const galleryImages: GalleryImage[] = [
     src: "/images/food/official/beer-classic.jpg",
     alt: "Cold beer and a shot at the bar",
     shape: "square",
+    category: "food",
+  },
+  {
+    src: "/images/food/official/ribeye-steak.jpg",
+    alt: "Rib eye steak with fries and chimichurri",
+    shape: "square",
+    category: "food",
+  },
+  {
+    src: "/images/drinks/peach-cobbler-old-fashion.jpg",
+    alt: "Peach cobbler old fashioned cocktail",
+    shape: "tall",
     category: "food",
   },
   {

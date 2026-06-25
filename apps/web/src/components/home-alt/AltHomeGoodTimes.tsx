@@ -52,10 +52,10 @@ export default function AltHomeGoodTimes() {
 
           <div className="relative min-h-[260px] overflow-hidden rounded-[24px] bg-[#171713] md:min-h-[320px]">
             <Image
-              src="/images/drinks/espresso-martini-2.jpg"
-              alt="Espresso martini and specialty cocktails at the bar"
+              src="/images/drinks/peach-cobbler-old-fashion.jpg"
+              alt="Peach cobbler old fashioned specialty cocktail"
               fill
-              className="object-cover object-[center_10%]"
+              className="object-cover object-center"
               sizes="(max-width: 768px) 100vw, 360px"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
