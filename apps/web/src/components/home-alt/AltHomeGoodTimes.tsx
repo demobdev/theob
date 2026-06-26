@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import { FileText } from "lucide-react";
 import { getOrderPagePath } from "@/lib/orderLinks";
 
 export default function AltHomeGoodTimes() {
@@ -24,14 +26,23 @@ export default function AltHomeGoodTimes() {
             Scratch-made pizza, jumbo wings, and cold pours for dine-in, takeout, or your next
             watch party.
           </p>
-          <a
-            href={orderUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex rounded-full border-2 border-[#05070B] bg-white px-5 py-2 text-[10px] font-black uppercase tracking-widest text-[#05070B] shadow-[3px_3px_0_#05070B] transition-transform hover:-translate-y-0.5"
-          >
-            Order Takeout
-          </a>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/menu"
+              className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#05070B] bg-[#05070B] px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white transition-transform hover:scale-[1.02]"
+            >
+              <FileText size={14} aria-hidden />
+              Open Full Menu
+            </Link>
+            <a
+              href={orderUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex rounded-full border-2 border-[#05070B] bg-white px-5 py-2 text-[10px] font-black uppercase tracking-widest text-[#05070B] shadow-[3px_3px_0_#05070B] transition-transform hover:-translate-y-0.5"
+            >
+              Order Takeout
+            </a>
+          </div>
         </div>
       </div>
 
