@@ -135,11 +135,12 @@ export default function LocationsPage() {
         <div className="mx-auto max-w-[1600px]">
           <div className="relative min-h-[380px] overflow-hidden rounded-[24px] border-2 border-[#05070B]/10 sm:min-h-[440px]">
             <Image
-              src="/sports-feature.jpg"
-              alt="The Owner's Box sports bar and grill in Greenville SC on Woodruff Road"
+              src="/images/atmosphere/ob-front.png"
+              alt="The Owner's Box storefront on Woodruff Road in Greenville SC"
               fill
               priority
               className="object-cover"
+              style={{ objectPosition: "center top" }}
               sizes="(max-width: 768px) 100vw, 1600px"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/78 via-black/34 to-black/5" />
