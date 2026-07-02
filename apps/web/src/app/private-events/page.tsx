@@ -1,8 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
-import { CalendarDays, Mail, Tv, Users, UtensilsCrossed } from "lucide-react";
+import { Tv, Users, UtensilsCrossed } from "lucide-react";
 
 export const metadata = {
   title: "Private Events | The Owner's Box",
@@ -96,37 +95,6 @@ export default function PrivateEventsPage() {
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="rounded-[28px] border border-white/10 bg-white p-7 text-[#05070B]">
-                <CalendarDays className="mb-8 h-9 w-9" />
-                <h3 className="font-montserrat text-4xl font-black uppercase leading-[0.85] tracking-[-0.06em]">
-                  Plan A
-                  <br />
-                  Night Out
-                </h3>
-                <p className="mt-5 text-sm font-semibold leading-relaxed text-[#05070B]/70">
-                  Tell us your date, group size, and what you want on the screens.
-                </p>
-              </div>
-              <div className="rounded-[28px] border border-white/10 bg-[#05070B] p-7 text-white">
-                <Mail className="mb-8 h-9 w-9 text-white" />
-                <h3 className="font-montserrat text-4xl font-black uppercase leading-[0.85] tracking-[-0.06em]">
-                  Start
-                  <br />
-                  Here
-                </h3>
-                <p className="mt-5 text-sm font-semibold leading-relaxed text-white/65">
-                  Online catering checkout is not on the site yet, so inquiries go through the team.
-                </p>
-                <Link
-                  href="/locations#contact"
-                  className="mt-7 inline-flex rounded-full border-2 border-white bg-white px-5 py-2 text-[10px] font-black uppercase tracking-widest text-[#05070B] transition-transform hover:-translate-y-0.5"
-                >
-                  Inquire via contact form
-                </Link>
               </div>
             </div>
           </div>
