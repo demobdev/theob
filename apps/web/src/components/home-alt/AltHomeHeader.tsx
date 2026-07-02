@@ -10,7 +10,6 @@ import { OB_SOCIAL } from "@/lib/localSeo";
 const navLinks = [
   { label: "Menu", href: "/menu" },
   { label: "Events", href: "/private-events" },
-  { label: "Book a Party", href: "/private-events" },
   { label: "Locations", href: "/locations" },
 ];
 
