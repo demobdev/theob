@@ -9,7 +9,7 @@ const footerInputClass =
 const footerColumns = [
   [
     { label: "Locations", href: "/locations" },
-    { label: "Book a Party", href: "/private-events" },
+    { label: "Events", href: "/private-events" },
     { label: "Our Story", href: "/our-story" },
   ],
   [

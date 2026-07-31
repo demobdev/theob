@@ -394,7 +394,8 @@ function GoodEatsCard({
         className={`relative z-10 flex items-center justify-between gap-4 px-4 py-3 text-[10px] font-black uppercase tracking-[0.22em] sm:px-6 ${card.strip}`}
       >
         <span>The Owner&apos;s Box</span>
-        <span>{card.eyebrow}</span>
+        <span className="md:hidden">{card.eyebrow}</span>
+        <span className="hidden max-w-[55%] truncate text-right md:inline">{card.title}</span>
       </div>
 
       <div className={cardGridClass(isLast, card.body)}>
@@ -417,16 +418,17 @@ function GoodEatsCard({
         </div>
 
         <div
-          className={`flex min-w-0 flex-col justify-between gap-3 p-4 max-md:pb-8 sm:gap-4 sm:p-6 md:min-h-0 md:gap-4 md:overflow-visible md:p-10 ${card.body}`}
+          className={`flex min-w-0 flex-col justify-between gap-3 p-4 max-md:pb-8 sm:gap-4 sm:p-6 md:min-h-0 md:justify-end md:gap-4 md:overflow-visible md:p-10 ${card.body}`}
         >
-          <div className="shrink-0">
+          {/* Mobile: full headline block. Desktop: hidden so stack peek shows food picks, not clipped title copy. */}
+          <div className="shrink-0 md:hidden">
             <p className="mb-2 text-[9px] font-black uppercase tracking-[0.3em] opacity-70 sm:mb-3 sm:text-[10px]">
               {card.eyebrow}
             </p>
             <h3 className="max-w-full text-balance font-montserrat text-[clamp(2.2rem,8vw,6rem)] font-black uppercase leading-[0.78] tracking-[-0.08em] sm:text-[clamp(2.55rem,6vw,5.75rem)]">
               {card.title}
             </h3>
-            <p className="mt-3 max-w-lg text-xs font-semibold leading-relaxed opacity-70 sm:mt-4 sm:text-sm md:text-base">
+            <p className="mt-3 max-w-lg text-xs font-semibold leading-relaxed opacity-70 sm:mt-4 sm:text-sm">
               {card.text}
             </p>
             <CardCta href={orderUrl} external label={card.cta} />
@@ -438,6 +440,10 @@ function GoodEatsCard({
             onSelect={setSelectedFoodIndex}
           />
           <div className="shrink-0 max-md:mt-2 md:mt-0">
+            <div className="mb-4 hidden max-w-lg md:block">
+              <p className="text-sm font-semibold leading-relaxed opacity-70">{card.text}</p>
+              <CardCta href={orderUrl} external label={card.cta} />
+            </div>
             <MarqueeLine words={card.marquee} />
           </div>
         </div>
@@ -523,8 +529,8 @@ function EventInfoPanel({
 }) {
   return (
     <div className="flex w-full max-w-3xl flex-col gap-3 sm:gap-4">
-      <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-3 sm:gap-5 md:gap-6">
-        <div className="relative min-h-[10.5rem] overflow-hidden rounded-[20px] border-2 border-[#F2EAD4]/15 bg-[#171713] shadow-[0_18px_45px_rgba(0,0,0,0.28)] sm:min-h-0 sm:rounded-[28px]">
+      <div className="grid grid-cols-1 items-stretch gap-3 sm:gap-5 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:gap-6">
+        <div className="relative min-h-[10.5rem] overflow-hidden rounded-[20px] border-2 border-[#F2EAD4]/15 bg-[#171713] shadow-[0_18px_45px_rgba(0,0,0,0.28)] sm:min-h-0 sm:rounded-[28px] md:min-h-[10.5rem]">
           <Image
             src={image}
             alt="Private events at The Owner's Box"
@@ -535,7 +541,8 @@ function EventInfoPanel({
           <div className="absolute inset-0 bg-gradient-to-t from-[#071B2F]/85 via-[#071B2F]/10 to-transparent" />
         </div>
 
-        <ul className="flex h-full flex-col justify-between gap-2 sm:gap-2.5">
+        {/* Feature copy hidden on mobile — it sits in the stack peek zone and gets clipped by the card above. */}
+        <ul className="hidden h-full flex-col justify-between gap-2 sm:gap-2.5 md:flex">
           {features.map((feature) => (
             <li key={feature.label} className="flex flex-1">
               <EventFeatureRow {...feature} />
