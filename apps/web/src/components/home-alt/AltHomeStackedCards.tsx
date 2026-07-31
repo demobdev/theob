@@ -529,8 +529,8 @@ function EventInfoPanel({
 }) {
   return (
     <div className="flex w-full max-w-3xl flex-col gap-3 sm:gap-4">
-      <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-3 sm:gap-5 md:gap-6">
-        <div className="relative min-h-[10.5rem] overflow-hidden rounded-[20px] border-2 border-[#F2EAD4]/15 bg-[#171713] shadow-[0_18px_45px_rgba(0,0,0,0.28)] sm:min-h-0 sm:rounded-[28px]">
+      <div className="grid grid-cols-1 items-stretch gap-3 sm:gap-5 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:gap-6">
+        <div className="relative min-h-[10.5rem] overflow-hidden rounded-[20px] border-2 border-[#F2EAD4]/15 bg-[#171713] shadow-[0_18px_45px_rgba(0,0,0,0.28)] sm:min-h-0 sm:rounded-[28px] md:min-h-[10.5rem]">
           <Image
             src={image}
             alt="Private events at The Owner's Box"
@@ -541,7 +541,8 @@ function EventInfoPanel({
           <div className="absolute inset-0 bg-gradient-to-t from-[#071B2F]/85 via-[#071B2F]/10 to-transparent" />
         </div>
 
-        <ul className="flex h-full flex-col justify-between gap-2 sm:gap-2.5">
+        {/* Feature copy hidden on mobile — it sits in the stack peek zone and gets clipped by the card above. */}
+        <ul className="hidden h-full flex-col justify-between gap-2 sm:gap-2.5 md:flex">
           {features.map((feature) => (
             <li key={feature.label} className="flex flex-1">
               <EventFeatureRow {...feature} />
