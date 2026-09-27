@@ -30,7 +30,7 @@ export default function MenuPdfPage() {
 
             <div className="absolute inset-x-0 bottom-0 p-5 sm:p-10">
               <p className="mb-4 w-fit rounded-full border border-white/40 bg-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-white backdrop-blur">
-                Food · Bar · Specialty Drinks
+                Food · Sunday Brunch · Cocktails
               </p>
               <h1 className="font-montserrat text-[clamp(3rem,11vw,9rem)] font-black uppercase leading-[0.78] tracking-[-0.08em] text-[#F2EAD4]">
                 Our Menu

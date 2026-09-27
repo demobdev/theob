@@ -65,7 +65,7 @@ export default function MenuPdfViewer() {
               Full menu
             </p>
             <p className="mt-2 text-sm font-semibold leading-relaxed text-[#05070B]/70 sm:text-base">
-              Food, bar beverages, and specialty drinks. Order takeout online or get delivery on
+              Food, Sunday brunch, and signature cocktails. Order takeout online or get delivery on
               DoorDash.
             </p>
           </div>
