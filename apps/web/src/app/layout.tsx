@@ -8,6 +8,7 @@ import ConvexProfileSync from "@/components/ConvexProfileSync";
 import LocalBusinessJsonLd from "@/components/seo/LocalBusinessJsonLd";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { OB_DEFAULT_DESCRIPTION, OB_SITE_URL, OB_SOCIAL } from "@/lib/localSeo";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -76,6 +77,7 @@ export default function RootLayout({
           <ConvexProfileSync />
           {children}
         </ConvexClientProvider>
+        <Analytics />
       </body>
     </html>
   );
