@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import posthog from "posthog-js";
 
-/** Identifies the signed-in Clerk user in PostHog (client-side). */
+/** Links configured analytics to a stable ID without sending profile details. */
 export default function PostHogAuthSync() {
   const { user, isSignedIn } = useUser();
 
@@ -12,14 +12,11 @@ export default function PostHogAuthSync() {
     if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
 
     if (isSignedIn && user?.id) {
-      posthog.identify(user.id, {
-        email: user.primaryEmailAddress?.emailAddress,
-        name: user.fullName ?? undefined,
-      });
+      posthog.identify(user.id);
       return;
     }
     posthog.reset();
-  }, [isSignedIn, user?.id, user?.primaryEmailAddress?.emailAddress, user?.fullName]);
+  }, [isSignedIn, user?.id]);
 
   return null;
 }

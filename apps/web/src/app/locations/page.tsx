@@ -24,14 +24,17 @@ import { getOrderPagePath } from "@/lib/orderLinks";
 import { OB_GOOGLE_REVIEW_URL, OB_SUPPORT_EMAIL } from "@/lib/localSeo";
 import DoorDashButton from "@/components/common/DoorDashButton";
 
-const LocationMap = dynamic(() => import("@/components/locations/LocationMap"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-full w-full animate-pulse items-center justify-center rounded-2xl bg-[#121212] text-xs font-bold uppercase tracking-widest text-gray-500">
-      Loading map...
-    </div>
-  ),
-});
+const LocationMap = dynamic(
+  () => import("@/components/locations/LocationMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full w-full animate-pulse items-center justify-center rounded-2xl bg-[#121212] text-xs font-bold uppercase tracking-widest text-gray-500">
+        Loading map...
+      </div>
+    ),
+  },
+);
 
 const OB_LOCATION: [number, number] = [OB_COORDS.lat, OB_COORDS.lng];
 
@@ -60,7 +63,9 @@ function buildDirectionsUrl(userLocation: [number, number] | null): string {
 export default function LocationsPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [mapVisible, setMapVisible] = useState(false);
-  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(
+    null,
+  );
   const [geoError, setGeoError] = useState<string | null>(null);
   const [distanceLabel, setDistanceLabel] = useState<string | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
@@ -204,13 +209,19 @@ export default function LocationsPage() {
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 shrink-0 text-white/45" />
-                <a href={`tel:${OB_ADDRESS.phoneTel}`} className="hover:text-white">
+                <a
+                  href={`tel:${OB_ADDRESS.phoneTel}`}
+                  className="hover:text-white"
+                >
                   {OB_ADDRESS.phone}
                 </a>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 shrink-0 text-white/45" />
-                <a href={`mailto:${OB_SUPPORT_EMAIL}`} className="hover:text-white">
+                <a
+                  href={`mailto:${OB_SUPPORT_EMAIL}`}
+                  className="hover:text-white"
+                >
                   {OB_SUPPORT_EMAIL}
                 </a>
               </div>
@@ -249,7 +260,9 @@ export default function LocationsPage() {
             </div>
 
             {geoError ? (
-              <p className="mt-4 text-xs font-semibold leading-relaxed text-white/70">{geoError}</p>
+              <p className="mt-4 text-xs font-semibold leading-relaxed text-white/70">
+                {geoError}
+              </p>
             ) : null}
           </div>
 
@@ -258,7 +271,11 @@ export default function LocationsPage() {
             className="min-h-[360px] overflow-hidden rounded-[28px] border border-[#05070B]/10 lg:min-h-[480px]"
           >
             {mapVisible ? (
-              <LocationMap location={OB_LOCATION} userLocation={userLocation} zoom={OB_MAP_ZOOM} />
+              <LocationMap
+                location={OB_LOCATION}
+                userLocation={userLocation}
+                zoom={OB_MAP_ZOOM}
+              />
             ) : (
               <div className="flex h-full min-h-[360px] w-full items-center justify-center rounded-2xl bg-[#121212] text-xs font-bold uppercase tracking-widest text-gray-500 lg:min-h-[480px]">
                 Map loads when in view
@@ -268,7 +285,10 @@ export default function LocationsPage() {
         </div>
       </section>
 
-      <section id="contact" className="ob-canvas scroll-mt-28 bg-white px-4 pb-20 text-[#05070B] sm:px-6">
+      <section
+        id="contact"
+        className="ob-canvas scroll-mt-28 bg-white px-4 pb-20 text-[#05070B] sm:px-6"
+      >
         <div className="mx-auto max-w-[1600px] rounded-[28px] border border-[#05070B]/10 bg-white p-6 sm:p-8">
           <div className="mb-8 max-w-xl">
             <p className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#05070B]/55">
@@ -278,7 +298,8 @@ export default function LocationsPage() {
               Send a message
             </h2>
             <p className="mt-4 text-sm font-semibold leading-relaxed text-[#05070B]/65">
-              Questions about orders, groups, or private events? Send us a note below.
+              Questions about orders, groups, or private events? Send us a note
+              below.
             </p>
           </div>
 
@@ -287,28 +308,56 @@ export default function LocationsPage() {
             onSubmit={(e) => {
               e.preventDefault();
               const form = e.currentTarget;
-              const name = (form.elements.namedItem("name") as HTMLInputElement).value;
-              const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-              const message = (form.elements.namedItem("message") as HTMLTextAreaElement).value;
+              const name = (form.elements.namedItem("name") as HTMLInputElement)
+                .value;
+              const email = (
+                form.elements.namedItem("email") as HTMLInputElement
+              ).value;
+              const message = (
+                form.elements.namedItem("message") as HTMLTextAreaElement
+              ).value;
               const subject = encodeURIComponent(`Contact from ${name}`);
-              const body = encodeURIComponent(`${message}\n\n- ${name}\n${email}`);
+              const body = encodeURIComponent(
+                `${message}\n\n- ${name}\n${email}`,
+              );
               window.location.href = `mailto:${OB_SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
             }}
           >
+            <p
+              id="contact-email-help"
+              className="text-sm font-semibold text-[#05070B]/65"
+            >
+              This form opens a draft in your email app. Review and send it
+              there to contact us.
+            </p>
+            <label htmlFor="contact-name" className="text-sm font-semibold">
+              Your name
+            </label>
             <input
+              id="contact-name"
               name="name"
+              autoComplete="name"
               required
               placeholder="Your name"
               className="rounded-xl border border-[#05070B]/15 bg-white px-4 py-3 text-sm font-semibold text-[#05070B] placeholder:text-[#05070B]/35 focus:border-[#D4AF37]/55 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/20"
             />
+            <label htmlFor="contact-email" className="text-sm font-semibold">
+              Email
+            </label>
             <input
+              id="contact-email"
               name="email"
+              autoComplete="email"
               type="email"
               required
               placeholder="Email"
               className="rounded-xl border border-[#05070B]/15 bg-white px-4 py-3 text-sm font-semibold text-[#05070B] placeholder:text-[#05070B]/35 focus:border-[#D4AF37]/55 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/20"
             />
+            <label htmlFor="contact-message" className="text-sm font-semibold">
+              Message
+            </label>
             <textarea
+              id="contact-message"
               name="message"
               required
               rows={4}
@@ -317,15 +366,19 @@ export default function LocationsPage() {
             />
             <button
               type="submit"
+              aria-describedby="contact-email-help"
               className="mt-1 rounded-full border-2 border-[#05070B] bg-[#05070B] px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-white transition-transform hover:scale-[1.02]"
             >
-              Send message
+              Open email draft
             </button>
           </form>
 
           <p className="mx-auto mt-4 max-w-xl text-[10px] font-semibold text-[#05070B]/45">
             Opens your email app ·{" "}
-            <a href={`mailto:${OB_SUPPORT_EMAIL}`} className="text-[#05070B]/70 underline-offset-2 hover:underline">
+            <a
+              href={`mailto:${OB_SUPPORT_EMAIL}`}
+              className="text-[#05070B]/70 underline-offset-2 hover:underline"
+            >
               {OB_SUPPORT_EMAIL}
             </a>
             {" · "}

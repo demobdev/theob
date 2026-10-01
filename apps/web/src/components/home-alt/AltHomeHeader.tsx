@@ -49,7 +49,11 @@ export default function AltHomeHeader() {
 
         <nav className="hidden items-center gap-6 md:flex">
           {utilityLinks.map((link) => (
-            <Link key={link.label} href={link.href} className="hover:text-[#D4AF37]">
+            <Link
+              key={link.label}
+              href={link.href}
+              className="hover:text-[#D4AF37]"
+            >
               {link.label}
             </Link>
           ))}
@@ -68,15 +72,29 @@ export default function AltHomeHeader() {
             />
             <nav className="hidden items-center gap-x-7 text-xs font-black uppercase tracking-tight md:flex">
               {navLinks.map((link) => (
-                <Link key={link.label} href={link.href} className="transition-opacity hover:opacity-60">
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="transition-opacity hover:opacity-60"
+                >
                   {link.label}
                 </Link>
               ))}
             </nav>
           </div>
 
-          <Link href="/" className="flex shrink-0 items-center justify-center gap-2 px-2">
-            <Image src="/ob-icon.png" alt="" width={34} height={34} className="h-8 w-8 object-contain" />
+          <Link
+            href="/"
+            aria-label="The Owner's Box home"
+            className="flex shrink-0 items-center justify-center gap-2 px-2"
+          >
+            <Image
+              src="/ob-icon.png"
+              alt=""
+              width={34}
+              height={34}
+              className="h-8 w-8 object-contain"
+            />
             <span className="hidden font-montserrat text-lg font-black uppercase leading-none tracking-tight sm:block">
               The Owner&apos;s Box
             </span>
@@ -94,7 +112,7 @@ export default function AltHomeHeader() {
               href={orderUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden rounded-full border-2 border-[#05070B] bg-[#05070B] px-4 py-2 text-[9px] font-black uppercase tracking-widest text-white transition-transform hover:scale-[1.02] sm:inline-flex"
+              className="inline-flex min-h-11 items-center rounded-full border-2 border-[#05070B] bg-[#05070B] px-3 py-2 text-[9px] font-black uppercase tracking-widest text-white transition-transform hover:scale-[1.02] sm:px-4"
             >
               Order Now
             </a>

@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 
 /** ~95s per full loop at typical desktop widths (matches marquee-extra-slow feel). */
@@ -166,7 +173,9 @@ const galleryImages: GalleryImage[] = [
   },
 ];
 
-function imagesForVariant(variant: AltHomeGalleryCarouselVariant): GalleryImage[] {
+function imagesForVariant(
+  variant: AltHomeGalleryCarouselVariant,
+): GalleryImage[] {
   const base =
     variant === "foodOnly"
       ? galleryImages.filter((image) => image.category === "food")
@@ -197,6 +206,8 @@ export default function AltHomeGalleryCarousel({
   const [isVisible, setIsVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const galleryId = useId();
 
   const carouselImages = useMemo(() => imagesForVariant(variant), [variant]);
 
@@ -255,7 +266,11 @@ export default function AltHomeGalleryCarousel({
     const tick = (time: number) => {
       const loopWidth = loopWidthRef.current;
       const shouldAutoScroll =
-        isVisible && !isDraggingRef.current && !prefersReducedMotion && loopWidth > 0;
+        isVisible &&
+        !paused &&
+        !isDraggingRef.current &&
+        !prefersReducedMotion &&
+        loopWidth > 0;
 
       if (shouldAutoScroll) {
         const last = lastFrameRef.current ?? time;
@@ -276,7 +291,24 @@ export default function AltHomeGalleryCarousel({
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [carouselImages.length, isVisible, prefersReducedMotion, measureLoopWidth, paintOffset]);
+  }, [
+    carouselImages.length,
+    isVisible,
+    paused,
+    prefersReducedMotion,
+    measureLoopWidth,
+    paintOffset,
+  ]);
+
+  const browse = (direction: number) => {
+    setPaused(true);
+    const firstImage = trackRef.current?.firstElementChild;
+    const step = firstImage
+      ? firstImage.getBoundingClientRect().width + 20
+      : 220;
+    offsetRef.current += direction * step;
+    paintOffset();
+  };
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
@@ -316,14 +348,48 @@ export default function AltHomeGalleryCarousel({
       ref={sectionRef}
       className="ob-canvas relative z-10 overflow-hidden bg-white py-12 text-[#05070B] sm:py-16"
     >
+      <div className="mx-auto mb-5 flex max-w-[1600px] flex-wrap items-center justify-between gap-3 px-5">
+        <p className="text-xs font-black uppercase tracking-widest">
+          Around The Owner&apos;s Box
+        </p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            aria-controls={galleryId}
+            onClick={() => browse(-1)}
+            className="min-h-11 rounded-full border-2 border-[#05070B] px-4 text-xs font-bold"
+          >
+            Previous photos
+          </button>
+          {!prefersReducedMotion && (
+            <button
+              type="button"
+              aria-controls={galleryId}
+              onClick={() => setPaused(!paused)}
+              className="min-h-11 rounded-full border-2 border-[#05070B] px-4 text-xs font-bold"
+            >
+              {paused ? "Play gallery" : "Pause gallery"}
+            </button>
+          )}
+          <button
+            type="button"
+            aria-controls={galleryId}
+            onClick={() => browse(1)}
+            className="min-h-11 rounded-full border-2 border-[#05070B] px-4 text-xs font-bold"
+          >
+            Next photos
+          </button>
+        </div>
+      </div>
       <div className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-white to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-white to-transparent" />
 
         <div
           ref={trackRef}
+          id={galleryId}
           role="region"
-          aria-label="Photo gallery. Click and drag horizontally to browse."
+          aria-label="Photo gallery. Use the photo buttons or drag horizontally to browse."
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
@@ -336,6 +402,9 @@ export default function AltHomeGalleryCarousel({
           {carouselImages.map((image, index) => (
             <div
               key={`${image.src}-${index}`}
+              aria-hidden={
+                index >= carouselImages.length / 2 ? true : undefined
+              }
               className={
                 image.shape === "tall"
                   ? "relative h-72 w-48 shrink-0 overflow-hidden rounded-[28px] border-2 border-[#D4AF37]/20 bg-[#171713] sm:h-[390px] sm:w-64 2xl:h-[460px] 2xl:w-80"
@@ -344,11 +413,13 @@ export default function AltHomeGalleryCarousel({
             >
               <Image
                 src={image.src}
-                alt={image.alt}
+                alt={index >= carouselImages.length / 2 ? "" : image.alt}
                 fill
                 draggable={false}
                 className={`pointer-events-none object-cover ${
-                  isDragging ? "" : "transition-transform duration-700 hover:scale-105"
+                  isDragging
+                    ? ""
+                    : "transition-transform duration-700 hover:scale-105"
                 }`}
                 sizes="(max-width: 768px) 200px, (max-width: 1536px) 260px, 320px"
                 onLoad={measureLoopWidth}

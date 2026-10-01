@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "test:privacy": "node --test tests/privacy-hardening.test.cjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
 import { Tv, Users, UtensilsCrossed } from "lucide-react";
@@ -54,9 +55,16 @@ export default function PrivateEventsPage() {
                 Starts Here
               </h1>
               <p className="mt-5 max-w-xl text-sm font-semibold leading-relaxed text-white/78 sm:text-base">
-                Bring the crew for birthdays, watch parties, fantasy draft nights, and Greenville nights
-                out. We handle the screens, food, and room energy.
+                Bring the crew for birthdays, watch parties, fantasy draft
+                nights, and Greenville nights out. We handle the screens, food,
+                and room energy.
               </p>
+              <Link
+                href="/locations#contact"
+                className="mt-5 inline-flex min-h-11 items-center rounded-full border-2 border-white bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest text-[#05070B] transition-transform hover:-translate-y-0.5"
+              >
+                Inquire about your event
+              </Link>
             </div>
           </div>
         </div>
@@ -83,7 +91,10 @@ export default function PrivateEventsPage() {
               </p>
               <div className="grid gap-4">
                 {eventFeatures.map(({ icon: Icon, title, text }) => (
-                  <div key={title} className="flex gap-4 rounded-2xl border border-white/10 p-5">
+                  <div
+                    key={title}
+                    className="flex gap-4 rounded-2xl border border-white/10 p-5"
+                  >
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white text-[#05070B]">
                       <Icon className="h-5 w-5" />
                     </div>
@@ -91,7 +102,9 @@ export default function PrivateEventsPage() {
                       <h2 className="mb-2 text-sm font-black uppercase tracking-widest text-white">
                         {title}
                       </h2>
-                      <p className="text-sm font-semibold leading-relaxed text-white/62">{text}</p>
+                      <p className="text-sm font-semibold leading-relaxed text-white/62">
+                        {text}
+                      </p>
                     </div>
                   </div>
                 ))}

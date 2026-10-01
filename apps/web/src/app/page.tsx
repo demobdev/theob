@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import AltHomeGoodTimes from "@/components/home-alt/AltHomeGoodTimes";
+import FeaturedMenuHighlights from "@/components/menu/FeaturedMenuHighlights";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import AltHomeHero from "@/components/home-alt/AltHomeHero";
 import AltHomeShopCollection from "@/components/home-alt/AltHomeShopCollection";
@@ -47,6 +48,7 @@ export default function Home() {
         className="ob-canvas hidden bg-white md:block md:h-[8vh] lg:h-[10vh]"
       />
       <AltHomeGoodTimes />
+      <FeaturedMenuHighlights />
       <AltHomeStackedCards />
       <div
         aria-hidden="true"

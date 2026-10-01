@@ -3,6 +3,7 @@ import Image from "next/image";
 import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import MenuPdfViewer from "@/components/menu/MenuPdfViewer";
+import FeaturedMenuHighlights from "@/components/menu/FeaturedMenuHighlights";
 
 const AltHomeGalleryCarousel = dynamic(
   () => import("@/components/home-alt/AltHomeGalleryCarousel"),
@@ -43,7 +44,10 @@ export default function MenuPdfPage() {
         </div>
       </section>
 
-      <MenuPdfViewer />
+      <FeaturedMenuHighlights />
+      <div id="full-menu" className="scroll-mt-8">
+        <MenuPdfViewer />
+      </div>
 
       <div className="ob-canvas bg-white px-4 pt-4 sm:px-6">
         <div className="mx-auto max-w-[1600px]">
