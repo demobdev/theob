@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AltHomeHeader from "@/components/home-alt/AltHomeHeader";
 import AltHomeFooter from "@/components/home-alt/AltHomeFooter";
+import { OB_HOURS } from "@/lib/storeLocation";
 
 export const metadata = {
   title: "FAQ | The Owner's Box",
@@ -10,7 +11,7 @@ export const metadata = {
 const faqs = [
   {
     q: "What are your hours?",
-    a: "Mon · Wed · Fri: 4 PM – Midnight. Thu · Sat: 11:30 AM – Midnight. Sun: 10 AM – Midnight. Sunday brunch runs 10 AM – 2 PM. Kitchen hours may vary on holidays — call ahead or visit our location page.",
+    a: `${OB_HOURS.lines.join(". ")}. Sunday brunch runs 10 AM – 2 PM. Kitchen hours may vary on holidays — call ahead or visit our location page.`,
   },
   {
     q: "Where are you located?",

@@ -19,14 +19,14 @@ export const OB_ADDRESS = {
 /** Display + schema hours — verify against Google Business Profile when they change. */
 export const OB_HOURS = {
   lines: [
-    "Mon · Wed · Fri: 4 PM – Midnight",
-    "Thu · Sat: 11:30 AM – Midnight",
+    "Mon–Wed · Fri: 4 PM – Midnight",
+    "Thu · Sat: 11 AM – Midnight",
     "Sun: 10 AM – Midnight",
   ],
   brunch: "Sunday Brunch: 10 AM – 2 PM",
   schema: [
-    { days: ["Monday", "Wednesday", "Friday"], opens: "16:00", closes: "00:00" },
-    { days: ["Thursday", "Saturday"], opens: "11:30", closes: "00:00" },
+    { days: ["Monday", "Tuesday", "Wednesday", "Friday"], opens: "16:00", closes: "00:00" },
+    { days: ["Thursday", "Saturday"], opens: "11:00", closes: "00:00" },
     { days: ["Sunday"], opens: "10:00", closes: "00:00" },
   ],
 } as const;
