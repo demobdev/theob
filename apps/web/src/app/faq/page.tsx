@@ -8,10 +8,31 @@ export const metadata = {
   description: "Hours, ordering, location, private events, and common questions about The Owner's Box.",
 };
 
+const confirmedVisitFaqs = [
+  { q: "What time does the kitchen close?", a: "The kitchen closes at 11 PM." },
+  { q: "How does seating work?", a: "Seating is first come, first served." },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://ownersboxgvl.com/faq#faq",
+  url: "https://ownersboxgvl.com/faq",
+  about: { "@id": "https://ownersboxgvl.com/#restaurant" },
+  mainEntity: confirmedVisitFaqs.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
+
 const faqs = [
   {
     q: "What are your hours?",
     a: `${OB_HOURS.lines.join(". ")}. Sunday brunch runs 10 AM – 2 PM. Kitchen hours may vary on holidays — call ahead or visit our location page.`,
+  },
+  {
+    ...confirmedVisitFaqs[0],
   },
   {
     q: "Where are you located?",
@@ -42,6 +63,9 @@ const faqs = [
     a: "Wall-to-wall screens and NFL Sunday Ticket at the bar. Ask the team when you arrive or mention your matchup when booking a private event.",
   },
   {
+    ...confirmedVisitFaqs[1],
+  },
+  {
     q: "Do you host private events?",
     a: "Yes — groups and watch parties. Visit our Private Events page or contact us through the form on our Locations page.",
   },
@@ -62,6 +86,10 @@ const faqs = [
 export default function FaqPage() {
   return (
     <main className="ob-theme-root ob-force-light min-h-screen bg-white text-[#05070B]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
+      />
       <AltHomeHeader />
 
       <section className="ob-canvas bg-white px-4 py-16 sm:px-6 sm:py-20">
