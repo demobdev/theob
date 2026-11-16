@@ -27,7 +27,7 @@ const firstHeroSlide: HeroSlide = {
   id: "bar",
   label: "Pull Up & Stay Awhile",
   heading: "Nothing But Good Times",
-  subheading: "Walk in for one round. Stay for the kind of night you talk about tomorrow.",
+  subheading: "Catch the game at our Greenville, SC sports bar on Woodruff Road. Settle in for wall-to-wall screens, jumbo wings, and scratch-made pizza.",
   ctaHref: orderUrl,
   ctaLabel: "Order Now",
   image: "/images/atmosphere/IMGL6884.jpg",
