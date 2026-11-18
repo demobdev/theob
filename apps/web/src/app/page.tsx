@@ -83,6 +83,14 @@ export default function Home() {
           <p className="mt-5 text-base leading-relaxed text-white/85">
             Contact The Owners Box before you visit to confirm any game coverage or arrangements you need.
           </p>
+          <div id="late-dinner" className="mt-8 border-t border-white/20 pt-6">
+            <h3 className="font-montserrat text-xl font-bold">
+              Late dinner and game-day seating
+            </h3>
+            <p className="mt-2 text-base leading-relaxed text-white/85">
+              Watching a game at The Owners Box? Our kitchen closes at 11 PM, and seating is first come, first served. Find us on Woodruff Road in Greenville.
+            </p>
+          </div>
         </div>
       </section>
       <AltHomeShopCollection />
