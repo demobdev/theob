@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { MERCH_PATHS } from "@/lib/shop/merch";
 import {
   formatShopifyPrice,
   getShopifyProducts,
@@ -11,7 +13,7 @@ import AltHomeShopCarousel, {
 const FALLBACK_PRODUCTS: ShopCarouselItem[] = [
   {
     id: "fallback-crew-tee",
-    title: "The OB Crew Tee",
+    title: "Woodruff Road Tee",
     description:
       "Black cotton tee with gold chest logo - Greenville on the tag.",
     imageUrl: "/images/ob-crew-tee-tp.png",
@@ -24,7 +26,7 @@ const FALLBACK_PRODUCTS: ShopCarouselItem[] = [
 function toCarouselItem(product: ShopifyProduct): ShopCarouselItem {
   return {
     id: product.id,
-    title: product.title,
+    title: "Woodruff Road Tee",
     description: product.description.trim() || "Official Owner's Box merch.",
     imageUrl: product.imageUrl ?? "/images/ob-crew-tee-tp.png",
     imageAlt: product.imageAlt ?? product.title,
@@ -48,6 +50,23 @@ export default async function AltHomeShopCollection() {
         products={products}
         checkoutEnabled={isShopifyCheckoutEnabled()}
       />
+      <nav
+        aria-label="Explore Owners Box merch"
+        className="relative z-10 mx-auto mt-7 flex max-w-[1600px] flex-wrap gap-4"
+      >
+        <Link
+          href={MERCH_PATHS.shop}
+          className="inline-flex min-h-11 items-center rounded-full border-2 border-[#05070B] bg-[#05070B] px-5 py-3 text-xs font-black uppercase tracking-widest text-white"
+        >
+          Shop the Collection
+        </Link>
+        <Link
+          href={MERCH_PATHS.holiday}
+          className="inline-flex min-h-11 items-center rounded-full border-2 border-[#05070B] bg-white px-5 py-3 text-xs font-black uppercase tracking-widest text-[#05070B]"
+        >
+          The 2026 Holiday Drop
+        </Link>
+      </nav>
     </section>
   );
 }

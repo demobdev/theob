@@ -72,12 +72,14 @@ export default function AltHomeShopCarousel({
     selection?.productId === active.id
       ? active.variants.find((variant) => variant.id === selection.variantId)
       : undefined;
-  const priceLabel = selectedVariant
-    ? formatShopifyPrice(
-        selectedVariant.priceAmount,
-        selectedVariant.priceCurrency,
-      )
-    : active.priceLabel;
+  const priceLabel = !isLive
+    ? null
+    : selectedVariant
+      ? formatShopifyPrice(
+          selectedVariant.priceAmount,
+          selectedVariant.priceCurrency,
+        )
+      : active.priceLabel;
   const stockLabel = !isLive
     ? "Coming Soon"
     : selectedVariant

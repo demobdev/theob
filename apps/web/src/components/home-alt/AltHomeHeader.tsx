@@ -16,7 +16,7 @@ const navLinks = [
 
 const utilityLinks = [
   { label: "Careers", href: "/careers" },
-  { label: "Shop", href: "/#shop" },
+  { label: "Shop", href: "/shop" },
   { label: "Our Story", href: "/our-story" },
   { label: "Feedback", href: "/locations#contact" },
 ];

@@ -29,3 +29,16 @@ npm run build --workspace=web-app
 The regression suite mocks every Shopify request and uses the existing web TypeScript dependency. It covers unavailable first size with later sizes available, missing selection, variant changes, tee-only scope, pagination, empty/failing catalog, gate enforcement, fresh stock checks and incorrect cart responses. A build also needs the app's existing non-commerce environment, including a valid Clerk publishable-key configuration.
 
 The Storefront API is pinned to 2026-10; the previous 2024-10 endpoint was beyond its supported version window. Both generated operations have been schema-validated for 2026-10. Live Storefront channel access and Printful fulfillment still require merchant verification before launch.
+
+## Private merch route review
+
+- `/shop` is the permanent merch landing page: The Owners Box Merch.
+- `/shop/holiday` stays stable across seasons; the current heading is The 2026 Holiday Drop.
+- `/shop/woodruff-road-tee` is the evergreen customer-facing tee route. It maps conceptually to the existing Shopify `the-ob-crew-tee` handle; this patch does not rename or create a Shopify product.
+- All three URLs use production-path canonicals, `noindex, follow` metadata and a noindex shop layout. They remain excluded from `OB_MARKETING_ROUTES` and the sitemap. Do not add robots.txt disallows that prevent crawlers from seeing noindex.
+- These are draft previews with no offers, product/merchant structured data, price, stock, delivery promise or fabricated sweater photography. The existing restaurant JSON-LD remains inherited from the site layout.
+- The homepage collection and the desktop/mobile Shop navigation link to the permanent pages using server-rendered anchors.
+- The homepage tee size picker remains behind `SHOPIFY_CHECKOUT_ENABLED`; draft state now also hides its price. No fit-specific extra SKU is published by these routes.
+- Before a separate authorized launch, verify the approved artwork, actual tee fits, real knit garment, final prices, channel publication and fulfillment. Then intentionally review removal of noindex, sitemap inclusion and truthful Product/Offer/variant structured data for purchasable items. Keep unready products in draft and noindex.
+
+Canonical/noindex implementation follows the Next.js Metadata API and Google noindex guidance: https://nextjs.org/docs/app/api-reference/functions/generate-metadata and https://developers.google.com/search/docs/crawling-indexing/block-indexing .
