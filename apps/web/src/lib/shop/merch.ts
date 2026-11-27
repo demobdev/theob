@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 export const MERCH_PATHS = {
   shop: "/shop",
   holiday: "/shop/holiday",
-  tee: "/shop/woodruff-road-tee",
 } as const;
 
 // Review URLs always canonicalize to the permanent production route, never localhost or a preview host.
