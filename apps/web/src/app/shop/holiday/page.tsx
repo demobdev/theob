@@ -53,9 +53,6 @@ export default function HolidayShopPage() {
         </div>
       </article>
       <div className="mt-10 flex flex-wrap gap-4">
-        <Link href={MERCH_PATHS.tee} className={merchLinkClass}>
-          Meet the Woodruff Road Tee
-        </Link>
         <Link href={MERCH_PATHS.shop} className={merchLinkClass}>
           All Owners Box merch
         </Link>
