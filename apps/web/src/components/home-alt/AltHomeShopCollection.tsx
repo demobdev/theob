@@ -1,72 +1,42 @@
+import Image from "next/image";
 import Link from "next/link";
-import {
-  formatShopifyPrice,
-  getShopifyProducts,
-  isShopifyConfigured,
-  type ShopifyProduct,
-} from "@/lib/shopify/storefront";
-import AltHomeShopCarousel, { type ShopCarouselItem } from "./AltHomeShopCarousel";
+import { MERCH_PATHS } from "@/lib/shop/merch";
+import { merchLinkClass } from "@/components/shop/MerchPageFrame";
 
-const FALLBACK_PRODUCTS: ShopCarouselItem[] = [
-  {
-    id: "fallback-crew-tee",
-    title: "The OB Crew Tee",
-    description: "Black cotton tee with gold chest logo — Greenville on the tag.",
-    imageUrl: "/images/ob-crew-tee-tp.png",
-    imageAlt: "Black Owner's Box crew shirt with gold chest logo",
-    priceLabel: null,
-    variantId: null,
-    availableForSale: false,
-  },
-  {
-    id: "fallback-quarter-zip",
-    title: "The OB Quarter Zip",
-    description: "Black quarter-zip pullover with Owner's Box branding.",
-    imageUrl: "/images/ob-crew-tee-tp.png",
-    imageAlt: "Owner's Box quarter zip pullover",
-    priceLabel: null,
-    variantId: null,
-    availableForSale: false,
-  },
-];
-
-function toCarouselItem(product: ShopifyProduct): ShopCarouselItem {
-  return {
-    id: product.id,
-    title: product.title,
-    description: product.description.trim() || "Official Owner's Box merch.",
-    imageUrl: product.imageUrl ?? "/images/ob-crew-tee-tp.png",
-    imageAlt: product.imageAlt ?? product.title,
-    priceLabel: formatShopifyPrice(product.priceAmount, product.priceCurrency),
-    variantId: product.variantId,
-    availableForSale: product.availableForSale,
-  };
-}
-
-export default async function AltHomeShopCollection() {
-  let products: ShopCarouselItem[] = FALLBACK_PRODUCTS;
-
-  if (isShopifyConfigured()) {
-    try {
-      const fromShopify = await getShopifyProducts();
-      if (fromShopify.length > 0) {
-        products = fromShopify.map(toCarouselItem);
-      }
-    } catch {
-      products = FALLBACK_PRODUCTS;
-    }
-  }
-
+export default function AltHomeShopCollection() {
   return (
     <section
       id="shop"
+      aria-labelledby="home-shop-title"
       className="ob-canvas relative z-20 scroll-mt-28 bg-white px-4 pb-20 pt-16 text-[#05070B] sm:px-6 sm:pb-24 sm:pt-20"
     >
-      <AltHomeShopCarousel products={products} />
-      <div className="mx-auto mt-6 max-w-[1440px]">
-        <Link href="/shop" className="inline-flex min-h-11 items-center rounded-full border-2 border-[#05070B] px-5 py-3 text-xs font-black uppercase tracking-widest hover:bg-[#05070B] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4">
-          Explore the 2026 Drops
-        </Link>
+      <div className="ob-surface ob-surface-light relative z-10 mx-auto grid max-w-[1600px] items-center gap-10 rounded-[28px] border border-[#05070B]/8 bg-white p-6 shadow-[0_24px_90px_rgba(0,0,0,0.12)] md:grid-cols-[0.9fr_1.1fr] md:p-12 xl:p-16">
+        <div>
+          <p className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-[#05070B]/65">
+            2026 Drops · The GVL Collection
+          </p>
+          <h2 id="home-shop-title" className="font-montserrat text-5xl font-black uppercase leading-[0.85] tracking-[-0.08em] sm:text-7xl">
+            Shop The<br />Collection
+          </h2>
+          <h3 className="mt-6 font-montserrat text-xl font-black uppercase">OB Premium Crew Tee</h3>
+          <p className="mt-2 max-w-md text-sm font-semibold leading-relaxed text-[#05070B]/70">
+            Heavyweight black cotton with a gold chest crest and GVL on the back.
+          </p>
+          <p className="mt-4 font-bold">$40 <span className="ml-2 text-xs text-[#05070B]/70">· S–4XL</span></p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href={MERCH_PATHS.shop} className={merchLinkClass}>Explore the 2026 Drops</Link>
+            <Link href="/shop/ob-premium-crew-tee" className={merchLinkClass}>View the tee</Link>
+          </div>
+        </div>
+        <div className="relative mx-auto aspect-square w-full max-w-xl overflow-hidden rounded-[24px] bg-[#F4F1E9]">
+          <Image
+            src="/images/ob-premium-crew-front.png"
+            alt="Black premium tee with gold OB left-chest crest"
+            fill
+            className="object-contain p-5"
+            sizes="(max-width: 768px) 90vw, 560px"
+          />
+        </div>
       </div>
     </section>
   );
