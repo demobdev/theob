@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   formatShopifyPrice,
   getShopifyProducts,
@@ -62,6 +63,11 @@ export default async function AltHomeShopCollection() {
       className="ob-canvas relative z-20 scroll-mt-28 bg-white px-4 pb-20 pt-16 text-[#05070B] sm:px-6 sm:pb-24 sm:pt-20"
     >
       <AltHomeShopCarousel products={products} />
+      <div className="mx-auto mt-6 max-w-[1440px]">
+        <Link href="/shop" className="inline-flex min-h-11 items-center rounded-full border-2 border-[#05070B] px-5 py-3 text-xs font-black uppercase tracking-widest hover:bg-[#05070B] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4">
+          Explore the 2026 Drops
+        </Link>
+      </div>
     </section>
   );
 }
