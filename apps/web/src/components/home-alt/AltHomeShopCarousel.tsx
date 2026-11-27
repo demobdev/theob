@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import AltHomeShopBuyButton from "./AltHomeShopBuyButton";
 import { cn } from "@/lib/utils";
+import type { ShopifyVariant } from "@/lib/shopify/storefront";
+import { formatShopifyPrice } from "@/lib/shopify/pricing";
 
 export type ShopCarouselItem = {
   id: string;
@@ -14,16 +16,23 @@ export type ShopCarouselItem = {
   imageUrl: string;
   imageAlt: string;
   priceLabel: string | null;
-  variantId: string | null;
-  availableForSale: boolean;
+  variants: ShopifyVariant[];
 };
 
 type Props = {
   products: ShopCarouselItem[];
+  checkoutEnabled?: boolean;
 };
 
-export default function AltHomeShopCarousel({ products }: Props) {
+export default function AltHomeShopCarousel({
+  products,
+  checkoutEnabled = false,
+}: Props) {
   const [index, setIndex] = useState(0);
+  const [selection, setSelection] = useState<{
+    productId: string;
+    variantId: string;
+  } | null>(null);
   const count = products.length;
   const active = products[index] ?? products[0];
 
@@ -42,6 +51,12 @@ export default function AltHomeShopCarousel({ products }: Props) {
     if (!active) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        target.closest("select, input, textarea, button, a")
+      )
+        return;
       if (event.key === "ArrowRight") goNext();
       if (event.key === "ArrowLeft") goPrev();
     };
@@ -52,7 +67,26 @@ export default function AltHomeShopCarousel({ products }: Props) {
 
   if (!active) return null;
 
-  const isLive = Boolean(active.availableForSale && active.variantId);
+  const isLive = checkoutEnabled && active.variants.length > 0;
+  const selectedVariant =
+    selection?.productId === active.id
+      ? active.variants.find((variant) => variant.id === selection.variantId)
+      : undefined;
+  const priceLabel = selectedVariant
+    ? formatShopifyPrice(
+        selectedVariant.priceAmount,
+        selectedVariant.priceCurrency,
+      )
+    : active.priceLabel;
+  const stockLabel = !isLive
+    ? "Coming Soon"
+    : selectedVariant
+      ? selectedVariant.availableForSale
+        ? "Available to order"
+        : "Sold out"
+      : active.variants.some((variant) => variant.availableForSale)
+        ? "Choose a size"
+        : "Sold out";
   const hasMultiple = count > 1;
 
   return (
@@ -69,14 +103,64 @@ export default function AltHomeShopCarousel({ products }: Props) {
         <p className="mt-6 max-w-md text-sm font-semibold leading-relaxed text-[#05070B]/70">
           {active.description}
         </p>
-        {active.priceLabel ? (
+        {priceLabel ? (
           <p className="mt-4 font-montserrat text-3xl font-black uppercase tracking-tight text-[#05070B]">
-            {active.priceLabel}
+            {priceLabel}
           </p>
         ) : null}
+        {isLive ? (
+          <div className="mt-6 max-w-xs">
+            <label
+              htmlFor="shop-size"
+              className="block text-xs font-black uppercase tracking-widest"
+            >
+              Size
+            </label>
+            <select
+              id="shop-size"
+              value={selectedVariant?.id ?? ""}
+              onChange={(event) =>
+                setSelection({
+                  productId: active.id,
+                  variantId: event.target.value,
+                })
+              }
+              aria-describedby="shop-stock"
+              className="mt-2 min-h-11 w-full rounded-xl border-2 border-[#05070B]/25 bg-white px-3 py-2 text-sm font-semibold text-[#05070B]"
+            >
+              <option value="">Choose a size</option>
+              {active.variants.map((variant) => (
+                <option key={variant.id} value={variant.id}>
+                  {variant.selectedOptions
+                    .map((option) => option.value)
+                    .join(" / ") || variant.title}
+                  {variant.availableForSale ? "" : " — Sold out"}
+                </option>
+              ))}
+            </select>
+            <p
+              id="shop-stock"
+              role="status"
+              className="mt-2 text-xs font-semibold text-[#05070B]/70"
+            >
+              {stockLabel}
+            </p>
+          </div>
+        ) : null}
         <div className="mt-7 flex flex-wrap gap-3">
-          {isLive && active.variantId ? (
-            <AltHomeShopBuyButton variantId={active.variantId} />
+          {isLive ? (
+            <AltHomeShopBuyButton
+              key={selectedVariant?.id ?? active.id}
+              variantId={selectedVariant?.id ?? null}
+              disabled={!selectedVariant?.availableForSale}
+              label={
+                selectedVariant
+                  ? selectedVariant.availableForSale
+                    ? "Shop Now"
+                    : "Sold out"
+                  : "Choose a size"
+              }
+            />
           ) : (
             <button
               type="button"
@@ -105,7 +189,11 @@ export default function AltHomeShopCarousel({ products }: Props) {
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <div className="flex items-center gap-2" role="tablist" aria-label="Shop products">
+            <div
+              className="flex items-center gap-2"
+              role="tablist"
+              aria-label="Shop products"
+            >
               {products.map((product, dotIndex) => (
                 <button
                   key={product.id}
@@ -176,7 +264,7 @@ export default function AltHomeShopCarousel({ products }: Props) {
               {active.title}
             </p>
             <span className="rounded-full border-2 border-[#05070B] px-3 py-1 text-[8px] font-black uppercase tracking-widest">
-              {isLive ? "In stock" : "Coming Soon"}
+              {stockLabel}
             </span>
           </div>
         </div>

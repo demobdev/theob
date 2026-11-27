@@ -16,7 +16,8 @@
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore"
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore",
+    "test:shopify": "node scripts/test-shopify.mjs"
   },
   "devDependencies": {
     "@clerk/clerk-react": "5.57.1",
