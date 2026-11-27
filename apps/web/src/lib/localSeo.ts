@@ -42,6 +42,7 @@ export const OB_MARKETING_ROUTES = [
   "/locations",
   "/our-story",
   "/private-events",
+  "/whats-on-this-week",
   "/faq",
   "/careers",
   "/privacy",
