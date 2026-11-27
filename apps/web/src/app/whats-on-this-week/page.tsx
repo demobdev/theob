@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const visitLinks = [
   { href: "/menu", label: "Menu" },
-  { href: "/locations", label: "Location and directions" },
+  { href: "/locations", label: "Get directions to The Owners Box" },
   { href: "/private-events", label: "Group events" },
 ];
 
