@@ -1,12 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import MerchPageFrame, { merchLinkClass } from "@/components/shop/MerchPageFrame";
-import { KnitCard, TeeCard } from "@/components/shop/MerchCards";
+import { KnitCard } from "@/components/shop/MerchCards";
 import { merchMetadata, MERCH_PATHS } from "@/lib/shop/merch";
 
 export const metadata = merchMetadata(
   "2026 Drops | The Owners Box Merch",
-  "Explore the 2026 Drops from The Owners Box in Greenville, SC: the OB Premium Crew Tee, the Woodruff Road Tee, and our first holiday knit.",
+  "Explore the 2026 Drops from The Owners Box in Greenville, SC: the OB Premium Crew Tee and our first holiday knit.",
   MERCH_PATHS.shop,
 );
 
@@ -27,7 +27,7 @@ export default function ShopPage() {
       </section>
       <section aria-labelledby="more-merch">
         <h2 id="more-merch" className="mb-5 font-montserrat text-2xl font-black uppercase">More from The Owners Box</h2>
-        <div className="grid gap-6 md:grid-cols-2"><TeeCard /><KnitCard /></div>
+        <KnitCard />
       </section>
     </MerchPageFrame>
   );
